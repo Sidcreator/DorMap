@@ -1,0 +1,12 @@
+# Ignore everything except versioned plan files
+/*
+!/План_СистемаДорожныхКарт_v*.md
+!/Архив
+/Архив/*
+!/Архив/План_СистемаДорожныхКарт_v*.md
+!/0
+/0/*
+!/0/План_СистемаДорожныхКарт_v*.md
+
+# Keep .gitignore itself tracked
+!.gitignore
