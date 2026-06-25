@@ -8,6 +8,7 @@
 /0/*
 !/0/План_СистемаДорожныхКарт_v*.md
 
-# Keep .gitignore and README tracked
+# Keep .gitignore, README and changelog tracked
 !.gitignore
 !/README.md
+!/Новое в ДорожнойКарте_v*.md
