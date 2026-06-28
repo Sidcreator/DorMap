@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Дорожная карта проекта УОТ КОРП</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background: #f0f2f5; }
+        h1 { color: #1a237e; border-bottom: 3px solid #3f51b5; padding-bottom: 12px; margin-bottom: 5px; }
+        h2 { color: #3f51b5; margin-top: 30px; border-left: 4px solid #3f51b5; padding-left: 12px; }
+        h3 { color: #555; margin-top: 20px; }
+        .meta { color: #666; font-size: 14px; margin-bottom: 20px; }
+
+        /* Сводная таблица */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin: 20px 0; }
+        .task-card { background: white; border-radius: 10px; padding: 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); border-left: 5px solid #ccc; transition: transform 0.2s; }
+        .task-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+        .task-card .task-num { font-size: 32px; font-weight: bold; color: #333; }
+        .task-card .task-title { font-size: 15px; font-weight: 600; margin: 8px 0 5px; color: #222; }
+        .task-card .task-meta { font-size: 12px; color: #888; }
+        .task-card .task-progress { height: 6px; background: #e0e0e0; border-radius: 3px; margin-top: 10px; }
+        .task-card .task-progress-bar { height: 100%; border-radius: 3px; transition: width 0.5s; }
+
+        /* Статусы */
+        .status-active { border-left-color: #2196f3; }
+        .status-done { border-left-color: #4caf50; }
+        .status-deferred { border-left-color: #9e9e9e; }
+        .progress-done { background: #4caf50; }
+        .progress-active { background: #2196f3; }
+        .progress-zero { background: #e0e0e0; }
+
+        /* Канбан */
+        .kanban { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 20px 0; }
+        .kanban-col { background: white; border-radius: 8px; padding: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .kanban-col h4 { margin: 0 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .kanban-item { background: #f5f5f5; border-radius: 6px; padding: 8px 10px; margin-bottom: 6px; font-size: 13px; }
+        .kanban-plan { border-top: 3px solid #9e9e9e; }
+        .kanban-analysis { border-top: 3px solid #ff9800; }
+        .kanban-dev { border-top: 3px solid #2196f3; }
+        .kanban-test { border-top: 3px solid #9c27b0; }
+        .kanban-done { border-top: 3px solid #4caf50; }
+
+        /* Таблицы */
+        table { border-collapse: collapse; width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-size: 13px; margin: 10px 0 20px; }
+        th { background: #3f51b5; color: white; padding: 10px 12px; text-align: left; position: sticky; top: 0; }
+        td { padding: 8px 12px; border-bottom: 1px solid #e8e8e8; }
+        tr:hover { background: #f5f7ff; }
+        .center { text-align: center; }
+
+        /* Статусы в ячейках */
+        .st-done { color: #4caf50; font-weight: bold; }
+        .st-active { color: #2196f3; font-weight: bold; }
+        .st-pending { color: #9e9e9e; }
+        .st-progress { color: #ff9800; font-weight: bold; }
+
+        /* Секции */
+        .section { background: white; border-radius: 10px; padding: 20px; margin: 15px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .section-icon { font-size: 24px; }
+        .section-title { font-size: 18px; font-weight: 600; color: #333; }
+
+        /* Навигация */
+        .nav { background: #1a237e; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; }
+        .nav a { color: white; text-decoration: none; font-size: 13px; padding: 4px 10px; border-radius: 4px; }
+        .nav a:hover { background: rgba(255,255,255,0.15); }
+
+        /* Протокол */
+        .protocol-table td:first-child { font-family: 'Consolas', monospace; font-size: 12px; white-space: nowrap; }
+
+        @media (max-width: 768px) {
+            .kanban { grid-template-columns: 1fr 1fr; }
+            .summary-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<h1>🗺️ Дорожная карта проекта УОТ КОРП</h1>
+<div class="meta">
+    Централизованная система управления задачами проекта «Управление Онлайн Торговлей» для КОРП<br>
+    Дата формирования: 2026-05-28
+</div>
+
+<div class="nav">
+    <a href="#summary">📋 Сводка</a>
+    <a href="#kanban">📊 Канбан</a>
+    <a href="#task1">🔧 Задача 1</a>
+    <a href="#task2">✅ Задача 2</a>
+    <a href="#task3">🔧 Задача 3</a>
+    <a href="#task4">🔧 Задача 4</a>
+    <a href="#task5">🔧 Задача 5</a>
+    <a href="#done">✅ Выполненные</a>
+    <a href="#protocol">📝 Протокол</a>
+</div>
+
+<!-- СВОДНАЯ ТАБЛИЦА -->
+<div class="section" id="summary">
+    <div class="section-header">
+        <span class="section-icon">📋</span>
+        <span class="section-title">Сводная таблица задач (Уровень 1)</span>
+    </div>
+
+    <div class="summary-grid">
+        <div class="task-card status-active">
+            <div class="task-num">1</div>
+            <div class="task-title">Внедрение процесса работы заказов Ozon в УОТКОРП</div>
+            <div class="task-meta">P1 · ⭐⭐⭐⭐ · 10 этапов · Начало: 2026-05-19</div>
+            <div class="task-progress"><div class="task-progress-bar progress-zero" style="width: 0%"></div></div>
+            <div class="task-meta" style="margin-top:5px">0% · 🔧 В работе</div>
+        </div>
+        <div class="task-card status-done">
+            <div class="task-num">2</div>
+            <div class="task-title">Сравнительный анализ расширений и тестов УОТ</div>
+            <div class="task-meta">P1 · ⭐⭐⭐⭐ · 10 этапов · 2026-05-22</div>
+            <div class="task-progress"><div class="task-progress-bar progress-done" style="width: 100%"></div></div>
+            <div class="task-meta" style="margin-top:5px">100% · ✅ Завершена</div>
+        </div>
+        <div class="task-card status-active">
+            <div class="task-num">3</div>
+            <div class="task-title">Внедрение управления поставками FBO Ozon в УОТКОРП</div>
+            <div class="task-meta">P1 · ⭐⭐⭐⭐ · 8 этапов · Начало: 2026-05-22</div>
+            <div class="task-progress"><div class="task-progress-bar progress-zero" style="width: 0%"></div></div>
+            <div class="task-meta" style="margin-top:5px">0% · 🔧 В работе</div>
+        </div>
+        <div class="task-card status-active">
+            <div class="task-num">4</div>
+            <div class="task-title">Сверка API-методов Wildberries в УОТКОРП и тестах</div>
+            <div class="task-meta">P1 · ⭐⭐⭐ · 7 этапов · Начало: 2026-05-26</div>
+            <div class="task-progress"><div class="task-progress-bar progress-zero" style="width: 0%"></div></div>
+            <div class="task-meta" style="margin-top:5px">0% · 🔧 В работе</div>
+        </div>
+        <div class="task-card status-active">
+            <div class="task-num">5</div>
+            <div class="task-title">Анализ и отладка YU-тестов 76тест и КОРПтест</div>
+            <div class="task-meta">P1 · ⭐⭐⭐ · 8 этапов · Начало: 2026-05-26</div>
+            <div class="task-progress"><div class="task-progress-bar progress-active" style="width: 30%"></div></div>
+            <div class="task-meta" style="margin-top:5px">30% · 🔵 В работе</div>
+        </div>
+        <div class="task-card status-done">
+            <div class="task-num">6</div>
+            <div class="task-title">✅ Выполненные задачи (7 шт.)</div>
+            <div class="task-meta">6.1–6.7 · Базовая инфраструктура и анализ</div>
+            <div class="task-progress"><div class="task-progress-bar progress-done" style="width: 100%"></div></div>
+            <div class="task-meta" style="margin-top:5px">100% · ✅ Все завершены</div>
+        </div>
+    </div>
+</div>
+
+<!-- КАНБАН -->
+<div class="section" id="kanban">
+    <div class="section-header">
+        <span class="section-icon">📊</span>
+        <span class="section-title">Канбан-доска</span>
+    </div>
+    <div class="kanban">
+        <div class="kanban-col kanban-plan">
+            <h4>📋 Планируется</h4>
+            <div class="kanban-item" style="color:#999">—</div>
+        </div>
+        <div class="kanban-col kanban-analysis">
+            <h4>🔍 Анализ</h4>
+            <div class="kanban-item"><strong>4</strong> Сверка API WB</div>
+        </div>
+        <div class="kanban-col kanban-dev">
+            <h4>🔧 Разработка</h4>
+            <div class="kanban-item"><strong>1</strong> Заказы Ozon</div>
+            <div class="kanban-item"><strong>3</strong> Поставки FBO</div>
+        </div>
+        <div class="kanban-col kanban-test">
+            <h4>🧪 Тестирование</h4>
+            <div class="kanban-item"><strong>5</strong> YU-тесты</div>
+        </div>
+        <div class="kanban-col kanban-done">
+            <h4>✅ Готово</h4>
+            <div class="kanban-item"><strong>2</strong> Анализ (10 этапов)</div>
+            <div class="kanban-item"><strong>6.1–6.5</strong> Инфраструктура</div>
+            <div class="kanban-item"><strong>6.6</strong> Сравнение УОТКОРП/УОТ607</div>
+            <div class="kanban-item"><strong>6.7</strong> Недостающая функц.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ЗАДАЧА 1 -->
+<div class="section" id="task1">
+    <div class="section-header">
+        <span class="section-icon">🔧</span>
+        <span class="section-title">1. Внедрение процесса работы заказов Ozon в УОТКОРП</span>
+    </div>
+    <p style="color:#666; font-size:13px">Активная задача создана на основе результатов анализа 6.8. Цель — внедрить полный процесс работы заказов Ozon в УОТКОРП.</p>
+    <table>
+        <tr><th>№</th><th>Этап</th><th>Описание</th><th>Статус</th><th>Дата</th><th>Журнал</th></tr>
+        <tr><td class="center">1.1</td><td>Настройка коннектора Ozon</td><td>Внедрить ФормаНастройки, адаптировать под общий модуль КОРП, назначить DefaultForm</td><td class="st-pending">⬜</td><td class="center">2026-05-19</td><td>ПланыРазработки_1</td></tr>
+        <tr><td class="center">1.2</td><td>Авторизация</td><td>Настроить авторизацию Ozon через настройки КОРП и CommonModule</td><td class="st-pending">⬜</td><td class="center">2026-05-19</td><td>ПланыРазработки_1</td></tr>
+        <tr><td class="center">1.3</td><td>Загрузка товаров</td><td>Адаптировать загрузку товаров, свойств и категорий под КОРП-модель данных</td><td class="st-pending">⬜</td><td class="center">2026-05-19</td><td>ПланыРазработки_1</td></tr>
+        <tr><td class="center">1.4</td><td>Выгрузка каталога</td><td>Подготовить выгрузку остатков, цен, фото и габаритов в Ozon</td><td class="st-pending">⬜</td><td class="center">2026-05-19</td><td>ПланыРазработки_1</td></tr>
+        <tr><td class="center">1.5</td><td>Загрузка заказов</td><td>Загружать заказы Ozon в КОРП-регистры и документы без дублей</td><td class="st-pending">⬜</td><td class="center">2026-05-19</td><td>ПланыРазработки_1</td></tr>
+        <tr><td class="center">1.6</td><td>Обработка заказов</td><td>Обеспечить сборку, лист подбора, маркировку и подготовку к отгрузке</td><td class="st-pending">⬜</td><td class="center">2026-05-19</td><td>ПланыРазработки_1</td></tr>
+        <tr><td class="center">1.7</td><td>Отгрузка FBO</td><td>Внедрить ПоставкаФБО, ТипыСкладовСервиса, ФункцииСервиса, СтатусыПоставок</td><td class="st-pending">⬜</td><td class="center">2026-05-19</td><td>ПланыРазработки_1</td></tr>
+        <tr><td class="center">1.8</td><td>Обновление статусов</td><td>Синхронизировать статусы заказов и поставок Ozon с внутренними статусами КОРП</td><td class="st-pending">⬜</td><td class="center">2026-05-19</td><td>ПланыРазработки_1</td></tr>
+        <tr><td class="center">1.9</td><td>Возвраты</td><td>Обеспечить загрузку и обработку возвратов Ozon в КОРП-цепочке</td><td class="st-pending">⬜</td><td class="center">2026-05-19</td><td>ПланыРазработки_1</td></tr>
+        <tr><td class="center">1.10</td><td>Финансы</td><td>Довести цепочку до финансового закрытия: комиссии, скидки, сверка, отчёты</td><td class="st-pending">⬜</td><td class="center">2026-05-19</td><td>ПланыРазработки_1</td></tr>
+    </table>
+</div>
+
+<!-- ЗАДАЧА 2 -->
+<div class="section" id="task2">
+    <div class="section-header">
+        <span class="section-icon">✅</span>
+        <span class="section-title">2. Сравнительный анализ расширений и тестов УОТ</span>
+    </div>
+    <p style="color:#666; font-size:13px">Комплексный анализ различий между расширениями (УОТ607, УОТ609, УОТКОРП) и тестовыми расширениями (76тест, КОРПтест). Завершена 2026-05-22.</p>
+    <table>
+        <tr><th>№</th><th>Этап</th><th>Описание</th><th>Статус</th><th>Журнал</th></tr>
+        <tr><td class="center">2.1</td><td>Анализ различий УОТ607 и УОТ609</td><td>Сравнение двух базовых поставок: структура, объекты, модули</td><td class="st-done">✅</td><td>Отчёт_СравнениеУОТ607_УОТ609.md</td></tr>
+        <tr><td class="center">2.2</td><td>API Ozon: УОТ609 vs УОТКОРП</td><td>Анализ методов API Ozon, отчёт различий</td><td class="st-done">✅</td><td>Отчёт_API_УОТ609_vs_УОТКОРП.md</td></tr>
+        <tr><td class="center">2.3</td><td>API WB: УОТ609 vs УОТКОРП</td><td>Анализ методов API Wildberries</td><td class="st-done">✅</td><td>Отчёт_API_УОТ609_vs_УОТКОРП.md</td></tr>
+        <tr><td class="center">2.4</td><td>API Яндекс.Маркет: УОТ609 vs УОТКОРП</td><td>Анализ методов API Яндекс.Маркет</td><td class="st-done">✅</td><td>Отчёт_API_УОТ609_vs_УОТКОРП.md</td></tr>
+        <tr><td class="center">2.5</td><td>API Авито: УОТ609 vs УОТКОРП</td><td>Анализ методов API Авито</td><td class="st-done">✅</td><td>Отчёт_API_УОТ609_vs_УОТКОРП.md</td></tr>
+        <tr><td class="center">2.6</td><td>Анализ тестов 76тест и КОРПтест</td><td>Сравнение тестовых расширений: структура, модули, макеты, покрытие</td><td class="st-done">✅</td><td>Отчёт_Тесты_76тест_vs_КОРПтест.md</td></tr>
+        <tr><td class="center">2.7</td><td>API Ozon: 76тест vs КОРПтест</td><td>Анализ тестовых методов API Ozon</td><td class="st-done">✅</td><td>Отчёт_Тесты_76тест_vs_КОРПтест.md</td></tr>
+        <tr><td class="center">2.8</td><td>API WB: 76тест vs КОРПтест</td><td>Анализ тестовых методов API WB</td><td class="st-done">✅</td><td>Отчёт_Тесты_76тест_vs_КОРПтест.md</td></tr>
+        <tr><td class="center">2.9</td><td>API Яндекс.Маркет: 76тест vs КОРПтест</td><td>Анализ тестовых методов API Яндекс.Маркет</td><td class="st-done">✅</td><td>Отчёт_Тесты_76тест_vs_КОРПтест.md</td></tr>
+        <tr><td class="center">2.10</td><td>API Авито: 76тест vs КОРПтест</td><td>Анализ тестовых методов API Авито</td><td class="st-done">✅</td><td>Отчёт_Тесты_76тест_vs_КОРПтест.md</td></tr>
+    </table>
+</div>
+
+<!-- ЗАДАЧА 3 -->
+<div class="section" id="task3">
+    <div class="section-header">
+        <span class="section-icon">🔧</span>
+        <span class="section-title">3. Внедрение управления поставками FBO Ozon в УОТКОРП</span>
+    </div>
+    <p style="color:#666; font-size:13px">Критический пробел: 12 API-методов управления поставками FBO отсутствовали в УОТКОРП. API-эндпоинты перенесены в CommonModule, но макеты и формы ещё не созданы.</p>
+    <table>
+        <tr><th>№</th><th>Этап</th><th>Описание</th><th>Статус</th><th>Журнал</th></tr>
+        <tr><td class="center">3.1</td><td>Анализ кода FBO в УОТ609</td><td>Детальное изучение 12 методов поставок FBO в ObjectModule.bsl УОТ609</td><td class="st-pending">⬜</td><td>ПланыРазработки_3</td></tr>
+        <tr><td class="center">3.2</td><td>Перенос макетов FBO</td><td>Перенос макетов ПоставкаФБО, ТипыСкладовСервиса, ФункцииСервиса, перечисления СтатусыПоставок</td><td class="st-pending">⬜</td><td>ПланыРазработки_3</td></tr>
+        <tr><td class="center">3.3</td><td>API: Черновики поставок</td><td>Реализация 3 методов: СоздатьЧерновик, ПолучитьСтатус, ПолучитьТаймСлоты</td><td class="st-pending">⬜</td><td>ПланыРазработки_3</td></tr>
+        <tr><td class="center">3.4</td><td>API: Заявки на поставку</td><td>Реализация 4 методов: СписокЗаявок, ИнформацияПоЗаявке, СтатусСоздания, СписокНаСкладСервиса</td><td class="st-pending">⬜</td><td>ПланыРазработки_3</td></tr>
+        <tr><td class="center">3.5</td><td>API: Управление поставками</td><td>Реализация 4 методов: СоставПоставки, ОбновитьПоставку, ЗагрузитьИнформацию, ТоварныйСостав</td><td class="st-pending">⬜</td><td>ПланыРазработки_3</td></tr>
+        <tr><td class="center">3.6</td><td>API: Водители поставок</td><td>Реализация метода ПередатьДанныеОВодителеПоставкиВСервис</td><td class="st-pending">⬜</td><td>ПланыРазработки_3</td></tr>
+        <tr><td class="center">3.7</td><td>Обновление макета КомандыСервиса</td><td>Добавить новые команды поставок FBO в макет КомандыСервиса УОТКОРП</td><td class="st-pending">⬜</td><td>ПланыРазработки_3</td></tr>
+        <tr><td class="center">3.8</td><td>Интеграционное тестирование</td><td>Проверка всех 12 API-методов, формат запросов, обработка ответов и ошибок</td><td class="st-pending">⬜</td><td>ПланыРазработки_3</td></tr>
+    </table>
+</div>
+
+<!-- ЗАДАЧА 4 -->
+<div class="section" id="task4">
+    <div class="section-header">
+        <span class="section-icon">🔧</span>
+        <span class="section-title">4. Сверка API-методов Wildberries в УОТКОРП и тестах</span>
+    </div>
+    <p style="color:#666; font-size:13px">Детальная сверка 50 API-эндпоинтов Wildberries между УОТКОРП и тестовыми расширениями (КОРПтест, 76тест).</p>
+    <table>
+        <tr><th>№</th><th>Этап</th><th>Описание</th><th>Статус</th></tr>
+        <tr><td class="center">4.1</td><td>Сверка 33 совпадающих эндпоинтов</td><td>Проверка 33 ✅ API-эндпоинтов WB: идентичность реализации, параметры, обработка ответов</td><td class="st-pending">⬜</td></tr>
+        <tr><td class="center">4.2</td><td>Анализ 4 перенесённых эндпоинтов</td><td>Проверка 4 🔵 эндпоинтов: корректность переноса, новая структура CM/OM</td><td class="st-pending">⬜</td></tr>
+        <tr><td class="center">4.3</td><td>Анализ 6 новых эндпоинтов УОТКОРП</td><td>Изучение 6 🆕 эндпоинтов: аналитика, возвраты, реклама, чат — только в УОТКОРП</td><td class="st-pending">⬜</td></tr>
+        <tr><td class="center">4.4</td><td>Критический пробел: маркировка Честный ЗНАК</td><td>2 🔴 эндпоинта отсутствуют в УОТКОРП: api/v1/brands, api/v1/tags</td><td class="st-pending">⬜</td></tr>
+        <tr><td class="center">4.5</td><td>Пробел: claims, конфигуратор, история задач</td><td>4 🔴 эндпоинта: claims (2), конфигуратор (1), история задач (1)</td><td class="st-pending">⬜</td></tr>
+        <tr><td class="center">4.6</td><td>Сверка тестового покрытия</td><td>КОРПтест (20/50 = 40%), 76тест (22/50 = 44%) — проверка полноты тестов</td><td class="st-pending">⬜</td></tr>
+        <tr><td class="center">4.7</td><td>Итоговый отчёт сверки</td><td>Сводка результатов, рекомендации по доработке</td><td class="st-pending">⬜</td></tr>
+    </table>
+</div>
+
+<!-- ЗАДАЧА 5 -->
+<div class="section" id="task5">
+    <div class="section-header">
+        <span class="section-icon">🔧</span>
+        <span class="section-title">5. Анализ и отладка YU-тестов 76тест и КОРПтест</span>
+    </div>
+    <p style="color:#666; font-size:13px">Сравнительный анализ и отладка подсистемы YU-тестов (ЮТ + Мокито) в расширениях 76тест (УОТ609) и КОРПтест (УОТКОРП). Прогресс: 30%.</p>
+    <table>
+        <tr><th>№</th><th>Этап</th><th>Описание</th><th>Статус</th><th>Журнал</th></tr>
+        <tr><td class="center">5.1</td><td>Инвентаризация модулей YU-тестов</td><td>Сравнение: 76тест (МокитоОбучение, МокитоПерехват, МокитоПроверки, МокитоСлужебный) vs КОРПтест (CG_Online_UT_Мокито)</td><td class="st-pending">⬜</td><td>—</td></tr>
+        <tr><td class="center">5.2</td><td>Анализ макетов YU-тестов</td><td>Сравнение макетов: МокитоКомандСервиса, Mokito_Vanessa (только КОРПтест), MXL-шаблоны</td><td class="st-pending">⬜</td><td>—</td></tr>
+        <tr><td class="center">5.3</td><td>Анализ констант и настроек</td><td>76тест: 4 константы vs КОРПтест: 6 констант (+АдресКаталогаМакетов, ГенерироватьМакетыТестовыхДанных)</td><td class="st-pending">⬜</td><td>—</td></tr>
+        <tr><td class="center">5.4</td><td>Сравнение DataProcessor тестов</td><td>76тест: ЮТ инструменты vs КОРПтест: специализированные обработчики МП (Avito, Ozon, GS1, SSO)</td><td class="st-pending">⬜</td><td>—</td></tr>
+        <tr><td class="center">5.5</td><td>Анализ переопределяемых модулей</td><td>76тест: 16 переопределяемых модулей (ИнтеграцииССервисами*Переопределяемый) — проверка наличия аналогов в КОРПтест</td><td class="st-pending">⬜</td><td>—</td></tr>
+        <tr><td class="center">5.6</td><td>Отладка: запуск тестов</td><td>Запуск YU-тестов в обоих расширениях, выявление ошибок, анализ причин падений</td><td class="st-pending">⬜</td><td>—</td></tr>
+        <tr><td class="center">5.7</td><td>Итоговый отчёт</td><td>Сводка результатов, рекомендации по синхронизации тестовой базы</td><td class="st-pending">⬜</td><td>—</td></tr>
+        <tr><td class="center">5.8</td><td>Схема запуска тестов YU</td><td>Анализ архитектуры YU-тестов: порядок вызова методов, построение дерева тестов, логика создания и исполнения тестов</td><td class="st-active">🔧</td><td>Отчёт_СхемаЗапускаТестовYU.md</td></tr>
+    </table>
+</div>
+
+<!-- ВЫПОЛНЕННЫЕ ЗАДАЧИ -->
+<div class="section" id="done">
+    <div class="section-header">
+        <span class="section-icon">✅</span>
+        <span class="section-title">6. Выполненные задачи (7 шт.)</span>
+    </div>
+    <table>
+        <tr><th>№</th><th>Задача</th><th>P</th><th>Сложность</th><th>%</th><th>Статус</th><th>Дата</th></tr>
+        <tr><td class="center">6.1</td><td>Создание системы документации 1сexpert</td><td class="center">P1</td><td class="center">⭐</td><td class="center st-done">100%</td><td class="st-done">✅</td><td class="center">2026-05-16</td></tr>
+        <tr><td class="center">6.2</td><td>Развёртывание системы дорожных карт</td><td class="center">P1</td><td class="center">⭐⭐</td><td class="center st-done">100%</td><td class="st-done">✅</td><td class="center">2026-05-16</td></tr>
+        <tr><td class="center">6.3</td><td>Анализ XML УТ тип 11.5.26.106</td><td class="center">P1</td><td class="center">⭐⭐⭐</td><td class="center st-done">100%</td><td class="st-done">✅</td><td class="center">2026-05-16</td></tr>
+        <tr><td class="center">6.4</td><td>Анализ XML УОТКОРП</td><td class="center">P1</td><td class="center">⭐⭐⭐</td><td class="center st-done">100%</td><td class="st-done">✅</td><td class="center">2026-05-16</td></tr>
+        <tr><td class="center">6.5</td><td>Анализ XML УОТ607</td><td class="center">P1</td><td class="center">⭐⭐⭐</td><td class="center st-done">100%</td><td class="st-done">✅</td><td class="center">2026-05-16</td></tr>
+        <tr><td class="center">6.6</td><td>Сравнение функциональности УОТКОРП и УОТ607</td><td class="center">P1</td><td class="center">⭐⭐⭐</td><td class="center st-done">100%</td><td class="st-done">✅</td><td class="center">2026-05-16</td></tr>
+        <tr><td class="center">6.7</td><td>Выявление недостающей функциональности заказов в УОТКОРП</td><td class="center">P1</td><td class="center">⭐⭐⭐⭐</td><td class="center st-done">100%</td><td class="st-done">✅</td><td class="center">2026-05-16</td></tr>
+    </table>
+
+    <h3>6.6. Сравнение функциональности УОТКОРП и УОТ607</h3>
+    <table>
+        <tr><th>№</th><th>Этап</th><th>Описание</th><th>Статус</th></tr>
+        <tr><td class="center">6.6.1</td><td>Инвентаризация УОТ607</td><td>Полный перечень объектов и модулей УОТ607</td><td class="st-done">✅</td></tr>
+        <tr><td class="center">6.6.2</td><td>Инвентаризация УОТКОРП</td><td>Полный перечень объектов и модулей УОТКОРП</td><td class="st-done">✅</td></tr>
+        <tr><td class="center">6.6.3</td><td>Сравнение</td><td>Сопоставление объектов: что есть в обеих, что только в одной</td><td class="st-done">✅</td></tr>
+        <tr><td class="center">6.6.4</td><td>Отчёт</td><td>Таблица различий с выводами</td><td class="st-done">✅</td></tr>
+    </table>
+
+    <h3>6.7. Выявление недостающей функциональности заказов в УОТКОРП</h3>
+    <p style="color:#666; font-size:13px"><strong>Подтверждено:</strong> блок заказов Ozon в УОТКОРП неполный.</p>
+    <table>
+        <tr><th>№</th><th>Этап</th><th>Описание</th><th>Статус</th></tr>
+        <tr><td class="center">6.7.1</td><td>Анализ заказов УОТ607</td><td>Выявлен весь функционал интеграции с заказами Ozon</td><td class="st-done">✅</td></tr>
+        <tr><td class="center">6.7.2</td><td>Анализ заказов УОТКОРП</td><td>Выявлен весь функционал интеграции с заказами Ozon</td><td class="st-done">✅</td></tr>
+        <tr><td class="center">6.7.3</td><td>Разрывы</td><td>🔴 Критические: ФормаНастройки, ПоставкаФБО, ТипыСкладов, ФункцииСервиса, СтатусыПоставок</td><td class="st-done">✅</td></tr>
+        <tr><td class="center">6.7.4</td><td>Оценка</td><td>Критичность: невозможно настроить коннектор Ozon без ФормаНастройки</td><td class="st-done">✅</td></tr>
+        <tr><td class="center">6.7.5</td><td>Отчёт</td><td>Перечень недостающей функциональности с приоритетами</td><td class="st-done">✅</td></tr>
+    </table>
+</div>
+
+<!-- ПРОТОКОЛ УПРАВЛЕНИЯ -->
+<div class="section" id="protocol">
+    <div class="section-header">
+        <span class="section-icon">📝</span>
+        <span class="section-title">Протокол управления (ключевые фразы)</span>
+    </div>
+    <table class="protocol-table">
+        <tr><th>Фраза</th><th>Действие</th></tr>
+        <tr><td>«заводим задачу в дорожную карту»</td><td>Создать задачу</td></tr>
+        <tr><td>«дор карта 1» / «итого» / «сводка» / «дорожная карта»</td><td>Сводная таблица уровня 1</td></tr>
+        <tr><td>«дор карта 2»</td><td>Сводная таблица уровня 1 + детализация всех задач</td></tr>
+        <tr><td>«статус задачи N»</td><td>Детализация задачи N</td></tr>
+        <tr><td>«обнови статус N.M»</td><td>Изменить статус этапа</td></tr>
+        <tr><td>«закрываем задачу N»</td><td>Пометить готово + запросить время (мин)</td></tr>
+        <tr><td>«откладываем задачу N»</td><td>Отложить</td></tr>
+        <tr><td>«верни задачу N в активные» / «перенеси задачу N в активные»</td><td>Перенести задачу в активные с новым активным номером</td></tr>
+        <tr><td>«итого время»</td><td>Сводка времени (мин / ч:мин)</td></tr>
+        <tr><td>«затрачено N мин на задачу M»</td><td>Вписать время в задачу M</td></tr>
+        <tr><td>«план разработки 1» / «план разработки 1.PN»</td><td>Показать планы внедрения процесса заказов Ozon</td></tr>
+        <tr><td>«план разработки 3» / «план разработки 3.PN»</td><td>Показать план управления поставками FBO</td></tr>
+        <tr><td>«правила дорожной карты»</td><td>Показать/сформировать правила пользования</td></tr>
+        <tr><td>«обновить правила дорожной карты»</td><td>Зафиксировать изменения в плане и сопутствующих документах</td></tr>
+    </table>
+</div>
+
+<!-- СТРУКТУРА НУМЕРАЦИИ -->
+<div class="section">
+    <div class="section-header">
+        <span class="section-icon">🔢</span>
+        <span class="section-title">Структура нумерации</span>
+    </div>
+    <table>
+        <tr><th>Уровень</th><th>Формат</th><th>Пример</th><th>Описание</th></tr>
+        <tr><td class="center">1 (задача)</td><td>N</td><td class="center">1</td><td>Крупная задача</td></tr>
+        <tr><td class="center">2 (этап)</td><td>N.N</td><td class="center">1.1</td><td>Стадия выполнения</td></tr>
+        <tr><td class="center">3 (шаг)</td><td>N.N.N</td><td class="center">1.1.1</td><td>Конкретное действие</td></tr>
+    </table>
+    <p style="color:#666; font-size:13px">При переносе задачи из выполненных или отложенных в активные ей присваивается новый номер активной задачи: если активных задач нет — <code>1</code>, иначе следующий свободный номер по порядку.</p>
+</div>
+
+<!-- ОЖИДАЮТ РЕШЕНИЯ -->
+<div class="section">
+    <div class="section-header">
+        <span class="section-icon">⏳</span>
+        <span class="section-title">Ожидают решения</span>
+    </div>
+    <ul style="font-size:14px; color:#555">
+        <li>Выбор варианта решения (A/B/C) для блока Ozon — <strong>ожидает отдельного распоряжения</strong> (рекомендуется <strong>вариант C</strong> — гибрид)</li>
+        <li>Время выполнения задач 6.1–6.7 и активных задач 1, 3 — <strong>не заполнено</strong> (стоит <code>—</code>)</li>
+        <li>Перенос 7 оставшихся API-эндпоинтов из УОТ609 в УОТКОРП — <strong>задача 3</strong> (14 из 21 уже перенесены в коде)</li>
+        <li>Макет <code>ВерсииМетодовAPI</code> в УОТКОРП — <strong>очищен</strong> (0 записей, было 27)</li>
+        <li>«Недостаточно данных» в дымовых тестах <code>CG_Online_ВводНачальныхОстатковТоваровВСервисе</code> — <strong>ожидает выбора решения</strong></li>
+    </ul>
+</div>
+
+</body>
+</html>

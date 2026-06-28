@@ -1,0 +1,697 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анализ: «Недостаточно данных» — Дымовые тесты CG_Online_ВводНачальныхОстатковТоваровВСервисе</title>
+    <style>
+        :root {
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --border: #dee2e6;
+            --text: #212529;
+            --text-muted: #6c757d;
+            --primary: #0d6efd;
+            --primary-light: #e7f1ff;
+            --danger: #dc3545;
+            --danger-light: #fce8ea;
+            --warning: #ffc107;
+            --warning-light: #fff9e6;
+            --success: #198754;
+            --success-light: #e6f4ed;
+            --info: #0dcaf0;
+            --info-light: #e6f9fc;
+            --code-bg: #f1f3f5;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            color: var(--text);
+            margin-bottom: 8px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid var(--danger);
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .card h2 {
+            font-size: 1.2rem;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card h3 {
+            font-size: 1.05rem;
+            margin: 16px 0 10px;
+            color: var(--text);
+        }
+
+        .icon { font-size: 1.3rem; }
+
+        /* Cause block */
+        .cause-block {
+            border-left: 4px solid var(--danger);
+            background: var(--danger-light);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 16px;
+        }
+
+        .cause-block p { margin-bottom: 8px; }
+        .cause-block p:last-child { margin-bottom: 0; }
+
+        /* Call chain */
+        .chain {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin: 16px 0;
+        }
+
+        .chain-step {
+            display: flex;
+            align-items: stretch;
+            min-height: 48px;
+        }
+
+        .chain-num {
+            width: 36px;
+            min-width: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #fff;
+            border-radius: 50%;
+            height: 36px;
+            margin-top: 6px;
+        }
+
+        .chain-content {
+            flex: 1;
+            padding: 6px 0 6px 14px;
+            border-left: 2px solid var(--border);
+            margin-left: 17px;
+        }
+
+        .chain-step:last-child .chain-content {
+            border-left: 2px solid transparent;
+        }
+
+        .chain-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .chain-detail {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .chain-detail code {
+            background: var(--code-bg);
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+        }
+
+        .step-blue { background: var(--primary); }
+        .step-orange { background: var(--warning); color: #333; }
+        .step-red { background: var(--danger); }
+        .step-green { background: var(--success); }
+
+        /* Filter table */
+        .filter-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 0.9rem;
+        }
+
+        .filter-table th, .filter-table td {
+            padding: 8px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .filter-table th {
+            background: var(--primary-light);
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .filter-table tr:last-child td { border-bottom: none; }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .badge-red { background: var(--danger-light); color: var(--danger); }
+        .badge-green { background: var(--success-light); color: var(--success); }
+        .badge-orange { background: var(--warning-light); color: #856404; }
+        .badge-blue { background: var(--primary-light); color: var(--primary); }
+
+        /* Solution cards */
+        .solution {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 14px;
+            overflow: hidden;
+        }
+
+        .solution-header {
+            padding: 12px 18px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .solution-body {
+            padding: 14px 18px;
+            border-top: 1px solid var(--border);
+            background: #fafbfc;
+        }
+
+        .solution-recommended {
+            border-color: var(--success);
+        }
+
+        .solution-recommended .solution-header {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .solution-alt {
+            border-color: var(--primary);
+        }
+
+        .solution-alt .solution-header {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .solution-warn {
+            border-color: var(--warning);
+        }
+
+        .solution-warn .solution-header {
+            background: var(--warning-light);
+            color: #856404;
+        }
+
+        /* Code block */
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px 16px;
+            font-size: 0.82rem;
+            overflow-x: auto;
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+
+        code {
+            font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+        }
+
+        .code-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .code-comment { color: #6a9955; }
+        .code-keyword { color: #569cd6; }
+        .code-string { color: #ce9178; }
+        .code-func { color: #dcdcaa; }
+
+        /* Pros/Cons */
+        .pros-cons {
+            display: flex;
+            gap: 16px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pros, .cons {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .pros {
+            background: var(--success-light);
+            border: 1px solid #b7dfc3;
+        }
+
+        .cons {
+            background: var(--warning-light);
+            border: 1px solid #f0d96e;
+        }
+
+        .pros strong { color: var(--success); }
+        .cons strong { color: #856404; }
+
+        .pros ul, .cons ul { margin-top: 4px; padding-left: 18px; }
+        .pros li, .cons li { margin-bottom: 3px; }
+
+        /* Test results table */
+        .test-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 0.88rem;
+        }
+
+        .test-table th, .test-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .test-table th {
+            background: var(--primary-light);
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .test-table tr:last-child td { border-bottom: none; }
+
+        .status-ok { color: var(--success); font-weight: 600; }
+        .status-skip { color: var(--warning); font-weight: 600; }
+        .status-fail { color: var(--danger); font-weight: 600; }
+
+        /* Why section */
+        .why-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        .why-list li {
+            padding: 8px 14px;
+            margin-bottom: 6px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .why-list li:nth-child(odd) { background: var(--danger-light); }
+        .why-list li:nth-child(even) { background: var(--warning-light); }
+
+        .why-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+        /* File ref */
+        .file-ref {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-family: monospace;
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-top: 30px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .card { padding: 14px 16px; }
+            .pros-cons { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>🔍 Анализ: «Недостаточно данных» — Дымовые тесты</h1>
+    <p class="subtitle">
+        Документ: <code>CG_Online_ВводНачальныхОстатковТоваровВСервисе</code> &nbsp;|&nbsp;
+        Расширение: <code>КОРПтест</code> &nbsp;|&nbsp;
+        Дата: 2026-05-27
+    </p>
+
+    <!-- ПРИЧИНА -->
+    <div class="card">
+        <h2><span class="icon">⚠️</span> Причина</h2>
+
+        <div class="cause-block">
+            <p><strong>Дымовые тесты «Открыть форму существующего объекта» не создают документы</strong> — они ищут уже существующие в базе данных по фильтру.</p>
+            <p>Тест пропускается (<code>ЮТест.Пропустить("Недостаточно данных")</code>), если ни один документ не проходит условия отбора.</p>
+        </div>
+
+        <h3>Цепочка вызовов</h3>
+        <div class="chain">
+            <div class="chain-step">
+                <div class="chain-num step-blue">1</div>
+                <div class="chain-content">
+                    <div class="chain-label">CG_Online_UT_ДТ_ДокументыКлиент.ОткрытьФормуСуществующегоОбъекта()</div>
+                    <div class="chain-detail"><code>ПараметрыОтбора = ДТС_Настройки.ПараметрыОтбораДокумента(Параметры)</code></div>
+                </div>
+            </div>
+            <div class="chain-step">
+                <div class="chain-num step-blue">2</div>
+                <div class="chain-content">
+                    <div class="chain-label">ДТС_Настройки.ПараметрыОтбораДокумента()</div>
+                    <div class="chain-detail">Формирует фильтр: <code>ПометкаУдаления = Ложь</code>, <code>Проведен = Ложь</code>, <code>Дата >= &Дата</code></div>
+                </div>
+            </div>
+            <div class="chain-step">
+                <div class="chain-num step-blue">3</div>
+                <div class="chain-content">
+                    <div class="chain-label">ДТС_Тесты.ОткрытьФормуОбъекта()</div>
+                    <div class="chain-detail"><code>Ссылка = ДТС_СлучайныеДанныеСервер.СлучайнаяСсылка(Тип, Имя, ПараметрыОтбора)</code></div>
+                </div>
+            </div>
+            <div class="chain-step">
+                <div class="chain-num step-blue">4</div>
+                <div class="chain-content">
+                    <div class="chain-label">ДТС_СлучайныеДанныеСервер.СлучайнаяСсылка()</div>
+                    <div class="chain-detail">Выполняет запрос к БД с фильтром из шага 2</div>
+                </div>
+            </div>
+            <div class="chain-step">
+                <div class="chain-num step-red">5</div>
+                <div class="chain-content">
+                    <div class="chain-label" style="color: var(--danger);">Результат пустой → Ссылка = Неопределено</div>
+                    <div class="chain-detail"><code>ЮТест.Пропустить("Недостаточно данных")</code></div>
+                </div>
+            </div>
+        </div>
+
+        <h3>Фильтр отбора документов</h3>
+        <table class="filter-table">
+            <thead>
+                <tr>
+                    <th>Условие</th>
+                    <th>Значение</th>
+                    <th>Результат для данного документа</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>ПометкаУдаления = Ложь</code></td>
+                    <td>Не удалён</td>
+                    <td><span class="badge badge-green">✅ Обычно проходит</span></td>
+                </tr>
+                <tr>
+                    <td><code>Проведен = Ложь</code></td>
+                    <td>Не проведён</td>
+                    <td><span class="badge badge-red">❌ Документ обычно проведён</span></td>
+                </tr>
+                <tr>
+                    <td><code>Дата >= &Дата</code></td>
+                    <td>Дата ≥ ТекущаяДата − 7 дней</td>
+                    <td><span class="badge badge-red">❌ Создан давно</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Почему документ не находится</h3>
+        <ul class="why-list">
+            <li>
+                <span class="why-icon">📋</span>
+                <span><strong>Документ «Ввод начальных остатков товаров в сервисе»</strong> — это документ начальной настройки. Создаётся <strong>однократно</strong> при внедрении интеграции с сервисом.</span>
+            </li>
+            <li>
+                <span class="why-icon">✅</span>
+                <span><strong>Сразу проводится</strong> после создания — поэтому условие <code>Проведен = Ложь</code> не выполняется.</span>
+            </li>
+            <li>
+                <span class="why-icon">📅</span>
+                <span><strong>Дата создания — давно</strong> — не попадает в фильтр <code>Дата >= ТекущаяДата() − 7 дней</code>.</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- РЕШЕНИЯ -->
+    <div class="card">
+        <h2><span class="icon">🛠️</span> Предлагаемые решения</h2>
+
+        <!-- Вариант 1 -->
+        <div class="solution solution-recommended">
+            <div class="solution-header">
+                <span>✅ Вариант 1 (рекомендуемый)</span>
+                <span class="badge badge-green">Рекомендуется</span>
+            </div>
+            <div class="solution-body">
+                <p><strong>Расширить диапазон дат в <code>ОтборДата()</code></strong> — вместо недели использовать начало года.</p>
+                <p class="file-ref">КОРПтест/CommonModules/ДТС_Настройки/Ext/Module.bsl : 652</p>
+                <div class="code-label">Было:</div>
+<pre><code><span class="code-keyword">Функция</span> ОтборДата()
+    <span class="code-keyword">Возврат</span> НачалоДня(ТекущаяДата()) - (60 * 60 * 24 * 7); <span class="code-comment">// Неделя</span>
+<span class="code-keyword">КонецФункции</span></code></pre>
+                <div class="code-label">Стало:</div>
+<pre><code><span class="code-keyword">Функция</span> ОтборДата()
+    <span class="code-keyword">Возврат</span> НачалоГода(ТекущаяДата()); <span class="code-comment">// Начало года</span>
+<span class="code-keyword">КонецФункции</span></code></pre>
+                <div class="pros-cons">
+                    <div class="pros">
+                        <strong>👍 Плюсы</strong>
+                        <ul>
+                            <li>Решает проблему для всех документов</li>
+                            <li>Простое изменение — одна строка</li>
+                            <li>Не требует поддержки списка исключений</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <strong>⚠️ Минусы</strong>
+                        <ul>
+                            <li>Запрос может вернуть больше записей</li>
+                            <li>Ограничение <code>КоличествоЗаписей = 1000</code> компенсирует</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вариант 2 -->
+        <div class="solution solution-alt">
+            <div class="solution-header">
+                <span>🔧 Вариант 2</span>
+                <span class="badge badge-blue">Альтернатива</span>
+            </div>
+            <div class="solution-body">
+                <p><strong>Убрать фильтр по дате для непроведённых документов</strong> в <code>ПараметрыОтбораДокумента()</code>.</p>
+                <p class="file-ref">КОРПтест/CommonModules/ДТС_Настройки/Ext/Module.bsl : 51</p>
+<pre><code><span class="code-keyword">Функция</span> ПараметрыОтбораДокумента(Параметры) <span class="code-keyword">Экспорт</span>
+    Условия = <span class="code-keyword">Новый</span> Массив;
+    Условия.Добавить(<span class="code-string">"ПометкаУдаления = Ложь"</span>);
+    Условия.Добавить(<span class="code-string">"Проведен = Ложь"</span>);
+    <span class="code-comment">// Убрано: Условия.Добавить("Дата >= &Дата");</span>
+    <span class="code-keyword">Возврат</span> ПараметрыОтбора(Условия);  <span class="code-comment">// Без ЗначенияПараметров</span>
+<span class="code-keyword">КонецФункции</span></code></pre>
+                <div class="pros-cons">
+                    <div class="pros">
+                        <strong>👍 Плюсы</strong>
+                        <ul>
+                            <li>Наиболее точное решение</li>
+                            <li>Непроведённых документов обычно немного</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <strong>⚠️ Минусы</strong>
+                        <ul>
+                            <li>Может найти очень старые документы</li>
+                            <li>Изменяет логику для всех типов документов</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вариант 3 -->
+        <div class="solution solution-warn">
+            <div class="solution-header">
+                <span>📝 Вариант 3</span>
+                <span class="badge badge-orange">Точечный</span>
+            </div>
+            <div class="solution-body">
+                <p><strong>Добавить в список исключений</strong> в <code>НастройкиИсключенийДокументов()</code>.</p>
+                <p class="file-ref">КОРПтест/CommonModules/ДТС_Настройки/Ext/Module.bsl : 377</p>
+<pre><code>НастройкиИсключений.Добавить(<span class="code-string">"Документ.CG_Online_ВводНачальныхОстатковТоваровВСервисе.ОткрытьФормуСуществующегоОбъекта"</span>);
+НастройкиИсключений.Добавить(<span class="code-string">"Документ.CG_Online_ВводНачальныхОстатковТоваровВСервисе.ЗаписатьСуществующийОбъект"</span>);
+НастройкиИсключений.Добавить(<span class="code-string">"Документ.CG_Online_ВводНачальныхОстатковТоваровВСервисе.ОткрытьФормуСуществующегоПроведенногоОбъекта"</span>);
+НастройкиИсключений.Добавить(<span class="code-string">"Документ.CG_Online_ВводНачальныхОстатковТоваровВСервисе.ПровестиСуществующийОбъект"</span>);</code></pre>
+                <div class="pros-cons">
+                    <div class="pros">
+                        <strong>👍 Плюсы</strong>
+                        <ul>
+                            <li>Точечное решение</li>
+                            <li>Не влияет на другие документы</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <strong>⚠️ Минусы</strong>
+                        <ul>
+                            <li>Тесты для этого документа вообще не выполняются</li>
+                            <li>Нужно поддерживать список исключений</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ТАБЛИЦА ТЕСТОВ -->
+    <div class="card">
+        <h2><span class="icon">📊</span> Какие тесты пропускаются</h2>
+        <p>Для <code>Документ.CG_Online_ВводНачальныхОстатковТоваровВСервисе</code> из <code>НаборТестовДокумента()</code> генерируются 7 тестов:</p>
+        <table class="test-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Тест</th>
+                    <th>Нужны данные</th>
+                    <th>Результат</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>ОткрытьФормуСписка</td>
+                    <td><span class="badge badge-green">Нет</span></td>
+                    <td class="status-ok">✅ Выполняется</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>ОткрытьФормуВыбора</td>
+                    <td><span class="badge badge-green">Нет</span></td>
+                    <td class="status-ok">✅ Выполняется</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>ОткрытьФормуОбъекта (новый)</td>
+                    <td><span class="badge badge-green">Нет</span></td>
+                    <td class="status-ok">✅ Выполняется</td>
+                </tr>
+                <tr style="background: var(--warning-light);">
+                    <td>4</td>
+                    <td><strong>ОткрытьФормуСуществующегоОбъекта</strong></td>
+                    <td><span class="badge badge-orange">Да</span></td>
+                    <td class="status-skip">⚠️ Пропуск</td>
+                </tr>
+                <tr style="background: var(--warning-light);">
+                    <td>5</td>
+                    <td><strong>ЗаписатьСуществующийОбъект</strong></td>
+                    <td><span class="badge badge-orange">Да</span></td>
+                    <td class="status-skip">⚠️ Пропуск</td>
+                </tr>
+                <tr style="background: var(--warning-light);">
+                    <td>6</td>
+                    <td><strong>ОткрытьФормуСуществующегоПроведенногоОбъекта</strong></td>
+                    <td><span class="badge badge-orange">Да</span></td>
+                    <td class="status-skip">⚠️ Пропуск</td>
+                </tr>
+                <tr style="background: var(--warning-light);">
+                    <td>7</td>
+                    <td><strong>ПровестиСуществующийОбъект</strong></td>
+                    <td><span class="badge badge-orange">Да</span></td>
+                    <td class="status-skip">⚠️ Пропуск</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- КЛЮЧЕВЫЕ ФАЙЛЫ -->
+    <div class="card">
+        <h2><span class="icon">📁</span> Ключевые файлы</h2>
+        <table class="filter-table">
+            <thead>
+                <tr>
+                    <th>Модуль</th>
+                    <th>Роль</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>ДТС_Настройки</code></td>
+                    <td>Фильтры отбора, исключения, <code>ОтборДата()</code></td>
+                </tr>
+                <tr>
+                    <td><code>ДТС_Тесты</code></td>
+                    <td>Исполнение тестов, вызов <code>СлучайнаяСсылка()</code></td>
+                </tr>
+                <tr>
+                    <td><code>ДТС_СлучайныеДанныеСервер</code></td>
+                    <td>Запрос к БД для поиска существующих объектов</td>
+                </tr>
+                <tr>
+                    <td><code>ДТС_НаборыТестов</code></td>
+                    <td>Генерация наборов тестов из метаданных</td>
+                </tr>
+                <tr>
+                    <td><code>CG_Online_UT_ДТ_ДокументыКлиент</code></td>
+                    <td>Клиентский модуль дымовых тестов документов</td>
+                </tr>
+                <tr>
+                    <td><code>ДТС_МетаданныеСервер</code></td>
+                    <td>Получение списка документов из метаданных</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer">
+        Отчёт сформирован автоматически &nbsp;|&nbsp; Проект УОТ КОРП &nbsp;|&nbsp; 2026-05-27
+    </div>
+
+</div>
+</body>
+</html>

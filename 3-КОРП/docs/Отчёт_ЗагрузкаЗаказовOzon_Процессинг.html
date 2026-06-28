@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отчёт: Загрузка заказов Ozon при использовании Процессинга</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'base', themeVariables: { background: '#ffffff' } });</script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #1a1a1a; max-width: 1100px; margin: 0 auto; padding: 20px; background: #fff; }
+        h1 { color: #1a1a1a; border-bottom: 3px solid #F44336; padding-bottom: 10px; }
+        h2 { color: #333; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px; margin-top: 40px; }
+        h3 { color: #444; margin-top: 30px; }
+        h4 { color: #555; }
+        table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+        th { background: #f5f5f5; font-weight: 600; }
+        tr:nth-child(even) { background: #fafafa; }
+        blockquote { border-left: 4px solid #F44336; margin: 16px 0; padding: 8px 16px; background: #f9f9f9; }
+        .blockquote-green { border-left: 4px solid #4CAF50; margin: 16px 0; padding: 8px 16px; background: #f9f9f9; }
+        .blockquote-blue { border-left: 4px solid #2196F3; margin: 16px 0; padding: 8px 16px; background: #f9f9f9; }
+        code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; }
+        pre { background: #f5f5f5; padding: 12px 16px; border-radius: 6px; overflow-x: auto; font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; border: 1px solid #e0e0e0; }
+        .mermaid { background: #fff; padding: 20px; margin: 20px 0; text-align: center; }
+        hr { border: none; border-top: 2px solid #e0e0e0; margin: 40px 0; }
+        .status-ok { color: #4CAF50; font-weight: bold; }
+        .status-warn { color: #FF9800; font-weight: bold; }
+        .status-err { color: #F44336; font-weight: bold; }
+        .status-info { color: #2196F3; font-weight: bold; }
+        .legend { background: #f9f9f9; border: 1px solid #ddd; padding: 12px 16px; border-radius: 6px; margin: 16px 0; font-size: 14px; }
+        .callout { background: #fff3e0; border: 1px solid #FF9800; padding: 12px 16px; border-radius: 6px; margin: 16px 0; }
+        .callout-err { background: #FFEBEE; border: 1px solid #F44336; padding: 12px 16px; border-radius: 6px; margin: 16px 0; }
+        .callout-ok { background: #E8F5E9; border: 1px solid #4CAF50; padding: 12px 16px; border-radius: 6px; margin: 16px 0; }
+        ul, ol { padding-left: 24px; }
+        li { margin: 6px 0; }
+    </style>
+</head>
+<body>
+
+<h1>Отчёт: Загрузка заказов Ozon при использовании Процессинга</h1>
+
+<blockquote>
+    <strong>Проблема:</strong> При загрузке тестовых заказов Ozon (5 шт.) из макетов UT через Журнал документов сервисов,
+    <code>ЗаказыКСозданию</code> остаётся пустым (0), документы <code>CG_Online_ЗаказКлиентаСервиса</code> не создаются.
+</blockquote>
+
+<hr>
+
+<h2>1. Пайплайн загрузки заказа Ozon</h2>
+
+<h3>1.1. Общая архитектура</h3>
+
+<div class="mermaid">
+flowchart TD
+    subgraph UT["Тестовое окружение (UT)"]
+        UT_HTTP["CG_Online_UT_Ozon_ИнтеграцияСОзон<br/>ЭкранированиеЗапросаКСервису()"]
+        UT_PROC["CG_Online_UT_ИнтеграцииССервисами_ВызовСервера<br/>УстановитьИспользоватьПроцессинг(Истина)"]
+        MOCK["Макет JSON<br/>5 заказов FBS"]
+    end
+
+    subgraph REAL["Реальный модуль Ozon"]
+        OZON["CG_Online_Ozon_ИнтеграцияСОзон<br/>ЗагрузитьЗаказыССобственногоСклада()"]
+        OZON_ORDERS["Заполняет тзЗаказы (5 строк)<br/>тзТовары"]
+    end
+
+    subgraph DOC["Модуль документа ЗаказКлиентаСервиса"]
+        OBR["ОбработатьСинхронизируемыеДанные()"]
+        CHECK_PROTS["ИспользоватьПроцессинг()"]
+        BRANCH_PROC["✅ ВЕТКА ПРОЦЕССИНГА<br/>ЗаказыКлиентовВСервисах.ЗаписатьДанные()"]
+        BRANCH_DOC["❌ ВЕТКА ДОКУМЕНТОВ<br/>ДозаполнитьЗаказыКлиентовСервисов()"]
+        REGS["Регистры процессинга<br/>CG_Online_ЗаказыКлиентовВСервисах"]
+        LOG["Лог: Всего: 5, К созданию: N"]
+    end
+
+    UT_HTTP -.->|"перехватывает HTTP"| MOCK
+    OZON -->|"вызывает HTTP<br/>(перехвачен UT)"| UT_HTTP
+    OZON --> OZON_ORDERS
+    OZON_ORDERS -->|"передаёт тзЗаказы"| OBR
+    UT_PROC -.->|"устанавливает Истина"| CHECK_PROTS
+    OBR --> CHECK_PROTS
+    CHECK_PROTS -->|"Истина"| BRANCH_PROC
+    CHECK_PROTS -->|"Ложь (не срабатывает)"| BRANCH_DOC
+    BRANCH_PROC --> REGS
+    BRANCH_DOC -.-> LOG
+</div>
+
+<div class="callout-err">
+    <strong>Ключевой момент:</strong> В тестовом окружении <code>ИспользоватьПроцессинг() = Истина</code> →
+    управление идёт по левой ветке (регистры процессинга), <strong>минуя</strong> создание документов и лог с "Заказы к созданию".
+</div>
+
+<hr>
+
+<h2>2. Детальный анализ кода</h2>
+
+<h3>2.1. <code>CG_Online_UT_ИнтеграцииССервисами_ВызовСервера:78</code> — Включение процессинга</h3>
+
+<pre>
+Процедура ВключитьПроцессинг() Экспорт
+    МодульМетода = CG_Online_UT_ОбщегоНазначения.ОбщийМодульМетода("CG_Online_ЗначениеНастроек");
+    Если МодульМетода <> Неопределено Тогда
+        МодульМетода.УстановитьИспользоватьПроцессинг(Истина);  // ← строка 78
+    КонецЕсли;
+КонецПроцедуры
+</pre>
+
+<table>
+    <tr><th>Файл</th><td><code>Тест\CommonModules\CG_Online_UT_ИнтеграцииССервисами_ВызовСервера\Ext\Module.bsl</code></td></tr>
+    <tr><th>Функция</th><td><code>ВключитьПроцессинг()</code></td></tr>
+    <tr><th>Действие</th><td>Устанавливает константу <code>CG_Online_ИспользоватьПроцессинг = Истина</code></td></tr>
+    <tr><th>Статус</th><td class="status-err">⚠️ Причина проблемы</td></tr>
+</table>
+
+<h3>2.2. <code>CG_Online_ЗаказКлиентаСервиса:706–728</code> — Ветвление</h3>
+
+<pre>
+Процедура ОбработатьСинхронизируемыеДанные(ПараметрыСинхронизацииДанных, ТаблицыДанных, Результат) Экспорт
+
+    Если ТаблицыДанных.тзЗаказы.Количество() = 0 Тогда  // 5 заказов — не равно 0
+        Возврат;
+    КонецЕсли;
+
+    // [1] Загрузка товаров сервиса — НИЧЕГО НЕ ДЕЛАЕТ
+    //     (СоздаватьНоменклатуруПриЗагрузкеДокументов = Ложь по умолчанию)
+    CG_Online_НоменклатураСервисов.ЗагрузитьТоварыСервисаДляЗагрузкиДокументов(...);
+
+    Если CG_Online_ЗначениеНастроек.ИспользоватьПроцессинг() Тогда  // ← ИСТИНА в тесте
+
+        // [2] ПРОЦЕССИНГ: пишет в регистры, НЕ создаёт документы
+        CG_Online_ЗаказыКлиентовВСервисах.ЗаписатьДанные(...);
+        CG_Online_ЗаказыКлиентовВСервисахТовары.ЗаписатьДанные(...);
+        CG_Online_ЗаказыКлиентовВСервисахМаркировкаТоваров.ЗаписатьДанные(...);
+        CG_Online_ЗаказыКлиентовВСервисахГрузовыеМеста.ЗаписатьДанные(...);
+
+    Иначе
+
+        // [3] СОЗДАНИЕ ДОКУМЕНТОВ — НЕ ВЫПОЛНЯЕТСЯ В ТЕСТЕ
+        СтруктураВозврата = ДозаполнитьЗаказыКлиентовСервисов(
+            ПараметрыСинхронизацииДанных.НастройкаАвторизации,
+            ПараметрыСинхронизацииДанных.МодельРаботыСервиса,
+            ТаблицыДанных.тзТовары, ТаблицыДанных.тзЗаказы, , Результат);
+
+        ЗаказыКСозданию = СтруктураВозврата.ЗаказыКСозданию;
+        ЗаказыСОшибкойТоваров = СтруктураВозврата.ЗаказыСОшибкойТоваров;
+
+        // Лог — НЕ ПОПАДАЕТ В ТЕСТ
+        CG_Online_ЖурналСобытийВызовСервера.Информация(..., СтрокаЛога);
+
+    КонецЕсли;
+</pre>
+
+<table>
+    <tr><th>Файл</th><td><code>УОТ\CommonModules\CG_Online_ЗаказКлиентаСервиса\Ext\Module.bsl</code></td></tr>
+    <tr><th>Функция</th><td><code>ОбработатьСинхронизируемыеДанные()</code></td></tr>
+    <tr><th>Строка ветвления</th><td>715</td></tr>
+    <tr><th>Статус</th><td class="status-err">Ветка документов (стр. 729+) недостижима в тесте</td></tr>
+</table>
+
+<h3>2.3. <code>ДозаполнитьЗаказыКлиентовСервисов:3113</code> — Маппинг товаров (не вызывается)</h3>
+
+<pre>
+Функция ДозаполнитьЗаказыКлиентовСервисов(...) Экспорт
+
+    // Запрос из 19 наборов, в т.ч.:
+    //   Result[7] = ТоварыСОшибкой (где Товар IS NULL)
+    //   Result[8] = ЗаказыКСозданию (НовыеЗаказы)
+    //
+    // Фильтры:
+    //   ВД: Артикул <> "" ИЛИ ИдентификаторТовара <> ""   ← 5 заказов проходят
+    //   Identity map: LEFT JOIN c пустым регистром → все новые
+    //   НоменклатураСервисов: LEFT JOIN — если Артикул не найден → ТоварыСОшибкой
+</pre>
+
+<div class="blockquote-blue">
+    <strong>Важно:</strong> Даже если бы ветка документов выполнялась, заказы могли бы уйти в
+    <code>ТоварыСОшибкой</code> (Result[7]) при отсутствии Артикула в <code>CG_Online_НоменклатураСервисов</code>.
+    Артикулы из макета: <strong>276142, 282617, 276939, 270940, 283231</strong>.
+    <code>ЗагрузитьТоварыСервисаДляЗагрузкиДокументов</code> не заполняет справочник, т.к. флаг
+    <code>СоздаватьНоменклатуруПриЗагрузкеДокументов</code> по умолчанию <strong>Ложь</strong>.
+</div>
+
+<hr>
+
+<h2>3. Сравнение путей обработки</h2>
+
+<table>
+    <tr>
+        <th>Характеристика</th>
+        <th>Процессинг (TRUE)</th>
+        <th>Документы (FALSE)</th>
+    </tr>
+    <tr>
+        <td><strong>Входные данные</strong></td>
+        <td>Ожидает <code>тзЗаказыКлиентовВСервисах</code></td>
+        <td>Использует <code>тзЗаказы</code> (заполняется Ozon-модулем)</td>
+    </tr>
+    <tr>
+        <td><strong>Действие</strong></td>
+        <td>Пишет в регистры сведений<br/><code>CG_Online_ЗаказыКлиентовВСервисах</code></td>
+        <td>Создаёт документы <code>CG_Online_ЗаказКлиентаСервиса</code></td>
+    </tr>
+    <tr>
+        <td><strong>Создание документа</strong></td>
+        <td class="status-err">❌ Нет</td>
+        <td class="status-ok">✅ Да</td>
+    </tr>
+    <tr>
+        <td><strong>Лог "Всего заказов"</strong></td>
+        <td class="status-err">❌ Нет</td>
+        <td class="status-ok">✅ Да</td>
+    </tr>
+    <tr>
+        <td><strong>Вызов <code>ДозаполнитьЗаказыКлиентовСервисов</code></strong></td>
+        <td class="status-err">❌ Нет</td>
+        <td class="status-ok">✅ Да</td>
+    </tr>
+    <tr>
+        <td><strong>Сопоставление номенклатуры</strong></td>
+        <td class="status-warn">⚠️ Не выполняется</td>
+        <td class="status-ok">✅ Выполняется</td>
+    </tr>
+    <tr>
+        <td><strong>Фоновый обработчик</strong></td>
+        <td class="status-warn">⚠️ Требуется (может не быть в тесте)</td>
+        <td class="status-ok">✅ Синхронно</td>
+    </tr>
+</table>
+
+<hr>
+
+<h2>4. Дополнительные проблемы в пути Процессинга</h2>
+
+<h3>4.1. <code>ЗагрузитьТоварыСервисаДляЗагрузкиДокументов:3696</code></h3>
+
+<pre>
+Процедура ЗагрузитьТоварыСервисаДляЗагрузкиДокументов(...)
+
+    СоздаватьНоменклатуруПриЗагрузкеДокументов = Ложь;  // ← ПО УМОЛЧАНИЮ
+
+    Если ЗначениеЗаполнено(ПараметрыСинхронизацииДанных.НастройкаГенерацииДокументов) Тогда
+        СоздаватьНоменклатуруПриЗагрузкеДокументов = СоздаватьНоменклатуруПриЗагрузкеДокументов
+            ИЛИ ПараметрыСинхронизацииДанных.НастройкаГенерацииДокументов.СоздаватьНоменклатуруПриЗагрузкеДокументов;
+    КонецЕсли;
+
+    Если СоздаватьНоменклатуруПриЗагрузкеДокументов И ТаблицыДанных.тзТовары <> Неопределено
+        И ТаблицыДанных.тзТовары.Количество() > 0 Тогда
+
+        МногопоточнаяЗагрузкаТоваровИзСервиса(...);  // НИКОГДА НЕ ВЫЗЫВАЕТСЯ
+    КонецЕсли;
+</pre>
+
+<table>
+    <tr><th>Файл</th><td><code>УОТ\CommonModules\CG_Online_НоменклатураСервисов\Ext\Module.bsl</code></td></tr>
+    <tr><th>Функция</th><td><code>ЗагрузитьТоварыСервисаДляЗагрузкиДокументов()</code></td></tr>
+    <tr><th>Проблема</th><td><code>СоздаватьНоменклатуруПриЗагрузкеДокументов = Ложь</code> → товары из Ozon API не загружаются в справочник <code>CG_Online_НоменклатураСервисов</code></td></tr>
+    <tr><th>Статус</th><td class="status-warn">⚠️ Требует настройки флага в НастройкеАвторизации или НастройкеГенерацииДокументов</td></tr>
+</table>
+
+<h3>4.2. <code>ЗаказыКлиентовВСервисах.ЗаписатьДанные:136</code></h3>
+
+<pre>
+Процедура ЗаписатьДанные(ПараметрыСинхронизацииДанных, ТаблицыДанных, Результат) Экспорт
+
+    Если ТаблицыДанных.тзЗаказыКлиентовВСервисах = Неопределено Тогда
+        // ← ПУСТАЯ ТАБЛИЦА, если не передана
+        ТаблицыДанных.тзЗаказыКлиентовВСервисах = ...СтруктураТаблицыЗаказыКлиентовВСервисах();
+    КонецЕсли;
+
+    // ← В регистр пишется ПУСТАЯ таблица
+    CG_Online_СинхронизацияДанных.ЗаписатьМассивДанных(...);
+</pre>
+
+<table>
+    <tr><th>Файл</th><td><code>УОТ\CommonModules\CG_Online_ЗаказыКлиентовВСервисах\Ext\Module.bsl</code></td></tr>
+    <tr><th>Функция</th><td><code>ЗаписатьДанные()</code></td></tr>
+    <tr><th>Проблема</th><td>Ozon-модуль заполняет <code>тзЗаказы</code> и <code>тзТовары</code>, а процессинг ожидает <code>тзЗаказыКлиентовВСервисах</code></td></tr>
+    <tr><th>Статус</th><td class="status-err">❌ Данные из тзЗаказы теряются</td></tr>
+</table>
+
+<hr>
+
+<h2>5. Выводы</h2>
+
+<div class="callout-err">
+    <strong>Первопричина:</strong> <code>CG_Online_UT_ИнтеграцииССервисами_ВызовСервера:78</code> —
+    явное включение <code>ИспользоватьПроцессинг = Истина</code> в тестовом окружении.
+</div>
+
+<ol>
+    <li>
+        <strong>Прямая причина пустого <code>ЗаказыКСозданию</code>:</strong>
+        <code>ДозаполнитьЗаказыКлиентовСервисов</code> не вызывается — управление идёт по ветке процессинга,
+        которая не создаёт документы.
+    </li>
+    <li>
+        <strong>Дополнительная потеря данных:</strong> даже регистры процессинга не получают данные,
+        т.к. Ozon-модуль заполняет <code>тзЗаказы</code> (5 заказов), а процессинг ожидает
+        <code>тзЗаказыКлиентовВСервисах</code>.
+    </li>
+    <li>
+        <strong>Номенклатура не загружается:</strong> <code>ЗагрузитьТоварыСервисаДляЗагрузкиДокументов</code>
+        бездействует, т.к. флаг <code>СоздаватьНоменклатуруПриЗагрузкеДокументов</code> не установлен.
+    </li>
+    <li>
+        <strong>Лог не выводится:</strong> запись "Всего заказов: 5 | Заказы к созданию: N" формируется
+        только в ветке документов (стр. 774–792), которая недостижима.
+    </li>
+</ol>
+
+<hr>
+
+<h2>6. Рекомендации</h2>
+
+<h3>Вариант A: Отключить процессинг в тесте</h3>
+
+<div class="callout-ok">
+    Убрать или заменить на <code>Ложь</code> вызов <code>УстановитьИспользоватьПроцессинг(Истина)</code>
+    в <code>CG_Online_UT_ИнтеграцииССервисами_ВызовСервера</code>. Тогда:
+    <ul>
+        <li>Вызовется <code>ДозаполнитьЗаказыКлиентовСервисов</code></li>
+        <li>Появится лог с распределением по категориям</li>
+        <li>Можно увидеть, сколько заказов в <code>ТоварыСОшибкой</code> vs <code>ЗаказыКСозданию</code></li>
+    </ul>
+</div>
+
+<h3>Вариант B: Исправить путь процессинга</h3>
+
+<div class="blockquote-blue">
+    Если процессинг нужен по бизнес-требованиям:
+    <ul>
+        <li>Убедиться, что Ozon-модуль заполняет <code>тзЗаказыКлиентовВСервисах</code> (или добавить конвертацию)</li>
+        <li>Включить <code>СоздаватьНоменклатуруПриЗагрузкеДокументов</code> в настройке авторизации</li>
+        <li>Обеспечить запуск фонового обработчика процессинга в тестовом окружении</li>
+    </ul>
+</div>
+
+<h3>Вариант C: Проверить в лоб</h3>
+
+<div class="blockquote-blue">
+    Чтобы убедиться, что <code>Дозаполнить</code> корректно обработал бы 5 заказов:
+    <ol>
+        <li>Временно добавить <code>CG_Online_ЖурналСобытийВызовСервера.Информация(...)</code> в ветку процессинга</li>
+        <li>Сравнить количество заказов в <code>тзЗаказы</code> до и после <code>ОбработатьСинхронизируемыеДанные</code></li>
+    </ol>
+</div>
+
+<hr>
+
+<h2>7. Ключевые файлы</h2>
+
+<table>
+    <tr><th>Файл</th><th>Строки</th><th>Роль</th></tr>
+    <tr>
+        <td><code>Тест\CommonModules\CG_Online_UT_ИнтеграцииССервисами_ВызовСервера\Ext\Module.bsl</code></td>
+        <td>78</td>
+        <td class="status-err">Установка <code>ИспользоватьПроцессинг = Истина</code></td>
+    </tr>
+    <tr>
+        <td><code>УОТ\CommonModules\CG_Online_ЗаказКлиентаСервиса\Ext\Module.bsl</code></td>
+        <td>706–870</td>
+        <td class="status-err"><code>ОбработатьСинхронизируемыеДанные</code> — точка ветвления</td>
+    </tr>
+    <tr>
+        <td><code>УОТ\CommonModules\CG_Online_ЗаказКлиентаСервиса\Ext\Module.bsl</code></td>
+        <td>3113–4770</td>
+        <td><code>ДозаполнитьЗаказыКлиентовСервисов</code> — 19 наборов, маппинг товаров</td>
+    </tr>
+    <tr>
+        <td><code>УОТ\CommonModules\CG_Online_НоменклатураСервисов\Ext\Module.bsl</code></td>
+        <td>3696–3724</td>
+        <td class="status-warn"><code>ЗагрузитьТоварыСервисаДляЗагрузкиДокументов</code> — бездействует</td>
+    </tr>
+    <tr>
+        <td><code>УОТ\CommonModules\CG_Online_Ozon_ИнтеграцияСОзон\Ext\Module.bsl</code></td>
+        <td>8560–8900</td>
+        <td><code>ЗагрузитьЗаказыССобственногоСклада</code> — заполняет тзЗаказы</td>
+    </tr>
+    <tr>
+        <td><code>Тест\DataProcessors\CG_Online_UT_Ozon_ИнтеграцияСОзон\Ext\ManagerModule.bsl</code></td>
+        <td>24–102</td>
+        <td>Перехват HTTP, макеты JSON</td>
+    </tr>
+    <tr>
+        <td><code>УОТ\CommonModules\CG_Online_ЗначениеНастроекПовтИсп\Ext\Module.bsl</code></td>
+        <td>509–521</td>
+        <td><code>ИспользоватьПроцессинг()</code> — чтение функциональной опции</td>
+    </tr>
+</table>
+
+<hr>
+
+<h2>8. Диаграмма данных в пути процессинга</h2>
+
+<div class="mermaid">
+flowchart LR
+    subgraph INPUT["ТаблицыДанных (вход)"]
+        tzZakazy["тзЗаказы ✓ (5 строк)"]
+        tzTovary["тзТовары ✓"]
+        tzZKS["тзЗаказыКлиентовВСервисах ✗ (Неопределено)"]
+    end
+
+    subgraph PROCESS["Путь Процессинга"]
+        CHECK["ЗаказыКлиентовВСервисах.ЗаписатьДанные()"]
+        INIT["тзЗаказыКлиентовВСервисах = Неопределено<br/>→ создаётся ПУСТАЯ таблица"]
+        WRITE["ЗаписатьМассивДанных()<br/>→ пишет ПУСТОЙ набор в регистр"]
+    end
+
+    subgraph RESULT["Результат"]
+        REG["Регистр CG_Online_ЗаказыКлиентовВСервисах<br/>— пуст"]
+        LOGS["Лог — нет"]
+        DOCS["Документы — не созданы"]
+    end
+
+    INPUT --> CHECK
+    CHECK --> INIT
+    INIT --> WRITE
+    WRITE --> REG
+    WRITE --> LOGS
+    WRITE --> DOCS
+
+    style tzZKS fill:#FFCDD2,stroke:#F44336
+    style INIT fill:#FFCDD2,stroke:#F44336,stroke-width:2px
+    style WRITE fill:#FFCDD2,stroke:#F44336
+    style REG fill:#FFCDD2,stroke:#F44336
+</div>
+
+<hr>
+
+<div class="legend">
+    <strong>Условные обозначения:</strong><br>
+    <span class="status-ok">✅</span> — работает корректно &nbsp;&nbsp;
+    <span class="status-warn">⚠️</span> — требует внимания &nbsp;&nbsp;
+    <span class="status-err">❌</span> — проблема
+</div>
+
+<p><em>Дата формирования: 2026-06-02</em></p>
+
+</body>
+</html>

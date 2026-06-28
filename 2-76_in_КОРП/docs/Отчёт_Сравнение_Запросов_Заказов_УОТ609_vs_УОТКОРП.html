@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Сравнение запросов цикла заказов: УОТ609 (76тест) vs УОТКОРП</title>
+<style>
+body { font-family: 'Segoe UI', sans-serif; margin: 20px; background: #f5f5f5; color: #222; }
+h1 { color: #1a1a2e; border-bottom: 3px solid #e94560; padding-bottom: 10px; }
+h2 { color: #16213e; margin-top: 30px; }
+h3 { color: #0f3460; }
+table { border-collapse: collapse; width: 100%; margin: 15px 0; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+th, td { border: 1px solid #ddd; padding: 10px 12px; text-align: left; vertical-align: top; }
+th { background: #16213e; color: #fff; }
+tr:nth-child(even) { background: #f8f9fa; }
+.match-yes { background: #d4edda; color: #155724; font-weight: bold; padding: 2px 8px; border-radius: 4px; }
+.match-no { background: #f8d7da; color: #721c24; font-weight: bold; padding: 2px 8px; border-radius: 4px; }
+.match-new { background: #cce5ff; color: #004085; font-weight: bold; padding: 2px 8px; border-radius: 4px; }
+.diff-crit { background: #fff3cd; }
+.diff-high { background: #fff8e1; }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin: 1px; }
+.tag-609 { background: #cfe2ff; color: #052c65; }
+.tag-korp { background: #d1e7dd; color: #0a3622; }
+.tag-both { background: #e2d9f3; color: #392c5e; }
+.summary-box { background: #fff; border-left: 5px solid #e94560; padding: 15px; margin: 15px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+.code { font-family: 'Consolas', monospace; font-size: 12px; background: #f4f4f4; padding: 1px 4px; border-radius: 3px; }
+.info { color: #666; font-size: 13px; }
+.note { background: #e7f3ff; border-left: 4px solid #2196F3; padding: 10px; margin: 10px 0; }
+.warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px; margin: 10px 0; }
+.critical { background: #f8d7da; border-left: 4px solid #dc3545; padding: 10px; margin: 10px 0; }
+</style>
+</head>
+<body>
+
+<h1>Сравнение запросов цикла заказов</h1>
+<p><strong>Дата:</strong> 2026-06-01 | <strong>Задача:</strong> 5.9 — Тестирование кодов ошибок от МП</p>
+<p><strong>Источник (76тест):</strong> УОТ609 → <span class="code">CommonModules\CG_Online_ВзаимодействиеСКонфигурацией\Ext\Module.bsl</span></p>
+<p><strong>Цель (УОТКОРП):</strong> <span class="code">CommonModules\CG_Online_ЗаказКлиентаСервиса\Ext\Module.bsl</span></p>
+<p class="info">76тест использует УОТ609 как базовое расширение. SQL-запросы в 76тест при тестировании заказов выполняются из модуля <b>CG_Online_ВзаимодействиеСКонфигурацией</b> (УОТ609). В УОТКОРП аналогичные запросы вынесены в отдельный модуль <b>CG_Online_ЗаказКлиентаСервиса</b>.</p>
+
+<div class="summary-box">
+<h3>Сводка</h3>
+<table>
+<tr><th>Метрика</th><th>Значение</th></tr>
+<tr><td>Всего функций ТекстЗапроса*</td><td><strong>14</strong></td></tr>
+<tr><td>Совпадают (есть в обоих)</td><td><strong>8</strong> (57%)</td></tr>
+<tr><td>Только в УОТ609 (отсутствуют в УОТКОРП)</td><td><strong>4</strong> (29%)</td></tr>
+<tr><td>Только в УОТКОРП (новые)</td><td><strong>3</strong> (21%)</td></tr>
+<tr><td>Системные различия</td><td>Префикс <span class="code">CG_Online_IWS_</span> → <span class="code">CG_Online_</span>; суффикс <span class="code">_Процессинг</span> → убран</td></tr>
+</table>
+</div>
+
+<h2>Сводная таблица функций ТекстЗапроса*</h2>
+
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Функция</th>
+<th><span class="tag tag-609">УОТ609</span></th>
+<th><span class="tag tag-korp">УОТКОРП</span></th>
+<th>Статус</th>
+<th>Различия</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><span class="code">ТекстЗапросаЗаказыКлиентовСервисовДляГенерацииЗаказов</span></td>
+<td>стр. 53305</td>
+<td>стр. 6026</td>
+<td><span class="match-yes">✅ Совпадает</span></td>
+<td>Префикс IWS_ убран; LEFT JOIN вместо INNER JOIN; +Номенклатура/Характеристика/Упаковка; убраны ОстатокМеньше/Больше</td>
+</tr>
+<tr>
+<td>2</td>
+<td><span class="code">ТекстЗапросаЗаказыКлиентовСервисовДляГенерацииРеализаций</span></td>
+<td>стр. 54106</td>
+<td>—</td>
+<td><span class="match-no">❌ Только в УОТ609</span></td>
+<td>Генерация РеализацияТоваровУслуг — вынесена в CG_Online_ВзаимодействиеСКонфигурацией</td>
+</tr>
+<tr>
+<td>3</td>
+<td><span class="code">ТекстЗапросаЗаказыКлиентовСервисовДляГенерацииПередач</span></td>
+<td>стр. 54765</td>
+<td>—</td>
+<td><span class="match-no">❌ Только в УОТ609</span></td>
+<td>Генерация ПередачаТоваровХранителю — вынесена в CG_Online_ВзаимодействиеСКонфигурацией</td>
+</tr>
+<tr>
+<td>4</td>
+<td><span class="code">ТекстЗапросаЗаказыКлиентовСервисовОдинКОдному</span></td>
+<td>—</td>
+<td>стр. 7047</td>
+<td><span class="match-new">🆕 Только в УОТКОРП</span></td>
+<td>Новый запрос — группировка ЗКС один-к-одному с ЗаказКлиента</td>
+</tr>
+<tr>
+<td>5</td>
+<td><span class="code">ТекстЗапросаЗаказыКлиентовСервисовОдинНаДатуДоставки</span></td>
+<td>—</td>
+<td>стр. 7215</td>
+<td><span class="match-new">🆕 Только в УОТКОРП</span></td>
+<td>Новый запрос — группировка по дате доставки</td>
+</tr>
+<tr>
+<td>6</td>
+<td><span class="code">ТекстЗапросаНеобработанныеЗаказыЗаПериод</span></td>
+<td>стр. 49176</td>
+<td>стр. 7665</td>
+<td><span class="match-yes">✅ Совпадает</span></td>
+<td>Префикс IWS_ убран; структура идентична</td>
+</tr>
+<tr>
+<td>7</td>
+<td><span class="code">ТекстЗапросаЗаказыКлиентовСервисовКОтгрузке</span></td>
+<td>—</td>
+<td>стр. 7945</td>
+<td><span class="match-new">🆕 Только в УОТКОРП</span></td>
+<td>Новый запрос — отбор заказов к отгрузке</td>
+</tr>
+<tr>
+<td>8</td>
+<td><span class="code">ТекстЗапросаЗаказыКлиентовСервисовСклады</span></td>
+<td>стр. 55563 (<span class="code">_Процессинг</span>)</td>
+<td>стр. 5311</td>
+<td><span class="match-yes">✅ Совпадает</span></td>
+<td>Убран суффикс _Процессинг; убраны ОстатокМеньше/Больше/ПроцентОтОстатка/ОстатокКратно/ПродаватьКратно</td>
+</tr>
+<tr>
+<td>9</td>
+<td><span class="code">ТекстЗапросаЗаказыКлиентовСервисовДляСозданияОтмен</span></td>
+<td>стр. 56663</td>
+<td>стр. 2589</td>
+<td><span class="match-yes">✅ Совпадает</span></td>
+<td>Префикс IWS_ убран</td>
+</tr>
+<tr>
+<td>10</td>
+<td><span class="code">ТекстЗапросаЗаказыКлиентаСервисаКМаркировке</span></td>
+<td>стр. 56883 (<span class="code">_Процессинг</span>)</td>
+<td>стр. 2021</td>
+<td><span class="match-yes">✅ Совпадает</span></td>
+<td>Убран суффикс _Процессинг; SQL практически идентичен</td>
+</tr>
+<tr>
+<td>11</td>
+<td><span class="code">ТекстЗапросаЗаказыСИзменениямиОтправлений</span></td>
+<td>стр. 47376</td>
+<td>стр. 2130</td>
+<td><span class="match-yes">✅ Совпадает</span></td>
+<td>УОТ609: опечатка "Отправленй" (без "и"); префикс IWS_ убран</td>
+</tr>
+<tr>
+<td>12</td>
+<td><span class="code">ТекстЗапросаДанныеДляИзмененияОтправлений</span></td>
+<td>стр. 47894</td>
+<td>стр. 2247</td>
+<td><span class="match-yes">✅ Совпадает</span></td>
+<td>Префикс IWS_ убран</td>
+</tr>
+<tr>
+<td>13</td>
+<td><span class="code">ТекстЗапросаДоступныеОстатки_Процессинг</span></td>
+<td>стр. 56159</td>
+<td>—</td>
+<td><span class="match-no">❌ Только в УОТ609</span></td>
+<td>Запрос доступных остатков — вынесен в другой модуль в КОРП</td>
+</tr>
+<tr>
+<td>14</td>
+<td><span class="code">ТекстЗапросаЗаказыКлиентаСервисаКПодтверждениюПроцессинг</span></td>
+<td>стр. 56594</td>
+<td>—</td>
+<td><span class="match-no">❌ Только в УОТ609</span></td>
+<td>Запрос заказов к подтверждению — вынесен в другой модуль в КОРП</td>
+</tr>
+</tbody>
+</table>
+
+<h2>Детальный анализ ключевых различий</h2>
+
+<h3>1. Системное переименование таблиц</h3>
+<table>
+<thead><tr><th>УОТ609</th><th>УОТКОРП</th><th>Примечание</th></tr></thead>
+<tbody>
+<tr><td><span class="code">CG_Online_IWS_НастройкиАвторизации</span></td><td><span class="code">CG_Online_НастройкиАвторизации</span></td><td>Убран префикс IWS_</td></tr>
+<tr><td><span class="code">CG_Online_IWS_НоменклатураСервисов</span></td><td><span class="code">CG_Online_НоменклатураСервисов</span></td><td>Убран префикс IWS_</td></tr>
+<tr><td><span class="code">CG_Online_IWS_ИдентификаторыОбъектовВСервисах</span></td><td><span class="code">CG_Online_ИдентификаторыОбъектовВСервисах</span></td><td>Убран префикс IWS_</td></tr>
+<tr><td><span class="code">CG_Online_IWS_НастройкиГенерацииДокументовСервисов</span></td><td><span class="code">CG_Online_НастройкиГенерацииДокументовСервисовИСТП</span></td><td>Другой справочник (суффикс ИСТП)</td></tr>
+<tr><td><span class="code">CG_Online_IWS_СтатусыДокументовСервисов</span></td><td><span class="code">CG_Online_СтатусыДокументовСервисов</span></td><td>Убран префикс IWS_</td></tr>
+<tr><td><span class="code">CG_Online_IWS_РежимыФормированияЗаказовКлиентов</span></td><td><span class="code">CG_Online_РежимыФормированияЗаказовКлиентов</span></td><td>Убран префикс IWS_</td></tr>
+</tbody>
+</table>
+
+<h3>2. Критические расхождения</h3>
+
+<div class="critical">
+<h4>🔴 2.1. LEFT JOIN vs INNER JOIN в ДляГенерацииЗаказов</h4>
+<p>В запросе <span class="code">ПериодОбработки</span>:</p>
+<ul>
+<li><b>УОТ609</b>: <span class="code">ВНУТРЕННЕЕ СОЕДИНЕНИЕ</span> (INNER JOIN) — исключает заказы без настроек генерации</li>
+<li><b>УОТКОРП</b>: <span class="code">ЛЕВОЕ СОЕДИНЕНИЕ</span> (LEFT JOIN) — включает заказы без настроек</li>
+</ul>
+<p><b>Влияние:</b> УОТКОРП может обрабатывать заказы с незаполненными настройками, что может привести к ошибкам на后续 этапах.</p>
+</div>
+
+<div class="warning">
+<h4>🟡 2.2. Убраны поля остатков из Склады</h4>
+<p>В запросе <span class="code">ТекстЗапросаЗаказыКлиентовСервисовДляГенерацииЗаказов</span> временная таблица <span class="code">Склады</span>:</p>
+<ul>
+<li><b>УОТ609</b>: содержит поля <span class="code">ОстатокМеньше</span>, <span class="code">ОстатокБольше</span>, <span class="code">ПроцентОтОстатка</span>, <span class="code">ОстатокКратно</span>, <span class="code">ПродаватьКратно</span></li>
+<li><b>УОТКОРП</b>: эти поля отсутствуют</li>
+</ul>
+<p><b>Влияние:</b> В УОТКОРП не передаются настройки остатков из склада в последующие этапы обработки.<p>
+</div>
+
+<div class="warning">
+<h4>🟡 2.3. Убран фильтр СборУпаковка</h4>
+<p><b>УОТ609</b>: содержит фильтр <span class="code">И ... МодельРаботыСервиса.СборУпаковка</span> в основном запросе.</p>
+<p><b>УОТКОРП</b>: этот фильтр отсутствует.</p>
+<p><b>Влияние:</b> УОТКОРП может генерировать заказы и для моделей без признака Сбор/Упаковка.</p>
+</div>
+
+<div class="warning">
+<h4>🟡 2.4. Убрано поле ПервичныйНомерОтправления</h4>
+<p><b>УОТ609</b>: выбирает <span class="code">ПервичныйНомерОтправления</span> в основном SELECT.</p>
+<p><b>УОТКОРП</b>: это поле отсутствует.</p>
+<p><b>Влияние:</b> В УОТКОРП теряется отслеживание первичного номера отправления при генерации заказов.</p>
+</div>
+
+<h3>3. Архитектурные различия</h3>
+
+<table>
+<thead><tr><th>Аспект</th><th>УОТ609</th><th>УОТКОРП</th></tr></thead>
+<tbody>
+<tr>
+<td><b>Модуль-владелец</b></td>
+<td><span class="code">CG_Online_ВзаимодействиеСКонфигурацией</span> — монолитный модуль (~60000 строк)</td>
+<td><span class="code">CG_Online_ЗаказКлиентаСервиса</span> — выделенный модуль (~8100 строк)</td>
+</tr>
+<tr>
+<td><b>Стратегия именования</b></td>
+<td>Суффиксы <span class="code">_Процессинг</span> для процессинговых функций</td>
+<td>Суффикс <span class="code">_Процессинг</span> убран — все функции безусловные</td>
+</tr>
+<tr>
+<td><b>НоменклатураСервисов join</b></td>
+<td>Простая подстановка идентификатора</td>
+<td>Добавлено разрешение <span class="code">Номенклатура</span>, <span class="code">Характеристика</span>, <span class="code">Упаковка</span></td>
+</tr>
+<tr>
+<td><b>Вызов ТекстЗапросаЗакрытыеЗаказыКлиентов</b></td>
+<td>Локальный вызов (внутри того же модуля)</td>
+<td>Вызов из <span class="code">CG_Online_ВзаимодействиеСКонфигурацией</span> (внешний модуль)</td>
+</tr>
+<tr>
+<td><b>Замена справочников</b></td>
+<td>Замена только <span class="code">Справочник.CG_Online_IWS_НоменклатураСервисов</span></td>
+<td>Замена <span class="code">СправочникНоменклатураСервисов</span> + <span class="code">СправочникНоменклатураПартнеров</span></td>
+</tr>
+<tr>
+<td><b>Генерация Реализаций</b></td>
+<td>Встроена в модуль (<span class="code">ДляГенерацииРеализаций</span>)</td>
+<td>Отсутствует — вероятно, вынесена в другой модуль</td>
+</tr>
+<tr>
+<td><b>Генерация Передач</b></td>
+<td>Встроена в модуль (<span class="code">ДляГенерацииПередач</span>)</td>
+<td>Отсутствует — вероятно, вынесена в другой модуль</td>
+</tr>
+</tbody>
+</table>
+
+<h3>4. Функции, отсутствующие в УОТКОРП (4 шт.)</h3>
+
+<table>
+<thead><tr><th>#</th><th>Функция</th><th>Назначение</th><th>Риск</th></tr></thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><span class="code">ТекстЗапросаЗаказыКлиентовСервисовДляГенерацииРеализаций</span></td>
+<td>Формирование SQL для создания документов РеализацияТоваровУслуг на основе заказов сервисов</td>
+<td>🔴 Высокий — без неё не создаются реализации</td>
+</tr>
+<tr>
+<td>2</td>
+<td><span class="code">ТекстЗапросаЗаказыКлиентовСервисовДляГенерацииПередач</span></td>
+<td>Формирование SQL для создания документов ПередачаТоваровХранителю</td>
+<td>🔴 Высокий — без неё не создаются передачи</td>
+</tr>
+<tr>
+<td>3</td>
+<td><span class="code">ТекстЗапросаДоступныеОстатки_Процессинг</span></td>
+<td>Запрос доступных остатков товаров для процессинга</td>
+<td>🟡 Средний — остатки могут запрашиваться иначе</td>
+</tr>
+<tr>
+<td>4</td>
+<td><span class="code">ТекстЗапросаЗаказыКлиентаСервисаКПодтверждениюПроцессинг</span></td>
+<td>Выборка заказов, ожидающих подтверждения в сервисе</td>
+<td>🟡 Средний — подтверждение может быть реализовано иначе</td>
+</tr>
+</tbody>
+</table>
+
+<h3>5. Новые функции в УОТКОРП (3 шт.)</h3>
+
+<table>
+<thead><tr><th>#</th><th>Функция</th><th>Назначение</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><span class="code">ТекстЗапросаЗаказыКлиентовСервисовОдинКОдному</span></td><td>Группировка ЗКС по принципу один заказ сервиса = один заказ клиента</td></tr>
+<tr><td>2</td><td><span class="code">ТекстЗапросаЗаказыКлиентовСервисовОдинНаДатуДоставки</span></td><td>Группировка ЗКС по дате доставки для объединения в один заказ клиента</td></tr>
+<tr><td>3</td><td><span class="code">ТекстЗапросаЗаказыКлиентовСервисовКОтгрузке</span></td><td>Отбор заказов, готовых к отгрузке (без созданного документа отгрузки)</td></tr>
+</tbody>
+</table>
+
+<h3>6. Выводы</h3>
+
+<div class="note">
+<p><b>Общий вывод:</b> 57% запросов (8 из 14) совпадают по бизнес-логике с поправкой на переименование таблиц. 29% (4 функции) отсутствуют в УОТКОРП, что объясняется архитектурной перестройкой — логика реализаций/передач вынесена из модуля ЗаказКлиентаСервиса в другие модули. 21% (3 функции) — новые, реализующие сценарии КОРП.</p>
+
+<p><b>Ключевые риски при работе с заказами Ozon в УОТКОРП:</b></p>
+<ol>
+<li><b>LEFT JOIN вместо INNER JOIN</b> (п. 2.1) — может приводить к обработке заказов без настроек, что вызывает ошибки на后续 этапах</li>
+<li><b>Убраны поля остатков</b> (п. 2.2) — потеряна передача лимитов остатков из склада в заказы</li>
+<li><b>Отсутствие генерации реализаций/передач</b> (п. 4) — цепочка документов может обрываться, если эти запросы не реализованы в других модулях УОТКОРП</li>
+<li><b>Переименование справочника НастройкиГенерацииДокументовСервисов</b> (добавлен суффикс ИСТП) — критично для поиска настроек</li>
+</ol>
+</div>
+
+<p class="info" style="margin-top:30px;">Сформировано: 2026-06-01. Для задачи 5.9 «Тестирование кодов ошибок от МП».</p>
+
+</body>
+</html>

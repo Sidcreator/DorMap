@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Анализ: analytics/v3/sales-funnel/products — Статистика карточек товаров за период</title>
+<style>
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; max-width: 1000px; margin: 40px auto; padding: 0 20px; color: #1a1a1a; line-height: 1.5; }
+  h1 { border-bottom: 2px solid #1565c0; padding-bottom: 10px; color: #1565c0; }
+  h2 { color: #1565c0; margin-top: 32px; }
+  .meta { background: #f5f5f5; padding: 12px 16px; border-radius: 6px; font-size: 0.9em; }
+  .code { background: #263238; color: #e2e8f0; padding: 12px 16px; border-radius: 6px; font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 0.85em; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 0.9em; }
+  th, td { border: 1px solid #bdbdbd; padding: 6px 10px; text-align: left; }
+  th { background: #1565c0; color: white; position: sticky; top: 0; }
+  tr:nth-child(even) { background: #f5f5f5; }
+  .issue { background: #ffebee; border-left: 4px solid #d32f2f; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .ok { background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .warn { background: #fff3e0; border-left: 4px solid #e65100; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .tg { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; font-weight: bold; }
+  .tg-green { background: #e8f5e9; color: #2e7d32; }
+  .tg-red { background: #ffebee; color: #c62828; }
+  .tg-amber { background: #fff3e0; color: #e65100; }
+  ul { line-height: 1.7; }
+</style>
+</head>
+<body>
+
+<h1>Анализ: <code>analytics/v3/sales-funnel/products</code></h1>
+
+<div class="meta">
+  <strong>Метод:</strong> <code>GET analytics/v3/sales-funnel/products</code><br>
+  <strong>Авторизация:</strong> <code>HeaderApiKey</code><br>
+  <strong>Маркетплейс:</strong> Wildberries<br>
+  <strong>Задача ДК:</strong> 1.2.1 — Статистика карточек товаров за период<br>
+  <strong>Проект:</strong> 1/76<br>
+  <strong>Дата:</strong> 2026-06-28
+</div>
+
+<h2>1. Описание метода</h2>
+<p>Метод формирует отчёт о товарах, сравнивая ключевые показатели за текущий период с аналогичным прошлым. Данные обновляются 1 раз в час.</p>
+
+<div class="ok">
+  <strong>Особенности:</strong><br>
+  - Max период — 365 дней от текущей даты<br>
+  - Выкупы, отмены и возвраты отражаются за день заказа<br>
+  - Если несколько параметров фильтрации — карточка должна соответствовать всем<br>
+  - Пустые массивы [] = все карточки продавца
+</div>
+
+<h2>2. Параметры запроса (Request Body)</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Поле</th>
+      <th>Тип</th>
+      <th>Обязат.</th>
+      <th>Описание</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>selectedPeriod</code></td>
+      <td>object</td>
+      <td>+</td>
+      <td>Запрашиваемый период</td>
+    </tr>
+    <tr>
+      <td>&nbsp;&nbsp;<code>start</code></td>
+      <td>string (date)</td>
+      <td>+</td>
+      <td>Начало периода</td>
+    </tr>
+    <tr>
+      <td>&nbsp;&nbsp;<code>end</code></td>
+      <td>string (date)</td>
+      <td>+</td>
+      <td>Конец периода</td>
+    </tr>
+    <tr>
+      <td><code>pastPeriod</code></td>
+      <td>object</td>
+      <td>-</td>
+      <td>Период для сравнения (такой же длины)</td>
+    </tr>
+    <tr>
+      <td>&nbsp;&nbsp;<code>start</code></td>
+      <td>string (date)</td>
+      <td>-</td>
+      <td>Начало периода сравнения</td>
+    </tr>
+    <tr>
+      <td>&nbsp;&nbsp;<code>end</code></td>
+      <td>string (date)</td>
+      <td>-</td>
+      <td>Конец периода сравнения</td>
+    </tr>
+    <tr>
+      <td><code>nmIds</code></td>
+      <td>array[u64]</td>
+      <td>-</td>
+      <td>Артикулы WB (0..1000). Пусто = все товары</td>
+    </tr>
+    <tr>
+      <td><code>brandNames</code></td>
+      <td>array[string]</td>
+      <td>-</td>
+      <td>Список брендов для фильтрации</td>
+    </tr>
+    <tr>
+      <td><code>subjectIds</code></td>
+      <td>array[u64]</td>
+      <td>-</td>
+      <td>Список ID предметов</td>
+    </tr>
+    <tr>
+      <td><code>tagIds</code></td>
+      <td>array[u64]</td>
+      <td>-</td>
+      <td>Список ID ярлыков</td>
+    </tr>
+    <tr>
+      <td><code>skipDeletedNm</code></td>
+      <td>boolean</td>
+      <td>-</td>
+      <td>Скрыть удалённые товары</td>
+    </tr>
+    <tr>
+      <td><code>orderBy</code></td>
+      <td>object</td>
+      <td>-</td>
+      <td>Параметры сортировки</td>
+    </tr>
+    <tr>
+      <td>&nbsp;&nbsp;<code>field</code></td>
+      <td>string</td>
+      <td>+</td>
+      <td>openCard, addToCart, orderCount, orderSum, buyoutCount, buyoutSum, cancelCount, cancelSum, avgPrice, stockMpQty, stockWbQty, shareOrderPercent, addToWishlist, timeToReady, localizationPercent, wbClub.*</td>
+    </tr>
+    <tr>
+      <td>&nbsp;&nbsp;<code>mode</code></td>
+      <td>string</td>
+      <td>+</td>
+      <td>asc | desc</td>
+    </tr>
+    <tr>
+      <td><code>limit</code></td>
+      <td>uint32</td>
+      <td>-</td>
+      <td>Количество карточек (default: 50, max: 1000)</td>
+    </tr>
+    <tr>
+      <td><code>offset</code></td>
+      <td>uint32</td>
+      <td>-</td>
+      <td>Сколько пропустить (default: 0)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Пример запроса</h3>
+<div class="code">{
+  "selectedPeriod": {
+    "start": "2023-06-01",
+    "end": "2024-03-01"
+  },
+  "pastPeriod": {
+    "start": "2023-06-01",
+    "end": "2024-03-01"
+  },
+  "nmIds": [1234567],
+  "brandNames": ["nike", "adidas"],
+  "subjectIds": [64, 334],
+  "tagIds": [32, 53],
+  "skipDeletedNm": false,
+  "orderBy": {
+    "field": "openCard",
+    "mode": "asc"
+  },
+  "limit": 231,
+  "offset": 10
+}</div>
+
+<h2>3. Структура ответа (Response)</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Путь</th>
+      <th>Тип</th>
+      <th>Описание</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>data.products[].product.nmId</code></td>
+      <td>u64</td>
+      <td>Артикул WB</td>
+    </tr>
+    <tr>
+      <td><code>data.products[].product.title</code></td>
+      <td>string</td>
+      <td>Название товара</td>
+    </tr>
+    <tr>
+      <td><code>data.products[].product.vendorCode</code></td>
+      <td>string</td>
+      <td>Артикул продавца</td>
+    </tr>
+    <tr>
+      <td><code>data.products[].product.brandName</code></td>
+      <td>string</td>
+      <td>Бренд</td>
+    </tr>
+    <tr>
+      <td><code>data.products[].product.subjectName</code></td>
+      <td>string</td>
+      <td>Категория</td>
+    </tr>
+    <tr>
+      <td><code>data.products[].product.stocks</code></td>
+      <td>object</td>
+      <td><code>{ wb, mp, balanceSum }</code></td>
+    </tr>
+    <tr>
+      <td><code>data.products[].statistic.selected</code></td>
+      <td>object</td>
+      <td>Показатели за выбранный период</td>
+    </tr>
+    <tr>
+      <td><code>data.products[].statistic.past</code></td>
+      <td>object</td>
+      <td>Показатели за период сравнения</td>
+    </tr>
+    <tr>
+      <td><code>data.products[].statistic.comparison</code></td>
+      <td>object</td>
+      <td>Динамика (поля с суффиксом Dynamic)</td>
+    </tr>
+    <tr>
+      <td><code>data.currency</code></td>
+      <td>string</td>
+      <td>Валюта (RUB)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Поля statistic.selected / past</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Поле</th>
+      <th>Тип</th>
+      <th>Описание</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><code>openCount</code></td><td>number</td><td>Переходы в карточку товара</td></tr>
+    <tr><td><code>cartCount</code></td><td>number</td><td>Добавления в корзину</td></tr>
+    <tr><td><code>orderCount</code></td><td>number</td><td>Заказано товаров, шт</td></tr>
+    <tr><td><code>orderSum</code></td><td>number</td><td>Заказано на сумму</td></tr>
+    <tr><td><code>buyoutCount</code></td><td>number</td><td>Выкуплено, шт</td></tr>
+    <tr><td><code>buyoutSum</code></td><td>number</td><td>Выкуплено на сумму</td></tr>
+    <tr><td><code>cancelCount</code></td><td>number</td><td>Отмены и возвраты, шт</td></tr>
+    <tr><td><code>cancelSum</code></td><td>number</td><td>Отмены и возвраты на сумму</td></tr>
+    <tr><td><code>avgPrice</code></td><td>number</td><td>Средняя цена</td></tr>
+    <tr><td><code>avgOrdersCountPerDay</code></td><td>number</td><td>Среднее кол-во заказов в день</td></tr>
+    <tr><td><code>shareOrderPercent</code></td><td>number</td><td>Доля в выручке, %</td></tr>
+    <tr><td><code>addToWishlist</code></td><td>number</td><td>Добавления в отложенное</td></tr>
+    <tr><td><code>timeToReady</code></td><td>object</td><td><code>{ days, hours, mins }</code></td></tr>
+    <tr><td><code>localizationPercent</code></td><td>number</td><td>Локальные заказы в рамках одного региона, %</td></tr>
+    <tr><td><code>wbClub</code></td><td>object</td><td>Показатели с WB Клубом</td></tr>
+    <tr><td><code>conversions</code></td><td>object</td><td><code>{ addToCartPercent, cartToOrderPercent, buyoutPercent }</code></td></tr>
+  </tbody>
+</table>
+
+<h3>Поля comparison (динамика)</h3>
+<p>Те же поля, что в selected/past, но с суффиксом <code>Dynamic</code>. Показывает изменение в % (может быть отрицательным).</p>
+
+<h3>Пример ответа</h3>
+<div class="code">{
+  "data": {
+    "products": [
+      {
+        "product": {
+          "nmId": 268913787,
+          "title": "Кроссовки для бега",
+          "vendorCode": "12345456",
+          "brandName": "Demix",
+          "subjectId": 105,
+          "subjectName": "Кроссовки",
+          "tags": [{"id": 1, "name": "Обувь"}],
+          "productRating": 4.5,
+          "feedbackRating": 4,
+          "stocks": { "wb": 0, "mp": 0, "balanceSum": 0 }
+        },
+        "statistic": {
+          "selected": {
+            "period": { "start": "2023-06-01", "end": "2024-03-01" },
+            "openCount": 45, "cartCount": 34,
+            "orderCount": 19, "orderSum": 1262,
+            "buyoutCount": 19, "buyoutSum": 1262,
+            "cancelCount": 0, "cancelSum": 0,
+            "avgPrice": 1262, "avgOrdersCountPerDay": 0.04,
+            "shareOrderPercent": 3, "addToWishlist": 455,
+            "timeToReady": { "days": 1, "hours": 8, "mins": 34 },
+            "localizationPercent": 46,
+            "wbClub": { "orderCount": 19, "orderSum": 1262, "buyoutSum": 1262, "buyoutCount": 19, "cancelSum": 0, "cancelCount": 0, "avgPrice": 1262, "buyoutPercent": 43, "avgOrderCountPerDay": 0.04 },
+            "conversions": { "addToCartPercent": 19, "cartToOrderPercent": 65, "buyoutPercent": 0 }
+          },
+          "past": { ... },
+          "comparison": {
+            "openCountDynamic": 10, "cartCountDynamic": 30,
+            "orderCountDynamic": -100, "orderSumDynamic": -100,
+            "buyoutCountDynamic": -100, "buyoutSumDynamic": -100,
+            "cancelCountDynamic": 0, "cancelSumDynamic": 0
+          }
+        }
+      }
+    ],
+    "currency": "RUB"
+  }
+}</div>
+
+<h2>4. Примечания</h2>
+
+<div class="ok">
+  <strong>Данные:</strong> обновляются 1 раз в час. В течение часа появляется большая часть данных (заказы, переходы, добавления в корзину). Малая часть может появляться в течение нескольких дней.
+</div>
+
+<div class="warn">
+  <strong>Ограничения:</strong>
+  <ul>
+    <li>Максимальный период — 365 дней от текущей даты</li>
+    <li>Если дата начала pastPeriod раньше чем 365 дней назад — она приводится к виду: <code>pastPeriod.start = текущая дата - 365 дней</code></li>
+    <li>limit ≤ 1000 (default 50)</li>
+    <li>nmIds — максимум 1000 элементов</li>
+  </ul>
+</div>
+
+<div class="issue">
+  <strong>Важно для реализации:</strong>
+  <ul>
+    <li>Окончательные итоги продаж — через детализации к отчётам реализации, не через этот метод</li>
+    <li>Выкупы, отмены и возвраты отражаются за день заказа (не за день события)</li>
+    <li>Поле <code>pastPeriod</code> опционально, но если указано — должно быть той же длины, что <code>selectedPeriod</code></li>
+  </ul>
+</div>
+
+<hr>
+<p><em>Проект 1/76 — Дорожная карта. Отчёт привязан к задаче 1.2.1.</em></p>
+
+</body>
+</html>

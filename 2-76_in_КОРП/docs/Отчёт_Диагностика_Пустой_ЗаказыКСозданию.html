@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Диагностика: пустой ЗаказыКСозданию в ДозаполнитьЗаказыКлиентовСервисов</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; line-height: 1.6; color: #1a1a2e; background: #f8f9fa; margin: 0; padding: 30px; }
+.container { max-width: 1100px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.08); padding: 40px; }
+h1 { font-size: 26px; margin: 0 0 5px; color: #1a1a2e; }
+h2 { font-size: 20px; margin: 30px 0 15px; color: #16213e; border-bottom: 2px solid #e9ecef; padding-bottom: 8px; }
+h3 { font-size: 16px; margin: 20px 0 10px; color: #0f3460; }
+h4 { font-size: 14px; margin: 15px 0 8px; color: #16213e; }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; margin-right: 6px; }
+.bg-gr { background: #d4edda; color: #155724; }
+.bg-rd { background: #f8d7da; color: #721c24; }
+.bg-yl { background: #fff3cd; color: #856404; }
+.bg-bl { background: #cce5ff; color: #004085; }
+.bg-pr { background: #e8daef; color: #6c3483; }
+.bg-gy { background: #e2e3e5; color: #383d41; }
+table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; vertical-align: top; }
+th { background: #f1f3f5; font-weight: 700; white-space: nowrap; }
+tr.hl { background: #fff3cd; }
+tr.ok { background: #f0faf0; }
+tr.miss { background: #fff5f5; }
+tr.bug { background: #fff0f0; }
+.call-chain { background: #1a1a2e; color: #e0e0e0; border-radius: 8px; padding: 16px 20px; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.7; overflow-x: auto; white-space: pre; }
+.call-chain .hl { color: #ffd700; }
+.call-chain .ok { color: #6fcf97; }
+.call-chain .err { color: #ff6b6b; }
+.call-chain .dim { color: #888; }
+.call-chain .arrow { color: #5dade2; }
+.sql-block { background: #f4f6f8; border: 1px solid #dde4ea; border-radius: 6px; padding: 12px 16px; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.5; overflow-x: auto; white-space: pre; }
+.sql-block .add { background: #d4edda; color: #155724; }
+.sql-block .del { background: #f8d7da; color: #721c24; }
+.step-card { border: 1px solid #dee2e6; border-radius: 8px; padding: 14px 18px; margin: 10px 0; }
+.step-card h4 { margin: 0 0 6px; font-size: 15px; }
+.step-card p { margin: 0; font-size: 13px; color: #555; }
+.meta-summary { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin: 12px 0; }
+.meta-card { background: #f8f9fa; border-radius: 8px; padding: 12px; border-left: 4px solid; }
+.meta-card.green { border-color: #28a745; }
+.meta-card.red { border-color: #dc3545; }
+.meta-card.yellow { border-color: #ffc107; }
+.code { font-family: 'Courier New', monospace; font-size: 13px; background: #f4f6f8; padding: 1px 5px; border-radius: 3px; }
+.alert { border: 1px solid #ffc107; background: #fffbe6; border-radius: 8px; padding: 12px 16px; margin: 12px 0; }
+.alert h4 { margin: 0 0 6px; color: #856404; }
+.alert p { margin: 0; font-size: 13px; }
+.alert-red { border: 1px solid #dc3545; background: #fff5f5; border-radius: 8px; padding: 12px 16px; margin: 12px 0; }
+.alert-red h4 { margin: 0 0 6px; color: #721c24; }
+.alert-red p { margin: 0; font-size: 13px; }
+ul, ol { font-size: 13px; margin: 6px 0; padding-left: 20px; }
+li { margin: 3px 0; }
+p { font-size: 13px; margin: 6px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Диагностика: пустой <span class="code">ЗаказыКСозданию</span> в УОТКОРП</h1>
+<p style="color:#666; margin:0 0 4px;">Функция <span class="code">ДозаполнитьЗаказыКлиентовСервисов</span> &mdash; модуль <span class="code">CG_Online_ЗаказКлиентаСервиса</span></p>
+<p style="color:#888; font-size:12px;">Создан: 2026-06-03 &nbsp;|&nbsp; Источник: УОТКОРП (v2.0.0.33) vs УОТ609 (v1.7.6.609)</p>
+
+<div class="meta-summary">
+  <div class="meta-card red">
+    <strong style="font-size:18px; color:#dc3545;">Пусто</strong><br>
+    <span style="font-size:12px;">ЗаказыКСозданию не возвращает строк</span>
+  </div>
+  <div class="meta-card yellow">
+    <strong style="font-size:18px; color:#856404;">Критичный</strong><br>
+    <span style="font-size:12px;">Документы заказов не создаются</span>
+  </div>
+  <div class="meta-card green">
+    <strong style="font-size:18px; color:#155724;">Найдена</strong><br>
+    <span style="font-size:12px;">Причина: лишний CROSS JOIN в НовыеЗаказы</span>
+  </div>
+</div>
+
+<h2>1. Симптом</h2>
+<ul>
+  <li>Загрузка заказов Ozon через тест проходит без ошибок</li>
+  <li><span class="code">ДозаполнитьЗаказыКлиентовСервисов()</span> возвращает пустой <span class="code">ЗаказыКСозданию</span></li>
+  <li>Документы <span class="code">CG_Online_ЗаказКлиентаСервиса</span> — не создаются</li>
+  <li>Регистры <span class="code">CG_Online_ЗаказыКлиентовСервисов</span> и <span class="code">CG_Online_РеестрДокументовСервисов</span> — пусты</li>
+</ul>
+
+<h2>2. Цепочка вызовов</h2>
+<div class="call-chain"><span class="dim">КОРПтест</span>
+  ЮнитТест <span class="ok">ЗагрузитьЗаказКлиентаСервиса</span>
+  <span class="arrow">→</span> <span class="name">CG_Online_UT_ИнтеграцииССервисами_ИСТП_ВызовСервера.ЗагрузитьЗаказКлиентаСервиса()</span>
+  <span class="arrow">→</span> <span class="name">CG_Online_ЗаказКлиентаСервиса.ЗагрузитьВсеОбъекты()</span>  <span class="dim">// УОТКОРП</span>
+  <span class="arrow">→</span> <span class="name">CG_Online_Ozon_ИнтеграцияСОзон.ЗагрузитьЗаказКлиентаСервиса()</span>
+  <span class="arrow">→</span> <span class="name">ЗагрузитьЗаказыССобственногоСклада()</span>    <span class="dim">// FBS</span>
+  <span class="arrow">→</span> <span class="hl">Мок v3/posting/fbs/list</span>   <span class="dim">// ЭкранированиеЗапросаКСервису (Режим > 0)</span>
+  <span class="arrow">→</span> Заполнение <span class="name">ТаблицыДанных.тзЗаказы</span> и <span class="name">тзТовары</span>
+<span class="dim">УОТКОРП</span>
+  <span class="arrow">→</span> <span class="name">ОбработатьСинхронизируемыеДанные()</span>   <span class="dim">// стр. 706</span>
+  <span class="arrow">→</span> <span class="name">CG_Online_НоменклатураСервисов.ЗагрузитьТоварыСервисаДляЗагрузкиДокументов()</span>
+  <span class="hl err">→</span> <span class="name err">ДозаполнитьЗаказыКлиентовСервисов()</span>  <span class="dim err">// стр. 758 — возвращает пустые ЗаказыКСозданию</span>
+  <span class="arrow">→</span> <span class="name">ДозаполнитьЗаказыКлиентовСервисовСкладами()</span>
+  <span class="arrow">→</span> <span class="ok">ЗаписатьДокументВРегистрСведенииЗаказыКлиентовСервисов()</span></div>
+
+<h2>3. Анатомия SQL-запроса <span class="code">ДозаполнитьЗаказыКлиентовСервисов</span></h2>
+
+<p>Функция (строка 3113–4770, ~1657 строк) строит пакетный запрос из временных таблиц (ПОМЕСТИТЬ) и финальных SELECT-пакетов. Нумерация пакетов (<span class="code">РезультатЗапроса[N]</span>) — 0-индексированная, учитывает только SELECT без ПОМЕСТИТЬ.</p>
+
+<h3>3.1. Этапы запроса</h3>
+
+<table>
+<tr><th># пакета</th><th>Строки</th><th>Тип</th><th>Таблица / Пакет</th><th>Назначение</th></tr>
+<tr><td>—</td><td>3192–3205</td><td>ПОМЕСТИТЬ</td><td><span class="code">ВД</span></td><td>Копия <span class="code">тзЗаказы</span> с фильтром <span class="code">Артикул&lt;&gt;"" ИЛИ ИдентификаторТовара&lt;&gt;""</span></td></tr>
+<tr><td>—</td><td>3208–3224</td><td>ПОМЕСТИТЬ</td><td><span class="code">ПериодОбработки</span></td><td>Агрегация мин/макс дат</td></tr>
+<tr><td class="hl">—</td><td>3227–3234</td><td>ПОМЕСТИТЬ</td><td><span class="code">СтатусОшибка</span></td><td>Статус с ТипСтатуса=Ошибка (1 строка)</td></tr>
+<tr><td>—</td><td>3237–3347</td><td>ПОМЕСТИТЬ</td><td><span class="code">втНовыеДанные</span></td><td>LEFT JOIN с <span class="code">ЗаказыКлиентовСервисовТовары</span></td></tr>
+<tr><td>—</td><td>3350–3379</td><td>ПОМЕСТИТЬ</td><td><span class="code">НаборТоваровСервисов</span></td><td>Уникальные товары</td></tr>
+<tr><td>—</td><td>3382–3476</td><td>ПОМЕСТИТЬ</td><td><span class="code">НоменклатураСервисов</span></td><td>Сопоставление с <span class="code">CG_Online_НоменклатураСервисов</span></td></tr>
+<tr><td>—</td><td>3478–3589</td><td>ПОМЕСТИТЬ</td><td><span class="code">СопоставленныеЗаказыСервисов</span></td><td>LEFT JOIN НоменклатураСервисов → Товар</td></tr>
+<tr class="hl"><td><strong>[7]</strong></td><td>3591–3691</td><td><strong>SELECT</strong></td><td><strong>ЗаказыСОшибкойТоваров</strong></td><td><strong>CROSS JOIN × СтатусОшибка, WHERE Товар IS NULL</strong></td></tr>
+<tr class="bug"><td>—</td><td>3694–3799</td><td><strong>ПОМЕСТИТЬ</strong></td><td><strong>НовыеЗаказы</strong></td><td><strong>CROSS JOIN × СтатусОшибка (!!!), WHERE ЗКС пуст</strong></td></tr>
+<tr><td>—</td><td>3802–3818</td><td>ПОМЕСТИТЬ</td><td><span class="code">ЗаказыКИзменениюОтправления</span></td><td>LEFT JOIN с регистром, WHERE НомерОтправления NOT NULL</td></tr>
+<tr class="hl"><td><strong>[8]</strong></td><td>3820–3926</td><td><strong>SELECT</strong></td><td><strong>ЗаказыКСозданию</strong></td><td><strong>НовыеЗаказы LEFT JOIN ЗаказыКИзменениюОтправления WHERE NULL</strong></td></tr>
+<tr><td>[12]</td><td>3928–4152</td><td>SELECT</td><td>ЗаказыКУдалениюОтправления</td><td>Изменение номера отправления</td></tr>
+<tr><td>[13]–[19]</td><td>4154–4708</td><td>SELECT</td><td>ЗаказыКИзменению / Увеличению / Уменьшению / Отмене / Период</td><td>Остальные категории</td></tr>
+</table>
+
+<h3>3.2. Ключевое отличие УОТ609 vs УОТКОРП в <span class="code">НовыеЗаказы</span></h3>
+
+<div class="alert-red">
+<h4>⚠️ Найден дефект: лишний CROSS JOIN со СтатусОшибка</h4>
+<p>В УОТКОРП во временную таблицу <span class="code">НовыеЗаказы</span> добавлен CROSS JOIN с <span class="code">СтатусОшибка</span>, которого не было в УОТ609. Если справочник <span class="code">CG_Online_СтатусыДокументовСервисов</span> не содержит элемента с <span class="code">ТипСтатуса = Ошибка</span> — CROSS JOIN даёт 0 строк, и <span class="code">НовыеЗаказы</span> (а значит и <span class="code">ЗаказыКСозданию</span>) будут пусты.</p>
+</div>
+
+<div class="step-card">
+<h4>📄 УОТ609 (исходный, корректный)</h4>
+<div class="sql-block">ПОМЕСТИТЬ НовыеЗаказы
+ИЗ
+    СопоставленныеЗаказыСервисов КАК СопоставленныеЗаказыСервисов      <span class="del">// один источник</span>
+ГДЕ
+    (СопоставленныеЗаказыСервисов.ЗаказКлиентаСервиса = &ПустойЗаказКлиентаСервиса
+        ИЛИ СопоставленныеЗаказыСервисов.ЗаказКлиентаСервиса ЕСТЬ NULL
+        ИЛИ СопоставленныеЗаказыСервисов.ЗаказКлиентаСервиса.ПометкаУдаления)</div>
+</div>
+
+<div class="step-card">
+<h4>📄 УОТКОРП (дефектный)</h4>
+<div class="sql-block">ПОМЕСТИТЬ НовыеЗаказы
+ИЗ
+    СопоставленныеЗаказыСервисов КАК СопоставленныеЗаказыСервисов,
+    СтатусОшибка КАК СтатусОшибка                                   <span class="add">← ЛИШНИЙ CROSS JOIN!</span>
+ГДЕ
+    (СопоставленныеЗаказыСервисов.ЗаказКлиентаСервиса = &ПустойЗаказКлиентаСервиса
+        ИЛИ СопоставленныеЗаказыСервисов.ЗаказКлиентаСервиса ЕСТЬ NULL
+        ИЛИ СопоставленныеЗаказыСервисов.ЗаказКлиентаСервиса.ПометкаУдаления)</div>
+</div>
+
+<h2>4. Проверка: <span class="code">СтатусОшибка</span></h2>
+
+<p>Временная таблица <span class="code">СтатусОшибка</span> создаётся запросом (строка 3227–3234):</p>
+
+<div class="sql-block">ВЫБРАТЬ ПЕРВЫЕ 1
+    CG_Online_СтатусыДокументовСервисов.Ссылка КАК Статус
+ПОМЕСТИТЬ СтатусОшибка
+ИЗ
+    Справочник.CG_Online_СтатусыДокументовСервисов
+ГДЕ
+    CG_Online_СтатусыДокументовСервисов.ТипСтатуса = ЗНАЧЕНИЕ(Перечисление.CG_Online_ТипыСтатусовДокументовСервисов.Ошибка)</div>
+
+<p>Запрос ищет статус с типом <span class="code">Ошибка</span> в справочнике <span class="code">CG_Online_СтатусыДокументовСервисов</span>. Если такой элемент отсутствует — <span class="code">СтатусОшибка</span> пуст.</p>
+
+<h3>4.1. Влияние на пакеты</h3>
+
+<div class="alert">
+<h4>🔍 Механизм влияния</h4>
+<p>CROSS JOIN (декартово произведение) таблицы A (N строк) с таблицей B (M строк) даёт N×M строк. Если B пуста (M=0), результат — 0 строк независимо от N.</p>
+</div>
+
+<table>
+<tr><th>Пакет</th><th>УОТ609</th><th>УОТКОРП</th></tr>
+<tr class="ok"><td><strong>[7] ЗаказыСОшибкойТоваров</strong></td><td>CROSS JOIN × СтатусОшибка<br>← пуст если нет статуса Ошибка</td><td>CROSS JOIN × СтатусОшибка<br>← пуст если нет статуса Ошибка</td></tr>
+<tr class="tr-hl"><td><strong>НовыеЗаказы (ПОМЕСТИТЬ)</strong></td><td><span class="bg-gr badge">OK</span> Без CROSS JOIN<br>не зависит от СтатусОшибка</td><td><span class="bg-rd badge">БАГ</span> Добавлен CROSS JOIN × СтатусОшибка<br>← пуст если нет статуса Ошибка</td></tr>
+<tr><td><strong>[8] ЗаказыКСозданию</strong></td><td><span class="bg-gr badge">OK</span> Данные есть (из НовыеЗаказы)</td><td><span class="bg-rd badge">ПУСТО</span> НовыеЗаказы пусты → пакет пуст</td></tr>
+<tr><td><strong>Документы ЗКС</strong></td><td><span class="bg-gr badge">OK</span> Создаются</td><td><span class="bg-rd badge">НЕ СОЗДАЮТСЯ</span></td></tr>
+</table>
+
+<h2>5. Сценарии проявления дефекта</h2>
+
+<table>
+<tr><th>Сценарий</th><th>Статус Ошибка есть?</th><th>УОТ609</th><th>УОТКОРП</th></tr>
+<tr class="ok"><td>База с загруженными статусами (норма)</td><td><span class="bg-gr badge">Да</span></td><td>✅ Работает</td><td>✅ Работает</td></tr>
+<tr class="miss"><td><strong>Тест без предзагрузки статусов</strong></td><td><span class="bg-rd badge">Нет</span></td><td>✅ Работает (только [7] пуст)</td><td><span class="bg-rd badge">❌ НЕ РАБОТАЕТ</span></td></tr>
+<tr class="miss"><td>Чистая база, первая загрузка заказов</td><td><span class="bg-rd badge">Нет</span></td><td>✅ Работает</td><td><span class="bg-rd badge">❌ НЕ РАБОТАЕТ</span></td></tr>
+<tr class="miss"><td>Сбой предзагрузки статусов в тесте</td><td><span class="bg-rd badge">Нет</span></td><td>✅ Работает</td><td><span class="bg-rd badge">❌ НЕ РАБОТАЕТ</span></td></tr>
+<tr class="ok"><td>Повторный запуск (статус уже создан)</td><td><span class="bg-gr badge">Да</span></td><td>✅ Работает</td><td>✅ Работает</td></tr>
+</table>
+
+<h2>6. Сравнение пакетов НовыеЗаказы: УОТ609 vs УОТКОРП</h2>
+
+<table>
+<tr><th>Характеристика</th><th>УОТ609 (корректный)</th><th>УОТКОРП (дефектный)</th></tr>
+<tr><td>Модуль</td><td><span class="code">ИнтеграцииССервисамиСервер</span></td><td><span class="code">ЗаказКлиентаСервиса</span></td></tr>
+<tr><td>Строка начала функции</td><td>23385</td><td>3113</td></tr>
+<tr><td>СтатусОшибка создание</td><td>ПОМЕСТИТЬ (стр. 23502)</td><td>ПОМЕСТИТЬ (стр. 3227)</td></tr>
+<tr><td>ЗаказыСОшибкойТоваров [7]</td><td>SELECT × СтатусОшибка CROSS JOIN</td><td>SELECT × СтатусОшибка CROSS JOIN</td></tr>
+<tr><td>НовыеЗаказы ПОМЕСТИТЬ</td><td><span class="bg-gr badge">Только СопоставленныеЗаказы</span></td><td><span class="bg-rd badge">+ СтатусОшибка CROSS JOIN</span></td></tr>
+<tr><td>ЗаказыКСозданию [8]</td><td>НовыеЗаказы LEFT JOIN ЗаказыКИзменениюОтправления</td><td>НовыеЗаказы LEFT JOIN ЗаказыКИзменениюОтправления</td></tr>
+<tr><td>Индекс ЗаказыКСозданию в BSL</td><td><span class="code">РезультатЗапроса[10]</span> (закомментирован)<br><span class="code">РезультатЗапроса[8]</span> (актуальный)</td><td><span class="code">РезультатЗапроса[8]</span></td></tr>
+</table>
+
+<h2>7. Вывод</h2>
+
+<div class="alert-red">
+<h4>🔴 Первопричина</h4>
+<p><strong>Дефект рефакторинга при переносе логики из УОТ609 в УОТКОРП.</strong> Во временную таблицу <span class="code">НовыеЗаказы</span> (строка 3791 модуля <span class="code">CG_Online_ЗаказКлиентаСервиса</span>) добавлен лишний CROSS JOIN с <span class="code">СтатусОшибка</span>. В оригинале (УОТ609) этот CROSS JOIN присутствует только в пакете [7] (<span class="code">ЗаказыСОшибкойТоваров</span>), где он необходим для простановки статуса «Ошибка» несопоставленным товарам. В <span class="code">НовыеЗаказы</span> он не нужен — эта таблица должна содержать все заказы без существующего документа ЗКС, независимо от наличия статуса Ошибка.</p>
+</div>
+
+<h3>7.1. Условия проявления</h3>
+<ul>
+  <li><strong>Триггер:</strong> отсутствие элемента справочника <span class="code">CG_Online_СтатусыДокументовСервисов</span> с <span class="code">ТипСтатуса = Ошибка</span> на момент выполнения запроса</li>
+  <li><strong>В тестовом контуре:</strong> если тест <span class="code">ЗагрузитьНастройкиАвторизации()</span> не выполнился или не создал статус Ошибка</li>
+  <li><strong>На чистой базе:</strong> при первом запуске загрузки заказов до загрузки справочника статусов</li>
+</ul>
+
+<h3>7.2. Исправление</h3>
+<p>Убрать CROSS JOIN со <span class="code">СтатусОшибка</span> из запроса создания <span class="code">НовыеЗаказы</span> (строка 3791). Источником данных должна остаться только <span class="code">СопоставленныеЗаказыСервисов</span>, как в оригинальном УОТ609:</p>
+
+<div class="sql-block">ПОМЕСТИТЬ НовыеЗаказы
+ИЗ
+    СопоставленныеЗаказыСервисов КАК СопоставленныеЗаказыСервисов       <span class="add">// без , СтатусОшибка</span>
+ГДЕ
+    (СопоставленныеЗаказыСервисов.ЗаказКлиентаСервиса = &ПустойЗаказКлиентаСервиса
+        ИЛИ СопоставленныеЗаказыСервисов.ЗаказКлиентаСервиса ЕСТЬ NULL
+        ИЛИ СопоставленныеЗаказыСервисов.ЗаказКлиентаСервиса.ПометкаУдаления)</div>
+
+<h2>8. Проверка гипотезы на тестовых данных</h2>
+
+<h3>8.1. Перечисление <span class="code">CG_Online_ТипыСтатусовДокументовСервисов</span></h3>
+<p>Значение <span class="code">Ошибка</span> существует в перечислении (УОТКОРП, <span class="code">Enums/CG_Online_ТипыСтатусовДокументовСервисов.xml</span>, строка 437).</p>
+
+<h3>8.2. Макеты справочника <span class="code">CG_Online_СтатусыДокументовСервисов</span></h3>
+
+<table>
+<tr><th>Макет</th><th>Содержит Ошибка?</th><th>Описание</th></tr>
+<tr class="ok"><td>СтатусыДокументовСервисовИСТП</td><td><span class="bg-gr badge">Да</span> (5 записей: Lamoda, Ozon, МегаМаркет, ЯндексМаркет)</td><td>Основной поставщик данных для тестов</td></tr>
+<tr class="ok"><td>СтатусыДокументовСервисовИССОХ</td><td><span class="bg-gy badge">Нет</span></td><td>ExpressRMS — нет Ошибка</td></tr>
+<tr class="miss"><td>СтатусыДокументовСервисовТП</td><td><span class="bg-gy badge">Только шапка</span></td><td>Нет данных</td></tr>
+<tr class="miss"><td>СтатусыДокументовСервисовИСП</td><td><span class="bg-gy badge">Только шапка</span></td><td>Нет данных</td></tr>
+</table>
+
+<h3>8.3. Инициализация в тесте</h3>
+<ul>
+  <li>Тест <span class="code">ЗагрузитьНастройкиАвторизации()</span> (строка 538, <span class="code">КОРПтест/ВызовСервера/Module.bsl</span>) вызывает <span class="code">ЗагрузитьСтатусыДокументовСервисов()</span></li>
+  <li>Та вызывает <span class="code">CG_Online_СтатусыДокументовСервисов.ЗагрузитьВсеОбъекты()</span>, который через макеты ИСТП загружает статусы включая <span class="code">Ошибка</span></li>
+  <li><strong>Порядок тестов имеет значение:</strong> если <span class="code">ЗагрузитьЗаказКлиентаСервиса()</span> запускается без предварительного <span class="code">ЗагрузитьНастройкиАвторизации()</span> — <span class="code">СтатусОшибка</span> может отсутствовать</li>
+</ul>
+
+<h2>9. Рекомендации</h2>
+<ol>
+  <li><strong>Исправить код:</strong> убрать <span class="code">, СтатусОшибка КАК СтатусОшибка</span> из FROM в запросе <span class="code">НовыеЗаказы</span> (строка 3791 <span class="code">CG_Online_ЗаказКлиентаСервиса/Ext/Module.bsl</span>).</li>
+  <li><strong>Проверить тестовое окружение:</strong> убедиться, что тест <span class="code">ЗагрузитьНастройкиАвторизации()</span> гарантированно выполняется перед <span class="code">ЗагрузитьЗаказКлиентаСервиса()</span> (порядок в тестовом наборе).</li>
+  <li><strong>Добавить проверку:</strong> после вызова <span class="code">ДозаполнитьЗаказыКлиентовСервисов()</span> логировать размер <span class="code">ЗаказыКСозданию</span> для диагностики.</li>
+  <li><strong>Регрессионный тест:</strong> добавить тест, проверяющий, что <span class="code">ЗаказыКСозданию</span> заполняется даже при отсутствии статуса Ошибка в справочнике.</li>
+</ol>
+
+<h2>10. Ссылки</h2>
+<ul>
+  <li><span class="code">УОТКОРП\CommonModules\CG_Online_ЗаказКлиентаСервиса\Ext\Module.bsl</span> — строка 3791 (дефект), строка 3113 (начало функции)</li>
+  <li><span class="code">УОТ609\CommonModules\CG_Online_ИнтеграцииССервисамиСервер\Ext\Module.bsl</span> — строка 23968 (эталон)</li>
+  <li><span class="code">УОТКОРП\Enums\CG_Online_ТипыСтатусовДокументовСервисов.xml</span> — значение Ошибка (строка 437)</li>
+  <li><span class="code">КОРПтест\CommonModules\CG_Online_UT_ИнтеграцииССервисами_ИСТП_ВызовСервера\Ext\Module.bsl</span> — строка 142 (тест)</li>
+  <li><span class="code">1сexpert\docs\Отчёт_Сравнение_Запросов_Заказов_УОТ609_vs_УОТКОРП.html</span> — общий отчёт сравнения запросов</li>
+</ul>
+
+</div>
+</body>
+</html>

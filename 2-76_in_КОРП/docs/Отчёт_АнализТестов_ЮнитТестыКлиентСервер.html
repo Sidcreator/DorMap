@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Анализ тестов: ЮнитТестыКлиентСервер — КОРПтест ↔ УОТКОРП</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; background: #f5f5f5; color: #333; }
+        h1 { color: #1a73e8; border-bottom: 3px solid #1a73e8; padding-bottom: 10px; }
+        h2 { color: #1a73e8; margin-top: 35px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+        h3 { color: #555; margin-top: 25px; }
+        .meta { color: #666; font-size: 14px; margin-bottom: 20px; background: #e8f0fe; padding: 10px 15px; border-radius: 6px; }
+        table { border-collapse: collapse; width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin: 15px 0; font-size: 13px; }
+        th { background: #1a73e8; color: white; padding: 8px 10px; text-align: left; }
+        td { padding: 6px 10px; border-bottom: 1px solid #e0e0e0; vertical-align: top; }
+        tr:hover { background: #f0f7ff; }
+        code { background: #f1f3f4; padding: 2px 6px; border-radius: 3px; font-family: 'Consolas', monospace; font-size: 12px; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 12px; line-height: 1.5; }
+        pre .comment { color: #6a9955; }
+        pre .keyword { color: #569cd6; }
+        pre .string { color: #ce9178; }
+        .section-card { background: white; border-radius: 8px; padding: 20px; margin: 15px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin: 1px; font-weight: bold; }
+        .tag-corptest { background: #e8f5e9; color: #2e7d32; }
+        .tag-uotkorp { background: #fff3e0; color: #e65100; }
+        .tag-mock { background: #f3e5f5; color: #6a1b9a; }
+        .tag-smoke { background: #fff8e1; color: #f57f17; }
+        .tag-ok { background: #e8f5e9; color: #2e7d32; }
+        .tag-warn { background: #fff3e0; color: #e65100; }
+        .tag-red { background: #ffebee; color: #c62828; }
+        .tag-blue { background: #e3f2fd; color: #1565c0; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 20px 0; }
+        .summary-card { background: white; border-radius: 8px; padding: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); text-align: center; }
+        .summary-card .icon { font-size: 28px; margin-bottom: 5px; }
+        .summary-card .num { font-size: 28px; font-weight: bold; color: #1a73e8; }
+        .summary-card .label { font-size: 12px; color: #666; }
+        .pattern-a { border-left: 4px solid #2e7d32; }
+        .pattern-b { border-left: 4px solid #e65100; }
+        .pattern-c { border-left: 4px solid #6a1b9a; }
+        .legend { display: flex; gap: 15px; flex-wrap: wrap; margin: 15px 0; font-size: 13px; }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .legend-dot { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+        .sticky-header { position: sticky; top: 0; background: #1a73e8; z-index: 10; }
+        .chart-bar { display: flex; height: 30px; border-radius: 4px; overflow: hidden; margin: 10px 0; }
+        .chart-bar .seg { display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; }
+        .chart-bar .seg-a { background: #2e7d32; }
+        .chart-bar .seg-b { background: #e65100; }
+        .chart-bar .seg-c { background: #6a1b9a; }
+        .test-active { background: #e8f5e9; }
+        .test-commented { background: #f5f5f5; color: #999; }
+        .test-commented td { color: #bbb; }
+    </style>
+</head>
+<body>
+
+<h1>Анализ тестов: ЮнитТестыКлиентСервер</h1>
+<div class="meta">
+    <strong>Дата:</strong> 2026-06-10 | <strong>Задача:</strong> 4.10<br>
+    <strong>Модуль:</strong> CG_Online_UT_ИнтеграцииССервисами_ЮнитТестыКлиентСервер (1087 строк)<br>
+    <strong>Сравнение:</strong> Логика построения теста КОРПтест ↔ бизнес-логика УОТКОРП
+</div>
+
+<h2>1. Сводка</h2>
+
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="icon">🧪</div>
+        <div class="num">68</div>
+        <div class="label">Всего тестов</div>
+    </div>
+    <div class="summary-card">
+        <div class="icon">✅</div>
+        <div class="num">61</div>
+        <div class="label">Активных тестов</div>
+    </div>
+    <div class="summary-card">
+        <div class="icon">💤</div>
+        <div class="num">7</div>
+        <div class="label">Закомментировано</div>
+    </div>
+    <div class="summary-card">
+        <div class="icon">📊</div>
+        <div class="num">0</div>
+        <div class="label">Тестов с assertions</div>
+    </div>
+    <div class="summary-card">
+        <div class="icon">📦</div>
+        <div class="num">10</div>
+        <div class="label">Тестовых наборов</div>
+    </div>
+    <div class="summary-card">
+        <div class="icon">🔌</div>
+        <div class="num">2</div>
+        <div class="label">Паттерна делегирования</div>
+    </div>
+</div>
+
+<h2>2. Сравнение: КОРПтест vs УОТКОРП</h2>
+
+<div class="section-card">
+<h3>Архитектурные различия</h3>
+<table>
+    <tr><th>Характеристика</th><th>КОРПтест (тестовое расширение)</th><th>УОТКОРП (бизнес-расширение)</th></tr>
+    <tr><td>Роль</td><td>Тестирование через Mockito-перехват HTTP</td><td>Реализация бизнес-логики интеграции с МП</td></tr>
+    <tr><td>Модуль регистрации</td><td><code>CG_Online_UT_..._ЮнитТестыКлиентСервер</code></td><td><code>CG_Online_НоменклатураСервисов</code></td></tr>
+    <tr><td>Модуль-прокси</td><td><code>CG_Online_UT_..._ВызовСервера</code></td><td>—</td></tr>
+    <tr><td>Модуль перехвата HTTP</td><td><code>CG_Online_UT_..._Переопределяемый</code></td><td><code>CG_Online_ИнтеграцииССервисамиСервер</code></td></tr>
+    <tr><td>DataProcessor по МП</td><td><code>CG_Online_UT_Ozon_ИнтеграцияСОзон</code> (моки)</td><td><code>CG_Online_Ozon_ИнтеграцияСОзон</code> (реальная логика)</td></tr>
+    <tr><td>Макеты</td><td>Templates в DataProcessor (JSON)</td><td>Макеты в ObjectModule, CommonTemplates</td></tr>
+    <tr><td>Тип тестирования</td><td>Дымовое (проверка только «не упало»)</td><td>—</td></tr>
+    <tr><td>Assertions</td><td>0 (ноль) — ни один тест не проверяет результат</td><td>—</td></tr>
+</table>
+</div>
+
+<h2>3. Паттерны построения тестов</h2>
+
+<div class="chart-bar">
+    <div class="seg seg-a" style="width:51%">Паттерн A — 35 (51%)</div>
+    <div class="seg seg-b" style="width:37%">Паттерн B — 25 (37%)</div>
+    <div class="seg seg-c" style="width:12%">Паттерн C — 8 (12%)</div>
+</div>
+
+<div class="section-card pattern-a">
+<h3>Паттерн A — Прямой вызов (35 тестов)</h3>
+<p><strong>Схема:</strong> <code>ЮнитТестыКлиентСервер.Тест()</code> → <code>ВызовСервера.Метод()</code> → <code>МодульУОТКОРП.Метод()</code></p>
+<p><strong>Применяется:</strong> общие операции (настройки, авторизация, номенклатура, цены, товары)</p>
+<pre>
+<span class="comment">// ЮнитТестыКлиентСервер (:383)</span>
+Процедура ЗагрузитьКатегорииТоваров() Экспорт
+    CG_Online_UT_ИнтеграцииССервисами_ВызовСервера.ЗагрузитьКатегорииТоваров();
+КонецПроцедуры
+
+<span class="comment">// ВызовСервера (:613)</span>
+Процедура ЗагрузитьКатегорииТоваров() Экспорт
+    МодульМетода = CG_Online_UT_ОбщегоНазначения.ОбщийМодульМетода(<span class="string">"CG_Online_НоменклатураСервисов"</span>);
+    Если МодульМетода &lt;&gt; Неопределено Тогда
+        МодульМетода.ЗагрузитьКатегорииТоваров();
+    КонецЕсли;
+КонецПроцедуры
+</pre>
+</div>
+
+<div class="section-card pattern-b">
+<h3>Паттерн B — Условный вызов через субмодуль (25 тестов)</h3>
+<p><strong>Схема:</strong> <code>ЮнитТестыКлиентСервер.Тест()</code> → <code>ВызовСервера.Метод()</code> → <code>#Если Сервер → ОбщийМодульМетода("CG_Online_..._ИСП/ИССОХ/ТП/ИСТП/ВИК_ВызовСервера")</code> → <code>МодульСубмодуля.Метод()</code></p>
+<p><strong>Применяется:</strong> субмодули (поставщики, онлайн-хранение, торговые площадки, уведомления)</p>
+<pre>
+<span class="comment">// ВызовСервера (:628) — паттерн для субмодуля</span>
+Процедура ЗагрузитьЗаказПоставщику() Экспорт
+    #Если Сервер Тогда
+        МодульМетода = CG_Online_UT_ОбщегоНазначения.ОбщийМодульМетода(
+            <span class="string">"CG_Online_UT_ИнтеграцииССервисами_ТП_ВызовСервера"</span>);
+        Если МодульМетода &lt;&gt; Неопределено Тогда
+            МодульМетода.ЗагрузитьЗаказПоставщику();
+        КонецЕсли;
+    #КонецЕсли
+КонецПроцедуры
+</pre>
+</div>
+
+<div class="section-card pattern-c">
+<h3>Паттерн C — Подготовка данных + вызов (8 тестов)</h3>
+<p><strong>Схема:</strong> Паттерн A или B + очистка регистров перед вызовом</p>
+<p><strong>Применяется:</strong> тесты, требующие чистого состояния данных</p>
+<pre>
+<span class="comment">// ЮнитТестыКлиентСервер (:908) — синхронизация цен</span>
+Процедура СинхронизацияЦенТоваров() Экспорт
+    CG_Online_UT_ИнтеграцииССервисами_ВызовСервера.ОчиститьТекущиеЦеныНоменклатурыСервисов();
+    CG_Online_UT_ИнтеграцииССервисами_ВызовСервера.СинхронизацияЦенТоваров();
+КонецПроцедуры
+</pre>
+</div>
+
+<h2>4. Полный каталог тестов (68 шт.)</h2>
+
+<table>
+    <tr><th>#</th><th>Тестовый набор</th><th>Тест (ЮнитТестыКлиентСервер)</th><th>Целевой модуль УОТКОРП</th><th>Метод УОТКОРП</th><th>П</th><th>Подготовка данных</th></tr>
+
+    <tr class="test-active">
+        <td>1</td><td rowspan="2">Интеграция с сервисами (Настройки Конфигурации)</td>
+        <td><code>ПроверкаБазовыхНастроекКонфигурации</code></td>
+        <td><code>CG_Online_ВзаимодействиеСКонфигурациейВызовСервера</code></td>
+        <td><code>ПроверкаБазовыхНастроекКонфигурации()</code></td>
+        <td><span class="tag tag-ok">A</span></td>
+        <td>Создаёт организацию и склад</td>
+    </tr>
+    <tr class="test-active">
+        <td>2</td>
+        <td><code>ОбновитьИнтерфейсИНастройки</code></td>
+        <td><code>CG_Online_UT_ЗначениеНастроекКлиент</code></td>
+        <td><code>ОбновитьИнтерфейсИНастройки()</code></td>
+        <td><span class="tag tag-ok">A</span></td>
+        <td>—</td>
+    </tr>
+
+    <tr class="test-active">
+        <td>3</td><td rowspan="5">Интеграция с сервисами (Базовые настройки)</td>
+        <td><code>ВключитьПодсистемы</code></td>
+        <td><code>CG_Online_ЗначениеНастроек</code></td>
+        <td><code>УстановитьИнтеграция*()</code></td>
+        <td><span class="tag tag-ok">A</span></td>
+        <td>—</td>
+    </tr>
+    <tr class="test-active"><td>4</td><td><code>ЗагрузитьМоделиРаботыСервисов</code></td><td><code>CG_Online_ЗначениеНастроек</code></td><td><code>СоздатьМоделиРаботыСервисов()</code></td><td><span class="tag tag-ok">A</span></td><td>—</td></tr>
+    <tr class="test-active"><td>5</td><td><code>ЗагрузитьТехнологическиеОперации</code></td><td><code>CG_Online_ТехнологическиеОперации</code></td><td><code>ЗагрузитьВсеОбъекты()</code></td><td><span class="tag tag-ok">A</span></td><td>—</td></tr>
+    <tr class="test-active"><td>6</td><td><code>ЗагрузитьНастройкиГенерацииНоменклатуры</code></td><td><code>CG_Online_НастройкиГенерацииНоменклатуры</code></td><td><code>ЗагрузитьВсеОбъекты()</code></td><td><span class="tag tag-ok">A</span></td><td>Макет настроек</td></tr>
+    <tr class="test-active"><td>7</td><td><code>ЗагрузитьНастройкиГенерацииТоваровСервисов</code></td><td><code>CG_Online_НастройкиГенерацииТоваровСервисов</code></td><td><code>ЗагрузитьВсеОбъекты()</code></td><td><span class="tag tag-ok">A</span></td><td>Макет настроек</td></tr>
+
+    <tr class="test-active">
+        <td>8</td><td rowspan="4">Интеграция с сервисами (Загрузка товаров)</td>
+        <td><code>ЗагрузитьСтатусыМодерацииИИдентификаторыТоваров</code></td>
+        <td><code>CG_Online_НоменклатураСервисов</code></td>
+        <td><code>ЗагрузитьСтатусыМодерацииИИдентификаторыТоваров()</code></td>
+        <td><span class="tag tag-ok">A</span></td>
+        <td>—</td>
+    </tr>
+    <tr class="test-active" style="background:#e8f5e9; font-weight:bold;">
+        <td>9</td>
+        <td><code>ЗагрузитьКатегорииТоваров</code></td>
+        <td><code>CG_Online_НоменклатураСервисов</code></td>
+        <td><code>ЗагрузитьКатегорииТоваров()</code></td>
+        <td><span class="tag tag-ok">A</span></td>
+        <td>—</td>
+    </tr>
+    <tr class="test-active"><td>10</td><td><code>ЗагрузитьДеревоКатегорииТоваров</code></td><td><code>CG_Online_НоменклатураСервисов</code></td><td><code>ЗагрузитьДеревоКатегорииТоваров()</code></td><td><span class="tag tag-ok">A</span></td><td>—</td></tr>
+    <tr class="test-active"><td>11</td><td><code>ЗагрузитьСвойстваКатегорий</code></td><td><code>CG_Online_НоменклатураСервисов</code></td><td><code>ЗагрузитьСвойстваКатегорий()</code></td><td><span class="tag tag-ok">A</span></td><td>—</td></tr>
+    <tr class="test-active"><td>12</td><td rowspan="4">Интеграция с сервисами (Загрузка товаров)</td><td><code>ЗагрузитьЗначенияСвойстваКатегорий</code></td><td><code>CG_Online_НоменклатураСервисов</code></td><td><code>ЗагрузитьЗначенияСвойстваКатегорий()</code></td><td><span class="tag tag-ok">A</span></td><td>—</td></tr>
+    <tr class="test-active"><td>13</td><td><code>ЗагрузитьНесопоставленныеТовары</code></td><td><code>CG_Online_НоменклатураСервисов</code></td><td><code>ЗагрузитьТовары(Параметры)</code></td><td><span class="tag tag-ok">A</span></td><td>Параметр "ТолькоНесопоставленные"</td></tr>
+    <tr class="test-active"><td>14</td><td><code>ЗагрузитьТовары</code></td><td><code>CG_Online_НоменклатураСервисов</code></td><td><code>ЗагрузитьТовары(Параметры)</code></td><td><span class="tag tag-ok">A</span></td><td>Пагинация (стр.1, 10 эл.)</td></tr>
+    <tr class="test-active"><td>15</td><td><code>ЗагрузитьШтрихкоды</code></td><td><code>CG_Online_НоменклатураСервисов</code></td><td><code>ЗагрузитьШтрихкоды()</code></td><td><span class="tag tag-ok">A</span></td><td>—</td></tr>
+
+    <tr class="test-commented">
+        <td>16</td><td rowspan="6">Интеграция с сервисами (Выгрузка товаров)</td>
+        <td><code>ВыгрузитьТовары</code></td>
+        <td><code>CG_Online_НоменклатураСервисов</code></td>
+        <td><code>ВыгрузитьТовары()</code></td>
+        <td><span class="tag tag-blue">—</span></td>
+        <td>⛔ закомментирован</td>
+    </tr>
+    <tr class="test-commented"><td>17</td><td><code>ВыгрузитьЦеныТоваров</code></td><td><code>CG_Online_ИнтеграцииССервисамиСервер</code></td><td><code>ВыгрузитьЦеныТоваров()</code></td><td><span class="tag tag-blue">—</span></td><td>⛔ закомментирован</td></tr>
+    <tr class="test-commented"><td>18</td><td><code>ВыгрузитьВсеЦеныТоваров</code></td><td><code>CG_Online_ИнтеграцииССервисамиСервер</code></td><td><code>ВыгрузитьВсеЦеныТоваров()</code></td><td><span class="tag tag-blue">—</span></td><td>⛔ закомментирован</td></tr>
+    <tr class="test-commented"><td>19</td><td><code>ВыгрузитьОстаткиТоваров</code></td><td><code>CG_Online_ИнтеграцииССервисамиСервер</code></td><td><code>ВыгрузитьОстаткиТоваров()</code></td><td><span class="tag tag-blue">—</span></td><td>⛔ закомментирован</td></tr>
+    <tr class="test-commented"><td>20</td><td><code>ВыгрузитьВсеОстаткиТоваров</code></td><td><code>CG_Online_ИнтеграцииССервисамиСервер</code></td><td><code>ВыгрузитьВсеОстаткиТоваров()</code></td><td><span class="tag tag-blue">—</span></td><td>⛔ закомментирован</td></tr>
+    <tr class="test-commented"><td>21</td><td><code>ВыгрузитьНулевыеОстаткиТоваровНаСкладах</code></td><td><code>CG_Online_ИнтеграцииССервисамиСервер</code></td><td><code>ВыгрузитьНулевыеОстаткиТоваровНаСкладах()</code></td><td><span class="tag tag-blue">—</span></td><td>⛔ закомментирован</td></tr>
+
+    <tr class="test-active"><td>22</td><td>Интеграция с сервисами (Синхронизация цен товаров)</td><td><code>СинхронизацияЦенТоваров</code></td><td><code>CG_Online_ИнтеграцииССервисамиСервер</code></td><td><code>СинхронизацияЦенТоваров()</code></td><td><span class="tag tag-warn">C</span></td><td>Очищает ТекущиеЦены</td></tr>
+    <tr class="test-active"><td>23</td><td rowspan="4">Интеграция с сервисами (Синхронизация цен товаров)</td><td><code>ЗагрузитьЦеныТоваров</code></td><td><code>CG_Online_ИнтеграцииССервисамиСервер</code></td><td><code>ЗагрузитьЦеныТоваров()</code></td><td><span class="tag tag-warn">C</span></td><td>Очищает ТекущиеЦены</td></tr>
+    <tr class="test-active"><td>24</td><td><code>ЗагрузитьИзмененныеЦеныНоменклатурыСервисов</code></td><td><code>CG_Online_ИнтеграцииССервисамиСервер</code></td><td><code>ЗагрузитьИзмененныеЦеныНоменклатурыСервисов()</code></td><td><span class="tag tag-warn">C</span></td><td>Очищает ТекущиеЦены</td></tr>
+    <tr class="test-active"><td>25</td><td><code>ЗагрузитьРегистрацияЦенНоменклатурыСервисов</code></td><td><code>CG_Online_РегистрацияЦенНоменклатурыСервисов</code></td><td><code>ЗагрузитьВсеОбъекты()</code></td><td><span class="tag tag-warn">C</span></td><td>Очищает ТекущиеЦены</td></tr>
+    <tr class="test-active"><td>26</td><td><code>ЗагрузитьУстановкаЦенНоменклатуры</code></td><td><code>CG_Online_УстановкаЦенНоменклатуры</code></td><td><code>ЗагрузитьВсеОбъекты()</code></td><td><span class="tag tag-warn">C</span></td><td>Очищает ТекущиеЦены</td></tr>
+</table>
+
+<h2>5. Анализ по методу ЗагрузитьКатегорииТоваров</h2>
+
+<div class="section-card">
+<h3>Тест (КОРПтест) → Бизнес-логика (УОТКОРП)</h3>
+<table>
+    <tr><th>Уровень</th><th>Модуль</th><th>Код</th><th>Комментарий</th></tr>
+    <tr>
+        <td><span class="tag tag-corptest">КОРПтест</span></td>
+        <td><code>ЮнитТестыКлиентСервер:383</code></td>
+        <td><code>ВызовСервера.ЗагрузитьКатегорииТоваров()</code></td>
+        <td>Простой вызов без параметров и без проверки результата</td>
+    </tr>
+    <tr>
+        <td><span class="tag tag-corptest">КОРПтест</span></td>
+        <td><code>ВызовСервера:613</code></td>
+        <td><code>МодульМетода = ОбщийМодульМетода("CG_Online_НоменклатураСервисов")</code></td>
+        <td>Поиск модуля УОТКОРП по имени</td>
+    </tr>
+    <tr>
+        <td><span class="tag tag-uotkorp">УОТКОРП</span></td>
+        <td><code>НоменклатураСервисов:1832</code></td>
+        <td><code>Цикл по НастройкиАвторизации → ЗагрузитьКатегорииТоваровПоНастройке()</code></td>
+        <td>Перебирает все учётные записи сервисов</td>
+    </tr>
+    <tr>
+        <td><span class="tag tag-uotkorp">УОТКОРП</span></td>
+        <td><code>НоменклатураСервисов:1782</code></td>
+        <td><code>ВыполнитьИнтеграционнуюФункцию("ЗагрузитьКатегорииТоваров")</code></td>
+        <td>Диспетчеризация по типу сервиса</td>
+    </tr>
+    <tr>
+        <td><span class="tag tag-uotkorp">УОТКОРП</span></td>
+        <td><code>Ozon.ObjectModule:824</code></td>
+        <td><code>Метод = "v1/description-category/tree"<br>HTTPЗапрос(Коннектор)</code></td>
+        <td>Формирует запрос к API Ozon</td>
+    </tr>
+    <tr>
+        <td><span class="tag tag-mock">Mockito</span></td>
+        <td><code>Переопределяемый:130</code></td>
+        <td><code>Обработки.CG_Online_UT_Ozon_... .ЭкранированиеЗапросаКСервису()</code></td>
+        <td>Перехват HTTP → возврат макета</td>
+    </tr>
+    <tr>
+        <td><span class="tag tag-mock">КОРПтест</span></td>
+        <td><code>ManagerModule:344</code></td>
+        <td><code>ПолучитьМакет("..._Краткий") → ПрочитатьJSON()</code></td>
+        <td>Возвращает JSON-макет категорий</td>
+    </tr>
+</table>
+</div>
+
+<h2>6. Ключевые выводы</h2>
+
+<div class="section-card">
+<table>
+    <tr><th style="width:30%">Вывод</th><th>Описание</th></tr>
+    <tr>
+        <td><span class="tag tag-red">Zero-assertion testing</span></td>
+        <td>100% тестов (68/68) — дымовые. Успех = отсутствие исключения. Нет ни одного вызова <code>ЮТест.ОжидаетЧто()</code>, <code>ЮТест.Утверждение()</code> или аналогичных.</td>
+    </tr>
+    <tr>
+        <td><span class="tag tag-warn">1:1 проекция на УОТКОРП</span></td>
+        <td>Каждый тест вызывает ровно 1 метод в 1 модуле УОТКОРП. Нет тестов, проверяющих цепочки операций, граничные условия или обработку ошибок.</td>
+    </tr>
+    <tr>
+        <td><span class="tag tag-blue">Два архитектурных стиля</span></td>
+        <td><b>Паттерн A</b> (51%): прямой вызов <code>ВызовСервера.Метод()</code> → <code>CG_Online_*.Метод()</code>.<br>
+        <b>Паттерн B</b> (37%): условный вызов через субмодуль <code>_ИСП_/ИССОХ_/ТП_/ИСТП_/ВИК_ВызовСервера</code>.
+        Если субмодуль не установлен — тест молча проходит без фактической проверки.</td>
+    </tr>
+    <tr>
+        <td><span class="tag tag-warn">7 закомментированных тестов</span></td>
+        <td>Тесты выгрузки товаров, цен, остатков, файлов и переноса карточек зарегистрированы как комментарии в <code>ИсполняемыеСценарии()</code>. Не исполняются.</td>
+    </tr>
+    <tr>
+        <td><span class="tag tag-ok">Минимальная подготовка данных</span></td>
+        <td>Только 8 тестов (12%) очищают регистры <code>ТекущиеОстатки</code> / <code>ТекущиеЦены</code> перед вызовом. 2 теста создают объекты БД (организации, склады, 40+ настроек авторизации).</td>
+    </tr>
+    <tr>
+        <td><span class="tag tag-warn">Пробел: тестирование ошибок</span></td>
+        <td>Нет тестов, проверяющих реакцию УОТКОРП на HTTP-ошибки (400, 403, 404, 409, 500), нештатные ответы API, отсутствие соединения или неверные учётные данные. Это — задача 4.10.</td>
+    </tr>
+</table>
+</div>
+
+<h2>7. Рекомендации</h2>
+
+<div class="section-card">
+<ol>
+    <li><strong>Добавить assertions</strong> — как минимум <code>ЮТест.ОжидаетЧто(Результат).Заполнено()</code> и проверку <code>Результат.Статус = Результат.Статусы.Выполнено</code> во все 68 тестов.</li>
+    <li><strong>Разблокировать 7 закомментированных тестов</strong> — выгрузка товаров, цен, остатков и файлов — критичные операции, которые должны быть покрыты тестами.</li>
+    <li><strong>Реализовать задачу 4.10</strong> — тест на реакцию кодов ошибок от МП в цикле (400/403/404/409/500) для <code>ЗагрузитьТовары</code> и <code>ЗагрузитьКатегорииТоваров</code>.</li>
+    <li><strong>Скрытые no-op тесты (паттерн B)</strong> — 25 тестов могут быть no-op при отсутствии субмодуля. Добавить <code>ЮТест.ПропуститьЕсли(МодульМетода = Неопределено)</code> вместо молчаливого пропуска.</li>
+    <li><strong>Параметризация тестов</strong> — использовать <code>.СПараметрами()</code> для циклического перебора настроек авторизации, страниц пагинации, кодов ошибок.</li>
+</ol>
+</div>
+
+</body>
+</html>

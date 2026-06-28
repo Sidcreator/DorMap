@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анализ: Заполнение справочника СтатусыДокументовСервисов</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --card: #161b22;
+            --border: #30363d;
+            --text: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent: #58a6ff;
+            --green: #3fb950;
+            --red: #f85149;
+            --yellow: #d29922;
+            --purple: #bc8cff;
+            --orange: #f0883e;
+            --blue-bg: #1f6feb22;
+            --green-bg: #23863622;
+            --red-bg: #da363322;
+            --yellow-bg: #9e6a0322;
+            --purple-bg: #8957e522;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 { color: var(--accent); font-size: 1.6em; margin-bottom: 8px; }
+        h2 { color: var(--accent); font-size: 1.3em; margin: 24px 0 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+        h3 { color: var(--purple); font-size: 1.1em; margin: 16px 0 8px; }
+        .meta { color: var(--text-muted); font-size: 0.85em; margin-bottom: 16px; }
+        
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 900px) { .card-grid { grid-template-columns: 1fr; } }
+        
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        .badge-609 { background: var(--blue-bg); color: var(--accent); border: 1px solid var(--accent); }
+        .badge-korp { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple); }
+        .badge-diff { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow); }
+        .badge-test { background: var(--green-bg); color: var(--green); border: 1px solid var(--green); }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 8px 0;
+            font-size: 0.9em;
+        }
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+        th {
+            background: #21262d;
+            color: var(--accent);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        tr:hover { background: #1c2128; }
+        
+        .flow-diagram {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+        .flow-diagram .step {
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin: 2px 0;
+        }
+        .flow-diagram .arrow { color: var(--yellow); }
+        .flow-diagram .module { color: var(--accent); }
+        .flow-diagram .func { color: var(--green); }
+        .flow-diagram .template { color: var(--orange); }
+        .flow-diagram .catalog { color: var(--purple); }
+        
+        .comparison-table td:first-child { font-weight: 600; white-space: nowrap; color: var(--text); }
+        
+        .summary-box {
+            background: var(--green-bg);
+            border: 1px solid var(--green);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 12px 0;
+        }
+        .warning-box {
+            background: var(--yellow-bg);
+            border: 1px solid var(--yellow);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 12px 0;
+        }
+        
+        .toc {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .toc a { color: var(--accent); text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+        .toc ul { padding-left: 20px; }
+        .toc li { margin: 4px 0; }
+        
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin: 12px 0;
+        }
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        .stat-card .number { font-size: 2em; font-weight: 700; }
+        .stat-card .label { font-size: 0.8em; color: var(--text-muted); }
+        
+        .collapsible { cursor: pointer; user-select: none; }
+        .collapsible::before { content: "▼ "; color: var(--text-muted); font-size: 0.8em; }
+        .collapsible.collapsed::before { content: "▶ "; }
+        .collapsible-content { display: block; }
+        .collapsible.collapsed + .collapsible-content { display: none; }
+    </style>
+</head>
+<body>
+
+<h1>📋 Анализ: Заполнение справочника СтатусыДокументовСервисов</h1>
+<div class="meta">
+    Дата: 2026-06-02 • Проект: УОТ КОРП • Сравнение: УОТ609 (76) ↔ УОТКОРП
+</div>
+
+<div class="toc">
+    <strong>Содержание</strong>
+    <ul>
+        <li><a href="#overview">1. Общие сведения</a></li>
+        <li><a href="#stats">2. Статистика</a></li>
+        <li><a href="#flow609">3. Процесс заполнения в УОТ609</a></li>
+        <li><a href="#flowkorp">4. Процесс заполнения в УОТКОРП</a></li>
+        <li><a href="#comparison">5. Сравнительная таблица</a></li>
+        <li><a href="#templates">6. Источники данных (шаблоны)</a></li>
+        <li><a href="#tests">7. Тестирование</a></li>
+        <li><a href="#conclusions">8. Выводы</a></li>
+    </ul>
+</div>
+
+<!-- ===== 1. Общие сведения ===== -->
+<h2 id="overview">1. Общие сведения</h2>
+<div class="card-grid">
+    <div class="card">
+        <h3><span class="badge badge-609">УОТ609 (76)</span></h3>
+        <table>
+            <tr><td>Имя справочника</td><td><code>CG_Online_IWS_СтатусыДокументовСервисов</code></td></tr>
+            <tr><td>Префикс</td><td><code>IWS_</code> (Интеграция с веб-сервисами)</td></tr>
+            <tr><td>Команда создания</td><td><code>СоздатьДоступныеСтатусыДокументовСервисов</code></td></tr>
+            <tr><td>CommonModule</td><td>Отсутствует (логика в ManagerModule)</td></tr>
+            <tr><td>Шаблоны справочника</td><td>0 (все в DataProcessor'ах)</td></tr>
+            <tr><td>DataProcessor'ов</td><td>20</td></tr>
+        </table>
+    </div>
+    <div class="card">
+        <h3><span class="badge badge-korp">УОТКОРП</span></h3>
+        <table>
+            <tr><td>Имя справочника</td><td><code>CG_Online_СтатусыДокументовСервисов</code></td></tr>
+            <tr><td>Префикс</td><td>Без <code>IWS_</code></td></tr>
+            <tr><td>Команда создания</td><td><code>СоздатьСтатусыДокументовСервисов</code></td></tr>
+            <tr><td>CommonModule</td><td>8 модулей (базовый + модели + спец.)</td></tr>
+            <tr><td>Шаблоны справочника</td><td>4 (ИСП, ИССОХ, ИСТП, ТП)</td></tr>
+            <tr><td>DataProcessor'ов</td><td>~15+ (расширенный набор)</td></tr>
+        </table>
+    </div>
+</div>
+
+<!-- ===== 2. Статистика ===== -->
+<h2 id="stats">2. Статистика</h2>
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="number" style="color:var(--accent)">20</div>
+        <div class="label">DataProcessor'ов с шаблоном (УОТ609)</div>
+    </div>
+    <div class="stat-card">
+        <div class="number" style="color:var(--purple)">8</div>
+        <div class="label">CommonModule'ей (УОТКОРП)</div>
+    </div>
+    <div class="stat-card">
+        <div class="number" style="color:var(--orange)">4</div>
+        <div class="label">Шаблона на справочнике (УОТКОРП)</div>
+    </div>
+    <div class="stat-card">
+        <div class="number" style="color:var(--green)">15</div>
+        <div class="label">Колонок в тзСтатусы</div>
+    </div>
+    <div class="stat-card">
+        <div class="number" style="color:var(--yellow)">14</div>
+        <div class="label">Документов-ссылок (УОТКОРП)</div>
+    </div>
+    <div class="stat-card">
+        <div class="number" style="color:var(--red)">13</div>
+        <div class="label">Регистров-ссылок (УОТКОРП)</div>
+    </div>
+</div>
+
+<!-- ===== 3. Процесс УОТ609 ===== -->
+<h2 id="flow609">3. Процесс заполнения в УОТ609</h2>
+
+<div class="card">
+    <h3>Структура справочника</h3>
+    <table>
+        <tr><th>Тип</th><th>Имя</th><th>Описание</th></tr>
+        <tr><td>Реквизит</td><td>ПредопределенныйСтатус</td><td>ПеречислениеСсылка.CG_Online_ПредопределенныеСтатусыДокументовСервисов</td></tr>
+        <tr><td>Реквизит</td><td>Исходящий</td><td>Булево</td></tr>
+        <tr><td>Реквизит</td><td>Входящий</td><td>Булево</td></tr>
+        <tr><td>Реквизит</td><td>Возврат</td><td>Булево</td></tr>
+        <tr><td>Реквизит</td><td>Брак</td><td>Булево</td></tr>
+        <tr><td>Реквизит</td><td>Продано</td><td>Булево</td></tr>
+        <tr><td>Реквизит</td><td>Отменено</td><td>Булево</td></tr>
+        <tr><td>Реквизит</td><td>ВТранзите</td><td>Булево</td></tr>
+        <tr><td>Реквизит</td><td>Цвет</td><td>Строка</td></tr>
+        <tr><td>Реквизит</td><td>Идентификатор</td><td>Строка(300)</td></tr>
+        <tr><td>Реквизит</td><td>Заголовок</td><td>Строка(300)</td></tr>
+        <tr><td>Реквизит</td><td>ТипСтатуса</td><td>ПеречислениеСсылка.CG_Online_ТипыСтатусовДокументовСервисов</td></tr>
+        <tr><td>Реквизит</td><td>ХозяйственнаяОперация</td><td>ПеречислениеСсылка.CG_Online_ХозяйственныеОперации</td></tr>
+        <tr><td>Табличная часть</td><td>ДанныеСервисов</td><td>Сервис, МодельРаботыСервиса, Идентификатор, ИдентификаторСубстатуса, Заголовок, ПредопределенныйСтатус</td></tr>
+        <tr><td>Табличная часть</td><td>Процессы</td><td>Данные о процессах</td></tr>
+    </table>
+</div>
+
+<div class="card">
+    <h3>Диаграмма вызовов</h3>
+    <div class="flow-diagram">
+        <div class="step">📌 <span class="catalog">ФормаСписка</span> → Кнопка «Создать доступные статусы документов сервисов»</div>
+        <div class="step"><span class="arrow">↓</span></div>
+        <div class="step"><span class="func">CommandModule.СоздатьДоступныеСтатусыДокументовСервисов()</span></div>
+        <div class="step"><span class="arrow">↓</span></div>
+        <div class="step"><span class="module">ManagerModule.СоздатьСтатусыДокументовСервисов()</span> <span style="color:var(--text-muted)">// строка 121</span></div>
+        <div class="step"><span class="arrow">↓</span></div>
+        <div class="step"><span class="module">CG_Online_ИнтеграцииССервисамиСервер.ЗагрузитьСтатусыДокументовСервисов()</span> <span style="color:var(--text-muted)">// строка 4328</span></div>
+        <div class="step"><span class="arrow">↓</span> Создаёт <span class="func">тзСтатусы</span> (15 колонок)</div>
+        <div class="step"><span class="arrow">↓</span> Цикл по НастройкиАвторизации × МоделиРаботыСервисов</div>
+        <div class="step"><span class="arrow">↓</span></div>
+        <div class="step"><span class="module">ВыполнитьИтеграционнуюФункцию("ЗагрузитьСтатусыДокументовСервисовПоНастройке")</span></div>
+        <div class="step"><span class="arrow">↓</span> Маршрутизация по сервису (Ozon/WB/YM/Avito/...)</div>
+        <div class="step"><span class="arrow">↓</span></div>
+        <div class="step">Каждый <span class="catalog">DataProcessor.ObjectModule</span>:</div>
+        <div class="step">&nbsp;&nbsp;1. <span class="template">ПолучитьМакет("СтатусыДокументовСервисов")</span> → табличный документ</div>
+        <div class="step">&nbsp;&nbsp;2. <span class="func">ЗагрузитьТабличныйДокументВТаблицуЗначений()</span> → тзДанных</div>
+        <div class="step">&nbsp;&nbsp;3. Заполняет <span class="func">тзСтатусы</span> строками из макета</div>
+        <div class="step">&nbsp;&nbsp;4. Преобразует идентификаторы → значения перечислений</div>
+        <div class="step"><span class="arrow">↓</span></div>
+        <div class="step"><span class="module">CG_Online_ВзаимодействиеСКонфигурацией.СтатусыДокументовСервисовПоНастройкеДляЗагрузки()</span> <span style="color:var(--text-muted)">// строка 35733</span></div>
+        <div class="step"><span class="arrow">↓</span></div>
+        <div class="step">Сравнение тзСтатусы с существующими записями справочника:</div>
+        <div class="step">&nbsp;&nbsp;• Новые → <span class="func">СоздатьЭлемент()</span></div>
+        <div class="step">&nbsp;&nbsp;• Существующие → <span class="func">ПолучитьОбъект()</span> + обновление</div>
+        <div class="step">&nbsp;&nbsp;• Удалённые → <span class="func">ПометкаУдаления = Истина</span></div>
+        <div class="step"><span class="arrow">↓</span></div>
+        <div class="step">✅ Запись элементов в <span class="catalog">Справочник.CG_Online_IWS_СтатусыДокументовСервисов</span></div>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Структура таблицы тзСтатусы</h3>
+    <table>
+        <tr><th>Колонка</th><th>Тип</th><th>Источник</th></tr>
+        <tr><td>МодельРаботыСервиса</td><td>СправочникСсылка.CG_Online_МоделиРаботыСервисов</td><td>Параметр цикла</td></tr>
+        <tr><td>Статус</td><td>СправочникСсылка.CG_Online_IWS_СтатусыДокументовСервисов</td><td>—</td></tr>
+        <tr><td>Идентификатор</td><td>Строка(300)</td><td>Из макета</td></tr>
+        <tr><td>ИдентификаторСубстатуса</td><td>Строка(300)</td><td>Из макета</td></tr>
+        <tr><td>Заголовок</td><td>Строка(300)</td><td>Из макета</td></tr>
+        <tr><td>Сервис</td><td>ПеречислениеСсылка.CG_Online_Сервисы</td><td>Преобразование из макета</td></tr>
+        <tr><td>ТипСтатуса</td><td>ПеречислениеСсылка.CG_Online_ТипыСтатусовДокументовСервисов</td><td>Преобразование из макета</td></tr>
+        <tr><td>ХозяйственнаяОперация</td><td>ПеречислениеСсылка.CG_Online_ХозяйственныеОперации</td><td>Преобразование из макета</td></tr>
+        <tr><td>Входящий</td><td>Булево</td><td>Из макета</td></tr>
+        <tr><td>Исходящий</td><td>Булево</td><td>Из макета</td></tr>
+        <tr><td>Брак</td><td>Булево</td><td>Из макета</td></tr>
+        <tr><td>Возврат</td><td>Булево</td><td>Из макета</td></tr>
+        <tr><td>ВТранзите</td><td>Булево</td><td>Из макета</td></tr>
+        <tr><td>Продано</td><td>Булево</td><td>Из макета</td></tr>
+        <tr><td>Отменено</td><td>Булево</td><td>Из макета</td></tr>
+    </table>
+</div>
+
+<!-- ===== 4. Процесс УОТКОРП ===== -->
+<h2 id="flowkorp">4. Процесс заполнения в УОТКОРП</h2>
+
+<div class="card">
+    <h3>Диаграмма вызовов</h3>
+    <div class="flow-diagram">
+        <div class="step">📌 <span class="catalog">ФормаСписка / ПанельАдминистрирования / ПанельСправочников</span></div>
+        <div class="step"><span class="arrow">↓</span></div>
+        <div class="step"><span class="func">CommandModule.СоздатьСтатусыДокументовСервисов()</span></div>
+        <div class="step"><span class="arrow">↓</span></div>
+        <div class="step"><span class="module">ManagerModule.СоздатьСтатусыДокументовСервисов()</span> <span style="color:var(--text-muted)">// строка 491</span></div>
+        <div class="step"><span class="arrow">↓</span></div>
+        <div class="step"><span class="module">CG_Online_СтатусыДокументовСервисов.ЗагрузитьВсеОбъекты()</span> <span style="color:var(--text-muted)">// строка 592</span></div>
+        <div class="step"><span class="arrow">↓</span></div>
+        <div class="step">┌─ Если есть НастройкиАвторизации:</div>
+        <div class="step">│&nbsp;&nbsp; <span class="arrow">→</span> Цикл по настройкам → <span class="func">ЗагрузитьОбъекты()</span></div>
+        <div class="step">│&nbsp;&nbsp; <span class="arrow">→</span> Каждый DataProcessor читает свой <span class="template">СтатусыДокументовСервисов</span></div>
+        <div class="step">│</div>
+        <div class="step">└─ Если нет настроек (первый запуск):</div>
+        <div class="step">&nbsp;&nbsp; <span class="arrow">→</span> <span class="func">ЗагрузитьСтатусыДокументовСервисовПоНастройке()</span></div>
+        <div class="step">&nbsp;&nbsp; <span class="arrow">→</span> Проверка подсистем:</div>
+        <div class="step">&nbsp;&nbsp;&nbsp;&nbsp; • <span class="module">CG_Online_СтатусыДокументовСервисовИСП</span> → <span class="template">ПолучитьМакет("СтатусыДокументовСервисовИСП")</span></div>
+        <div class="step">&nbsp;&nbsp;&nbsp;&nbsp; • <span class="module">CG_Online_СтатусыДокументовСервисовИССОХ</span> → <span class="template">ПолучитьМакет("СтатусыДокументовСервисовИССОХ")</span></div>
+        <div class="step">&nbsp;&nbsp;&nbsp;&nbsp; • <span class="module">CG_Online_СтатусыДокументовСервисовИСТП</span> → <span class="template">ПолучитьМакет("СтатусыДокументовСервисовИСТП")</span></div>
+        <div class="step">&nbsp;&nbsp;&nbsp;&nbsp; • <span class="module">CG_Online_СтатусыДокументовСервисовТП</span> → <span class="template">ПолучитьМакет("СтатусыДокументовСервисовТП")</span></div>
+        <div class="step"><span class="arrow">↓</span></div>
+        <div class="step"><span class="func">СтатусыДокументовСервисовИзТабличногоДокумента()</span> — разбор макета</div>
+        <div class="step"><span class="arrow">↓</span></div>
+        <div class="step"><span class="func">ОбработатьСинхронизируемыеДанные()</span> — запись в справочник</div>
+        <div class="step"><span class="arrow">↓</span></div>
+        <div class="step">✅ Запись элементов в <span class="catalog">Справочник.CG_Online_СтатусыДокументовСервисов</span></div>
+    </div>
+</div>
+
+<div class="card">
+    <h3>CommonModule'и УОТКОРП (8 шт.)</h3>
+    <table>
+        <tr><th>Модуль</th><th>Назначение</th><th>Подсистема</th></tr>
+        <tr><td><code>CG_Online_СтатусыДокументовСервисов</code></td><td>Базовый модуль (1087 строк)</td><td>БазоваяФункциональность</td></tr>
+        <tr><td><code>...ИСП</code></td><td>Интеграция с сервисами поставщиков</td><td>ОбъектыИСПУОТ</td></tr>
+        <tr><td><code>...ИССОХ</code></td><td>Интеграция с собственными складами</td><td>ОбъектыИССОХУОТ</td></tr>
+        <tr><td><code>...ИСТП</code></td><td>Интеграция с торговыми площадками</td><td>ОбъектыИСТПУОТ</td></tr>
+        <tr><td><code>...ТП</code></td><td>Торговая площадка</td><td>ОбъектыТПУОТ</td></tr>
+        <tr><td><code>...Локализация</code></td><td>Локализация для разных стран</td><td>ОбъектыЛокализации</td></tr>
+        <tr><td><code>...Переопределяемый</code></td><td>Переопределение логики</td><td>ОбъектыУОТ</td></tr>
+        <tr><td><code>...Специализация</code></td><td>Отраслевая специализация</td><td>ОбъектыСпециализация</td></tr>
+    </table>
+</div>
+
+<div class="card">
+    <h3>Дополнительные возможности УОТКОРП (отсутствуют в УОТ609)</h3>
+    <table>
+        <tr><th>Функция</th><th>Описание</th></tr>
+        <tr><td>Синхронизация данных</td><td>ЗагрузкаОбъект/ВыгрузкаОбъект, ЗагрузкаОбъектов/ВыгрузкаОбъектов</td></tr>
+        <tr><td>Версионирование</td><td>ПриОпределенииНастроекВерсионированияОбъектов</td></tr>
+        <tr><td>Блокирование реквизитов</td><td>ПолучитьБлокируемыеРеквизитыОбъекта — 12 реквизитов</td></tr>
+        <tr><td>Создание на основании</td><td>ДобавитьКомандыСозданияНаОсновании</td></tr>
+        <tr><td>Печать</td><td>ДобавитьКомандыПечати + Печать</td></tr>
+        <tr><td>Отчёты</td><td>ДобавитьКомандыОтчетов</td></tr>
+        <tr><td>Панель администрирования</td><td>Кнопки создания/открытия статусов в 4+ формах</td></tr>
+    </table>
+</div>
+
+<!-- ===== 5. Сравнительная таблица ===== -->
+<h2 id="comparison">5. Сравнительная таблица</h2>
+
+<table class="comparison-table">
+    <tr>
+        <th>Аспект</th>
+        <th><span class="badge badge-609">УОТ609 (76)</span></th>
+        <th><span class="badge badge-korp">УОТКОРП</span></th>
+        <th>Разница</th>
+    </tr>
+    <tr>
+        <td>Имя справочника</td>
+        <td><code>CG_Online_IWS_СтатусыДокументовСервисов</code></td>
+        <td><code>CG_Online_СтатусыДокументовСервисов</code></td>
+        <td><span class="badge badge-diff">Без IWS_</span></td>
+    </tr>
+    <tr>
+        <td>Команда создания</td>
+        <td><code>СоздатьДоступныеСтатусыДокументовСервисов</code></td>
+        <td><code>СоздатьСтатусыДокументовСервисов</code></td>
+        <td><span class="badge badge-diff">Другое имя</span></td>
+    </tr>
+    <tr>
+        <td>Точка входа</td>
+        <td><code>CG_Online_ИнтеграцииССервисамиСервер</code></td>
+        <td><code>CG_Online_СтатусыДокументовСервисов</code></td>
+        <td><span class="badge badge-diff">Разные модули</span></td>
+    </tr>
+    <tr>
+        <td>Функция входа</td>
+        <td><code>ЗагрузитьСтатусыДокументовСервисов()</code></td>
+        <td><code>ЗагрузитьВсеОбъекты()</code></td>
+        <td><span class="badge badge-diff">Разные имена</span></td>
+    </tr>
+    <tr>
+        <td>Шаблоны на справочнике</td>
+        <td>0</td>
+        <td>4 (ИСП, ИССОХ, ИСТП, ТП)</td>
+        <td><span class="badge badge-diff">+4 макета</span></td>
+    </tr>
+    <tr>
+        <td>Модули моделей работы</td>
+        <td>0</td>
+        <td>4 (ИСП, ИССОХ, ИСТП, ТП)</td>
+        <td><span class="badge badge-diff">+4 модуля</span></td>
+    </tr>
+    <tr>
+        <td>Всего CommonModule</td>
+        <td>0</td>
+        <td>8</td>
+        <td><span class="badge badge-diff">+8 модулей</span></td>
+    </tr>
+    <tr>
+        <td>ManagerModule (строк)</td>
+        <td>173</td>
+        <td>973</td>
+        <td><span class="badge badge-diff">×5.6 больше</span></td>
+    </tr>
+    <tr>
+        <td>Функция записи в БД</td>
+        <td><code>CG_Online_ВзаимодействиеСКонфигурацией.СтатусыДокументовСервисовПоНастройкеДляЗагрузки()</code></td>
+        <td><code>CG_Online_СтатусыДокументовСервисов.ОбработатьСинхронизируемыеДанные()</code></td>
+        <td><span class="badge badge-diff">Разные подходы</span></td>
+    </tr>
+    <tr>
+        <td>Синхронизация данных</td>
+        <td>❌ Нет</td>
+        <td>✅ Да (загрузка/выгрузка объектов)</td>
+        <td><span class="badge badge-korp">Только КОРП</span></td>
+    </tr>
+    <tr>
+        <td>Версионирование</td>
+        <td>❌ Нет</td>
+        <td>✅ Да</td>
+        <td><span class="badge badge-korp">Только КОРП</span></td>
+    </tr>
+    <tr>
+        <td>Блокирование реквизитов</td>
+        <td>❌ Нет</td>
+        <td>✅ Да (12 реквизитов)</td>
+        <td><span class="badge badge-korp">Только КОРП</span></td>
+    </tr>
+    <tr>
+        <td>Панель администрирования</td>
+        <td>❌ Нет</td>
+        <td>✅ Да (4+ формы с кнопками)</td>
+        <td><span class="badge badge-korp">Только КОРП</span></td>
+    </tr>
+    <tr>
+        <td>Документы-ссылки</td>
+        <td>~8</td>
+        <td>~14</td>
+        <td><span class="badge badge-diff">+6 документов</span></td>
+    </tr>
+</table>
+
+<!-- ===== 6. Источники данных ===== -->
+<h2 id="templates">6. Источники данных (шаблоны)</h2>
+
+<h3>УОТ609: DataProcessor'ы с макетом «СтатусыДокументовСервисов»</h3>
+<div class="card">
+    <table>
+        <tr><th>#</th><th>DataProcessor</th><th>Сервис</th><th>Функция (строка)</th></tr>
+        <tr><td>1</td><td><code>CG_Online_Ozon_ИнтеграцияСОзон</code></td><td>Ozon</td><td>стр. 4680</td></tr>
+        <tr><td>2</td><td><code>CG_Online_WB_ИнтеграцияСВайлдберриз</code></td><td>Wildberries</td><td>стр. 13922</td></tr>
+        <tr><td>3</td><td><code>CG_Online_YM_ИнтеграцияСЯндексМаркет</code></td><td>Яндекс Маркет</td><td>стр. 3138</td></tr>
+        <tr><td>4</td><td><code>CG_Online_Avito_ИнтеграцияСАвито</code></td><td>Авито</td><td>стр. 1153</td></tr>
+        <tr><td>5</td><td><code>CG_Online_Lamoda_ИнтеграцияСЛамода</code></td><td>Lamoda</td><td>стр. 1509</td></tr>
+        <tr><td>6</td><td><code>CG_Online_LemanaPro_ИнтеграцияСЛеманаПро</code></td><td>Лемана ПРО</td><td>стр. 1395</td></tr>
+        <tr><td>7</td><td><code>CG_Online_SMM_ИнтеграцияСоСберМегаМаркет</code></td><td>СберМегаМаркет</td><td>стр. 1710</td></tr>
+        <tr><td>8</td><td><code>CG_Online_IWS_ШаблонИнтеграцийССервисами</code></td><td>Шаблон</td><td>стр. 908</td></tr>
+        <tr><td>9</td><td><code>CG_Online_XML_ПростаяВыгрузкаYML</code></td><td>XML/YML</td><td>стр. 1542</td></tr>
+        <tr><td>10</td><td><code>CG_Online_XML_ИнтеграцияВФорматеCML2</code></td><td>CML2</td><td>стр. 1881</td></tr>
+        <tr><td>11</td><td><code>CG_Online_XML_РаботаСYML</code></td><td>YML</td><td>стр. 1884</td></tr>
+        <tr><td>12</td><td><code>CG_Online_РаботаСТабличнымДокументом</code></td><td>Табличный документ</td><td>стр. 1882</td></tr>
+        <tr><td>13</td><td><code>CG_Online_VK_ИнтеграцияСВКонтакте</code></td><td>ВКонтакте</td><td>стр. 1432</td></tr>
+        <tr><td>14</td><td><code>CG_Online_GS1_ИнтеграцияСЮнискан</code></td><td>Юнискан</td><td>стр. 2780</td></tr>
+        <tr><td>15</td><td><code>CG_Online_GP_ИнтеграцияСGroupPrice</code></td><td>GroupPrice</td><td>стр. 2669</td></tr>
+        <tr><td>16</td><td><code>CG_Online_KAK2C_ИнтеграцияСКактус</code></td><td>Кактус</td><td>стр. 1722</td></tr>
+        <tr><td>17</td><td><code>CG_Online_PB_ИнтеграцияСPicabox</code></td><td>Picabox</td><td>стр. 876</td></tr>
+        <tr><td>18</td><td><code>CG_Online_YD_ИнтеграцияСЯндексДиск</code></td><td>Яндекс Диск</td><td>стр. 942</td></tr>
+        <tr><td>19</td><td><code>CG_Online_YM_ВыгрузкаYML_DBS</code></td><td>YM DBS</td><td>стр. 1098</td></tr>
+        <tr><td>20</td><td><code>CG_Online_SM_ИнтеграцияСоСкладом</code></td><td>Склад</td><td>—</td></tr>
+    </table>
+</div>
+
+<h3>УОТКОРП: Дополнительные шаблоны на справочнике</h3>
+<div class="card">
+    <table>
+        <tr><th>Шаблон</th><th>Модуль</th><th>Модель работы</th><th>Подсистема</th></tr>
+        <tr><td><code>СтатусыДокументовСервисовИСП</code></td><td><code>CG_Online_СтатусыДокументовСервисовИСП</code></td><td>Интеграция с сервисами поставщиков</td><td>ОбъектыИСПУОТ</td></tr>
+        <tr><td><code>СтатусыДокументовСервисовИССОХ</code></td><td><code>CG_Online_СтатусыДокументовСервисовИССОХ</code></td><td>Интеграция с собственными складами</td><td>ОбъектыИССОХУОТ</td></tr>
+        <tr><td><code>СтатусыДокументовСервисовИСТП</code></td><td><code>CG_Online_СтатусыДокументовСервисовИСТП</code></td><td>Интеграция с торговыми площадками</td><td>ОбъектыИСТПУОТ</td></tr>
+        <tr><td><code>СтатусыДокументовСервисовТП</code></td><td><code>CG_Online_СтатусыДокументовСервисовТП</code></td><td>Торговая площадка</td><td>ОбъектыТПУОТ</td></tr>
+    </table>
+</div>
+
+<h3>УОТКОРП: DataProcessor'ы с макетом «СтатусыДокументовСервисов»</h3>
+<div class="card">
+    <table>
+        <tr><th>#</th><th>DataProcessor</th><th>Сервис</th></tr>
+        <tr><td>1</td><td><code>CG_Online_Ozon_ИнтеграцияСОзон</code></td><td>Ozon</td></tr>
+        <tr><td>2</td><td><code>CG_Online_WB_ИнтеграцияСВайлдберриз</code></td><td>Wildberries</td></tr>
+        <tr><td>3</td><td><code>CG_Online_YM_ИнтеграцияСЯндексМаркет</code></td><td>Яндекс Маркет</td></tr>
+        <tr><td>4</td><td><code>CG_Online_Avito_ИнтеграцияСАвито</code></td><td>Авито</td></tr>
+        <tr><td>5</td><td><code>CG_Online_LM_ИнтеграцияСЛамода</code></td><td>Lamoda</td></tr>
+        <tr><td>6</td><td><code>CG_Online_LP_ИнтеграцияСЛеманаПРО</code></td><td>Лемана ПРО</td></tr>
+        <tr><td>7</td><td><code>CG_Online_MM_ИнтеграцияСМегаМаркет</code></td><td>СберМегаМаркет</td></tr>
+        <tr><td>8</td><td><code>CG_Online_BP_ИнтеграцияСБетаПро</code></td><td>БетаПро</td></tr>
+        <tr><td>9</td><td><code>CG_Online_ITP_ИнтеграцияСИТПартнер</code></td><td>ИТПартнер</td></tr>
+        <tr><td>10</td><td><code>CG_Online_RMS_ИнтеграцияСExpressRMS</code></td><td>ExpressRMS</td></tr>
+        <tr><td>11</td><td><code>CG_Online_ШаблонИнтеграцийССервисами</code></td><td>Шаблон</td></tr>
+    </table>
+</div>
+
+<!-- ===== 7. Тестирование ===== -->
+<h2 id="tests">7. Тестирование</h2>
+
+<div class="card-grid">
+    <div class="card">
+        <h3><span class="badge badge-test">76тест</span></h3>
+        <table>
+            <tr><td>Модуль регистрации</td><td><code>CG_Online_UT_ИнтеграцииССервисами_ЮнитТесты</code></td></tr>
+            <tr><td>Имя теста</td><td><code>"Загрузить статусы документов сервисов"</code></td></tr>
+            <tr><td>Метод теста</td><td><code>ЗагрузитьСтатусыДокументовСервисов()</code></td></tr>
+            <tr><td>Вызов</td><td><code>CG_Online_ИнтеграцииССервисамиСервер.ЗагрузитьСтатусыДокументовСервисов()</code></td></tr>
+        </table>
+        <div class="warning-box" style="margin-top:8px">
+            ⚠️ Вызывает <strong>ту же функцию</strong>, что и боевой код УОТ609. Данные берутся из реальных макетов DataProcessor'ов.
+        </div>
+    </div>
+    <div class="card">
+        <h3><span class="badge badge-test">КОРПтест</span></h3>
+        <table>
+            <tr><td>Модуль регистрации</td><td><code>CG_Online_UT_ИнтеграцииССервисами_ЮнитТестыКлиентСервер</code></td></tr>
+            <tr><td>Имя теста</td><td><code>"Загрузить статусы документов сервисов"</code></td></tr>
+            <tr><td>Метод теста</td><td><code>ЗагрузитьСтатусыДокументовСервисов()</code></td></tr>
+            <tr><td>Вызов</td><td><code>CG_Online_UT_ОбщегоНазначения.ОбщийМодульМетода("CG_Online_СтатусыДокументовСервисов")</code></td></tr>
+        </table>
+        <div class="summary-box" style="margin-top:8px">
+            ✅ Использует паттерн <code>ОбщийМодульМетода()</code> для вызова <code>ЗагрузитьВсеОбъекты()</code> из КОРП-модуля.
+        </div>
+    </div>
+</div>
+
+<!-- ===== 8. Выводы ===== -->
+<h2 id="conclusions">8. Выводы</h2>
+
+<div class="card">
+    <h3>Ключевые различия архитектуры</h3>
+    <div class="summary-box">
+        <strong>1. Модульная архитектура КОРП</strong><br>
+        УОТКОРП использует развитую модульную архитектуру с 8 CommonModule'ями вместо прямого вызова из ManagerModule.
+        Это позволяет поддерживать разные модели работы (ИСП, ИССОХ, ИСТП, ТП) через проверку подсистем.
+    </div>
+    
+    <div class="summary-box">
+        <strong>2. Двойной источник данных в КОРП</strong><br>
+        В УОТКОРП статусы загружаются из двух источников:<br>
+        • <em>DataProcessor'ы сервисов</em> — при наличии настроек авторизации (как в УОТ609)<br>
+        • <em>Шаблоны на справочнике</em> — при первом запуске / отсутствии настроек (4 макета по моделям работы)
+    </div>
+    
+    <div class="warning-box">
+        <strong>3. Критическое отличие: имя справочника</strong><br>
+        УОТ609: <code>CG_Online_IWS_СтатусыДокументовСервисов</code><br>
+        УОТКОРП: <code>CG_Online_СтатусыДокументовСервисов</code><br>
+        При миграции/синхронизации требуется маппинг имён!
+    </div>
+    
+    <div class="summary-box">
+        <strong>4. Расширенный функционал КОРП</strong><br>
+        УОТКОРП добавляет: версионирование, блокирование реквизитов, синхронизацию данных,
+        создание на основании, печать, панель администрирования с 4+ формами управления статусами.
+    </div>
+</div>
+
+<div class="card">
+    <h3>Сводка по файлам анализа</h3>
+    <table>
+        <tr><th>Файл</th><th>Строк</th><th>Роль</th></tr>
+        <tr><td>УОТ609/Catalogs/.../ManagerModule.bsl</td><td>173</td><td>Entry point (609)</td></tr>
+        <tr><td>УОТ609/CommonModules/...ИнтеграцииССервисамиСервер/Module.bsl</td><td>25820</td><td>ЗагрузитьСтатусыДокументовСервисов (стр. 4328)</td></tr>
+        <tr><td>УОТ609/CommonModules/...ВзаимодействиеСКонфигурацией/Module.bsl</td><td>59795</td><td>Запись в БД (стр. 35733)</td></tr>
+        <tr><td>УОТ609/DataProcessors/...Ozon.../ObjectModule.bsl</td><td>14243</td><td>Пример: Ozon (стр. 4680)</td></tr>
+        <tr><td>УОТКОРП/Catalogs/.../ManagerModule.bsl</td><td>973</td><td>Entry point (КОРП)</td></tr>
+        <tr><td>УОТКОРП/CommonModules/...СтатусыДокументовСервисов/Module.bsl</td><td>1087</td><td>Базовый модуль КОРП</td></tr>
+        <tr><td>УОТКОРП/CommonModules/...СтатусыДокументовСервисовИСП/Module.bsl</td><td>~60</td><td>Модуль модели ИСП</td></tr>
+    </table>
+</div>
+
+<div style="text-align:center; color:var(--text-muted); margin-top:24px; font-size:0.85em;">
+    Сгенерировано: 2026-06-02 • 1С:Эксперт • Анализ СтатусыДокументовСервисов
+</div>
+
+</body>
+</html>

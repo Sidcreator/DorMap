@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Анализ: v1/report/discounted/create — Отчёт об уценённых товарах</title>
+<style>
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; max-width: 1000px; margin: 40px auto; padding: 0 20px; color: #1a1a1a; line-height: 1.5; }
+  h1 { border-bottom: 2px solid #1565c0; padding-bottom: 10px; color: #1565c0; }
+  h2 { color: #1565c0; margin-top: 32px; }
+  .meta { background: #f5f5f5; padding: 12px 16px; border-radius: 6px; font-size: 0.9em; }
+  .code { background: #263238; color: #e2e8f0; padding: 12px 16px; border-radius: 6px; font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 0.85em; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 0.9em; }
+  th, td { border: 1px solid #bdbdbd; padding: 6px 10px; text-align: left; }
+  th { background: #1565c0; color: white; position: sticky; top: 0; }
+  tr:nth-child(even) { background: #f5f5f5; }
+  .issue { background: #ffebee; border-left: 4px solid #d32f2f; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .ok { background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .warn { background: #fff3e0; border-left: 4px solid #e65100; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .tg { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; font-weight: bold; }
+  .tg-green { background: #e8f5e9; color: #2e7d32; }
+  .tg-red { background: #ffebee; color: #c62828; }
+  .tg-amber { background: #fff3e0; color: #e65100; }
+  .tg-gray { background: #eceff1; color: #546e7a; }
+</style>
+</head>
+<body>
+
+<h1>Анализ: <code>v1/report/discounted/create</code></h1>
+
+<div class="meta">
+  <strong>Метод:</strong> <code>— (НЕТ в УОТ614)</code><br>
+  <strong>Модуль:</strong> <code>—</code><br>
+  <strong>Задача ДК:</strong> 4.2 — /v1/report/discounted/create - Отчёт об уценённых товарах<br>
+  <strong>Проект:</strong> 1/76<br>
+  <strong>Дата:</strong> 2026-06-25
+</div>
+
+<h2>1. Описание</h2>
+
+<p>Запускает генерацию отчёта по уценённым товарам на складе Ozon. Ozon может самостоятельно уценить товар, например, при повреждении.</p>
+<p>В результате запроса возвращается <b>не сам отчёт</b>, а его уникальный идентификатор (<code>code</code>). Чтобы получить готовый отчёт, идентификатор передаётся в метод <code>/v1/report/info</code>.</p>
+
+<h2>2. Схема запроса (create)</h2>
+
+<div class="code">
+POST /v1/report/discounted/create
+{}
+</div>
+
+<p>Тело запроса — пустой объект. Параметры не требуются.</p>
+
+<h2>3. Схема ответа (create)</h2>
+
+<div class="code">
+{
+  "code": "REPORT_seller_products_924336_1720170405_a9ea2f27-a473-4b13-99f9-d0cfcb5b1a69"
+}
+</div>
+
+<h2>4. Полный маппинг полей JSON ответа (create)</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Поле JSON</th>
+      <th>Тип</th>
+      <th>Описание</th>
+      <th>Статус</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="5" style="background:#ffebee;font-weight:bold;">⏳ Метод не реализован (1 поле)</td>
+    </tr>
+    <tr class="unused">
+      <td>1</td>
+      <td><code>code</code></td>
+      <td>string</td>
+      <td>Уникальный идентификатор отчёта. Передаётся в /v1/report/info для получения готового отчёта</td>
+      <td><span class="tg tg-amber">⏳</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+
+<h2>5. Схема запроса /v1/report/info</h2>
+
+<p>Обрабатывает идентификатор кода из метода /v1/report/discounted/create. Возвращает информацию о созданном ранее отчёте по его идентификатору.</p>
+
+<div class="code">
+POST /v1/report/info
+{
+  "code": "REPORT_seller_products_924336_1720170405_a9ea2f27-a473-4b13-99f9-d0cfcb5b1a69"
+}
+</div>
+
+<h2>6. Схема ответа /v1/report/info</h2>
+
+<div class="code">
+{
+  "result": {
+    "code": "REPORT_seller_products_924336_1720170405_a9ea2f27",
+    "status": "success",
+    "error": "",
+    "expires_at": "2025-11-10T11:16:00.267Z",
+    "file": "https://cdn1.ozone.ru/s3/item-picture-6/f3/ce/f4ceae54b323213d3e61e59c323bd8e5.csv",
+    "report_type": "seller_products",
+    "params": {},
+    "created_at": "2021-11-25T14:54:55.688260Z"
+  }
+}
+</div>
+
+<h2>7. Полный маппинг полей JSON ответа /v1/report/info</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Поле JSON</th>
+      <th>Тип</th>
+      <th>Описание</th>
+      <th>Статус</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="5" style="background:#ffebee;font-weight:bold;">⏳ Метод не реализован (8 полей)</td>
+    </tr>
+    <tr class="unused">
+      <td>1</td>
+      <td><code>result.code</code></td>
+      <td>string</td>
+      <td>Идентификатор отчёта (тот же, что передан в запросе)</td>
+      <td><span class="tg tg-amber">⏳</span></td>
+    </tr>
+    <tr class="unused">
+      <td>2</td>
+      <td><code>result.status</code></td>
+      <td>string</td>
+      <td>Статус отчёта: success / failed / in_progress</td>
+      <td><span class="tg tg-amber">⏳</span></td>
+    </tr>
+    <tr class="unused">
+      <td>3</td>
+      <td><code>result.error</code></td>
+      <td>string</td>
+      <td>Описание ошибки, если статус failed</td>
+      <td><span class="tg tg-amber">⏳</span></td>
+    </tr>
+    <tr class="unused">
+      <td>4</td>
+      <td><code>result.expires_at</code></td>
+      <td>datetime</td>
+      <td>Дата истечения срока действия ссылки на файл</td>
+      <td><span class="tg tg-amber">⏳</span></td>
+    </tr>
+    <tr class="unused">
+      <td>5</td>
+      <td><code>result.file</code></td>
+      <td>string</td>
+      <td>Ссылка на скачивание готового отчёта (CSV)</td>
+      <td><span class="tg tg-amber">⏳</span></td>
+    </tr>
+    <tr class="unused">
+      <td>6</td>
+      <td><code>result.report_type</code></td>
+      <td>string</td>
+      <td>Тип отчёта (seller_products — уценённые товары)</td>
+      <td><span class="tg tg-amber">⏳</span></td>
+    </tr>
+    <tr class="unused">
+      <td>7</td>
+      <td><code>result.params</code></td>
+      <td>object</td>
+      <td>Параметры отчёта (зависят от типа)</td>
+      <td><span class="tg tg-amber">⏳</span></td>
+    </tr>
+    <tr class="unused">
+      <td>8</td>
+      <td><code>result.created_at</code></td>
+      <td>datetime</td>
+      <td>Дата и время создания отчёта</td>
+      <td><span class="tg tg-amber">⏳</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>8. Статусы отчёта</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Статус</th>
+      <th>Описание</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>success</code></td>
+      <td>Отчёт готов, доступен для скачивания по ссылке <code>result.file</code></td>
+    </tr>
+    <tr>
+      <td><code>failed</code></td>
+      <td>Ошибка создания отчёта, причина в <code>result.error</code></td>
+    </tr>
+    <tr>
+      <td><code>in_progress</code></td>
+      <td>Отчёт ещё генерируется, необходимо повторить запрос позже</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>9. Итоговая сводка</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Категория</th>
+      <th>Значение</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Полей в /discounted/create</td>
+      <td><b>1</b> (code)</td>
+    </tr>
+    <tr>
+      <td>Полей в /report/info (через result)</td>
+      <td><b>8</b> (code, status, error, expires_at, file, report_type, params, created_at)</td>
+    </tr>
+    <tr>
+      <td>Статус в УОТ614</td>
+      <td><span class="tg tg-red">❌ НЕ РЕАЛИЗОВАН</span></td>
+    </tr>
+    <tr>
+      <td>Требуется реализация</td>
+      <td><span class="tg tg-amber">POST /discounted/create → code → POST /report/info → ожидание success → скачивание CSV</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+<p><em>Проект 1/76 — Дорожная карта. Отчёт привязан к задаче 4.2.</em></p>
+
+</body>
+</html>

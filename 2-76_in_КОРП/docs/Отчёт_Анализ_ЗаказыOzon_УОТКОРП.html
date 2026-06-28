@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Анализ блока заказов Ozon в УОТКОРП</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; line-height: 1.6; color: #1a1a2e; background: #f8f9fa; margin: 0; padding: 30px; }
+.container { max-width: 1100px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.08); padding: 40px; }
+h1 { font-size: 26px; margin: 0 0 5px; color: #1a1a2e; }
+h2 { font-size: 20px; margin: 30px 0 15px; color: #16213e; border-bottom: 2px solid #e9ecef; padding-bottom: 8px; }
+h3 { font-size: 16px; margin: 20px 0 10px; color: #0f3460; }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; margin-right: 6px; }
+.badg-green { background: #d4edda; color: #155724; }
+.badg-red { background: #f8d7da; color: #721c24; }
+.badg-yellow { background: #fff3cd; color: #856404; }
+.badg-blue { background: #cce5ff; color: #004085; }
+.badg-purple { background: #e8daef; color: #6c3483; }
+.badg-gray { background: #e2e3e5; color: #383d41; }
+table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; vertical-align: top; }
+th { background: #f1f3f5; font-weight: 700; white-space: nowrap; }
+.tr-hl { background: #fff3cd; }
+.tr-ok { background: #f0faf0; }
+.tr-miss { background: #fff5f5; }
+.arch-box { display: flex; gap: 20px; margin: 15px 0; flex-wrap: wrap; }
+.arch-col { flex: 1; min-width: 280px; border: 1px solid #dee2e6; border-radius: 8px; padding: 16px; background: #fafbfc; }
+.arch-col h4 { margin: 0 0 10px; font-size: 14px; }
+.arch-col ul { margin: 0; padding-left: 18px; }
+.arch-col li { margin: 4px 0; font-size: 13px; }
+.call-chain { background: #1a1a2e; color: #e0e0e0; border-radius: 8px; padding: 16px 20px; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.7; overflow-x: auto; white-space: pre; }
+.call-chain .hl { color: #ffd700; }
+.call-chain .ok { color: #6fcf97; }
+.call-chain .err { color: #ff6b6b; }
+.call-chain .dim { color: #888; }
+.call-chain .arrow { color: #5dade2; }
+.call-chain .name { color: #7ec8e3; }
+.step-card { border: 1px solid #dee2e6; border-radius: 8px; padding: 14px 18px; margin: 10px 0; }
+.step-card h4 { margin: 0 0 6px; font-size: 15px; }
+.step-card p { margin: 0 0 4px; font-size: 13px; color: #555; }
+.step-num { display: inline-block; width: 28px; height: 28px; line-height: 28px; text-align: center; border-radius: 50%; color: #fff; font-weight: 700; font-size: 14px; margin-right: 10px; }
+.step-1 { background: #e74c3c; }
+.step-2 { background: #e67e22; }
+.step-3 { background: #f1c40f; color: #333; }
+.step-4 { background: #2ecc71; }
+.step-5 { background: #3498db; }
+.meta-summary { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin: 12px 0; }
+.meta-card { background: #f8f9fa; border-radius: 8px; padding: 12px; border-left: 4px solid; }
+.meta-card.green { border-color: #28a745; }
+.meta-card.red { border-color: #dc3545; }
+.meta-card.yellow { border-color: #ffc107; }
+.meta-card.blue { border-color: #17a2b8; }
+.meta-card .num { font-size: 22px; font-weight: 700; display: block; }
+.meta-card .lbl { font-size: 12px; color: #666; }
+.footer { margin-top: 30px; font-size: 12px; color: #999; text-align: center; border-top: 1px solid #eee; padding-top: 15px; }
+.cmd-table td:first-child { font-family: 'Courier New', monospace; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>📊 Анализ блока заказов Ozon в УОТКОРП</h1>
+<p style="color:#666;margin:4px 0 20px;">
+Дата: 2026-05-29 · Проект: УОТ КОРП<br>
+<strong>Эталон архитектуры: УОТКОРП</strong> (следующая версия программы)
+</p>
+
+<!-- ===================== 1 ===================== -->
+<h2>1. Метаданные заказов в УОТКОРП</h2>
+
+<div class="meta-summary">
+  <div class="meta-card green"><span class="num">✅ 12</span><span class="lbl">Документы (заказы, доставки, отгрузки)</span></div>
+  <div class="meta-card green"><span class="num">✅ 18</span><span class="lbl">Регистры сведений по заказам</span></div>
+  <div class="meta-card green"><span class="num">✅ 1</span><span class="lbl">Регистр накопления (ЗаказыТоваровВСервисе)</span></div>
+  <div class="meta-card green"><span class="num">✅ ~53</span><span class="lbl">CommonModules по заказам сервисов</span></div>
+  <div class="meta-card green"><span class="num">✅ 10</span><span class="lbl">Регламентных заданий (загрузка + изменения)</span></div>
+  <div class="meta-card green"><span class="num">✅ 2</span><span class="lbl">CommonModule + ObjectModule Ozon (688 + 578 КБ)</span></div>
+  <div class="meta-card green"><span class="num">✅</span><span class="lbl">Статусы заказов Ozon</span></div>
+  <div class="meta-card green"><span class="num">✅</span><span class="lbl">API FBS: v3/posting/fbs/list</span></div>
+  <div class="meta-card green"><span class="num">✅</span><span class="lbl">API FBO: v2/posting/fbo/list</span></div>
+  <div class="meta-card blue"><span class="num">✅</span><span class="lbl">Команда в макете: ЗагрузитьЗаказКлиентаСервиса</span></div>
+</div>
+
+<p><strong>Вывод:</strong> Все метаданные для заказов присутствуют. УОТКОРП — это развитая платформа с полным набором объектов для работы с заказами маркетплейсов.</p>
+
+<!-- ===================== 2 ===================== -->
+<h2>2. Ключевые модули цепочки заказов</h2>
+
+<table>
+<tr><th>Звено</th><th>Модуль / Объект</th><th>Роль</th><th>Статус</th></tr>
+<tr><td>Точка входа</td><td><code>CG_Online_ЗагрузитьЗаказКлиентаСервиса</code> (ScheduledJob)</td><td>Регламентное задание, каждый час</td><td><span class="badg-green">✅</span></td></tr>
+<tr><td>Обработчик</td><td><code>CG_Online_РегламентныеЗаданияИСТП.ЗагрузитьЗаказыКлиентовСервисовРегламент()</code></td><td>Вызывает <code>ЗаказКлиентаСервиса.ЗагрузитьВсеОбъекты()</code></td><td><span class="badg-green">✅</span></td></tr>
+<tr><td>Ядро загрузки</td><td><code>CG_Online_ЗаказКлиентаСервиса.ЗагрузитьОбъекты()</code> (стр. 527)</td><td>Для каждой настройки авторизации → диспетчеризация</td><td><span class="badg-green">✅</span></td></tr>
+<tr><td>Диспетчер</td><td><code>CG_Online_ИнтеграцииССервисамиСервер.ВыполнитьИнтеграционнуюФункцию()</code> (стр. 8565)</td><td>Поиск команды в макете → динамический вызов</td><td><span class="badg-green">✅</span></td></tr>
+<tr><td>Коннектор</td><td><code>КоннекторНастройкиАвторизации()</code> (стр. 65)</td><td>Определяет: ОбщийМодуль или СправочникСсылка</td><td><span class="badg-yellow">⚠️</span></td></tr>
+<tr><td>Макет команд</td><td><code>КомандыСервиса</code> Ozon (Template.xml, 14929 строк)</td><td>Таблица маршрутизации команд сервиса</td><td><span class="badg-green">✅</span></td></tr>
+<tr><td>Команда заказов</td><td>Индекс 141: <code>ЗагрузитьЗаказКлиентаСервиса</code></td><td>Идентификатор = ИмяМетода = "ЗагрузитьЗаказКлиентаСервиса"</td><td><span class="badg-green">✅</span></td></tr>
+<tr><td>Ozon-модули</td><td><code>CommonModule</code> (688 КБ, стр. 1332) и <code>ObjectModule</code> (578 КБ, стр. 1454)</td><td><code>ЗагрузитьЗаказКлиентаСервиса()</code> → FBS/FBO API</td><td><span class="badg-green">✅</span></td></tr>
+<tr><td>Постобработка</td><td><code>CG_Online_ЗаказКлиентаСервиса.ОбработатьСинхронизируемыеДанные()</code> (стр. 706)</td><td>Запись в регистры <code>ЗаказыКлиентовВСервисах*</code></td><td><span class="badg-green">✅</span></td></tr>
+</table>
+
+<!-- ===================== 3 ===================== -->
+<h2>3. Цепочка вызовов (архитектура УОТКОРП)</h2>
+
+<div class="call-chain"><span class="hl">РегламентноеЗадание</span>
+  <span class="name">CG_Online_ЗагрузитьЗаказКлиентаСервиса</span> <span class="arrow">→</span>
+
+  <span class="hl">РегламентныеЗаданияИСТП</span>
+  .ЗагрузитьЗаказыКлиентовСервисовРегламент() <span class="arrow">→</span>
+
+  <span class="hl">ЗаказКлиентаСервиса</span>.ЗагрузитьВсеОбъекты() (стр. 664)
+    ДЛЯ КАЖДОЙ НастройкаАвторизации:
+      <span class="hl">ЗаказКлиентаСервиса</span>.ЗагрузитьОбъекты() (стр. 527)
+        <span class="name">ЗаказКлиентаСервисаПереопределяемый</span>.ЗагрузитьОбъекты() <span class="dim">— хук</span>
+
+        <span class="hl">ИнтеграцииССервисамиСервер</span>
+        .ВыполнитьИнтеграционнуюФункцию(<span class="ok">"ЗагрузитьЗаказКлиентаСервиса"</span>) (стр. 8565)
+          ├── <span class="name">КоннекторНастройкиАвторизации()</span> <span class="arrow">→</span> <span class="ok">коннектор Ozon</span>
+          ├── <span class="name">КомандыСервиса()</span> <span class="arrow">→</span> читает макет
+          ├── <span class="ok">Фильтр: Идентификатор="ЗагрузитьЗаказКлиентаСервиса"</span>
+          │   <span class="ok">       & Использование="ВызовСерверногоМетода"</span>
+          │   <span class="ok">✅ НАЙДЕНА (индекс 141)</span>
+          │
+          └── <span class="hl">ВзаимодействиеСКонфигурацией</span>
+              .ВызватьФункциюОбъекта(Коннектор, <span class="ok">"ЗагрузитьЗаказКлиентаСервиса"</span>)
+                <span class="arrow">→</span>
+
+  <span class="hl">Ozon (CommonModule стр.1332 / ObjectModule стр.1454)</span>
+  .ЗагрузитьЗаказКлиентаСервиса()
+    ├── Если FBS: <span class="ok">POST v3/posting/fbs/list</span>
+    └── Если FBO: <span class="ok">POST v2/posting/fbo/list</span>
+    <span class="arrow">→</span> возвращает таблицы заказов <span class="arrow">→</span>
+
+  <span class="hl">ЗаказКлиентаСервиса</span>.ОбработатьСинхронизируемыеДанные() (стр. 706)
+    ├── <span class="name">НоменклатураСервисов</span>.ЗагрузитьТоварыСервисаДляЗагрузкиДокументов()
+    ├── <span class="name">ЗаказыКлиентовВСервисах</span>.ЗаписатьДанные()
+    ├── <span class="name">ЗаказыКлиентовВСервисахТовары</span>.ЗаписатьДанные()
+    ├── <span class="name">ЗаказыКлиентовВСервисахМаркировкаТоваров</span>.ЗаписатьДанные()
+    └── <span class="name">ЗаказыКлиентовВСервисахГрузовыеМеста</span>.ЗаписатьДанные()
+      <span class="arrow">→</span> запись в регистры КОРП
+</div>
+
+<!-- ===================== 4 ===================== -->
+<h2>4. Макет КомандыСервиса Ozon</h2>
+
+<p>Файл: <code>УОТКОРП\0\DataProcessors\CG_Online_Ozon_ИнтеграцияСОзон\Templates\КомандыСервиса\Ext\Template.xml</code> (14929 строк, 9 колонок)</p>
+
+<p><strong>Структура колонок макета УОТКОРП:</strong></p>
+<table>
+<tr><th>#</th><th>Колонка</th><th>Тип</th><th>Пример</th></tr>
+<tr><td>0</td><td><strong>Представление</strong></td><td>Строка</td><td>Загрузить заказы клиентов сервисов</td></tr>
+<tr><td>1</td><td><strong>Идентификатор</strong></td><td>Строка</td><td>ЗагрузитьЗаказКлиентаСервиса</td></tr>
+<tr><td>2</td><td><strong>ИмяМетода</strong></td><td>Строка</td><td>ЗагрузитьЗаказКлиентаСервиса</td></tr>
+<tr><td>3</td><td><strong>Использование</strong></td><td>Перечисление</td><td>ВызовСерверногоМетода</td></tr>
+<tr><td>4</td><td><strong>ПоказыватьОповещение</strong></td><td>Булево</td><td>Ложь</td></tr>
+<tr><td>5</td><td><strong>Модификатор</strong></td><td>Строка</td><td>(пусто)</td></tr>
+<tr><td>6</td><td><strong>Служебный</strong></td><td>Булево</td><td>Ложь</td></tr>
+<tr><td>7</td><td><strong>Пользовательский</strong></td><td>Булево</td><td>Истина</td></tr>
+<tr><td>8</td><td><strong>Регламентный</strong></td><td>Булево</td><td>Ложь</td></tr>
+</table>
+
+<p><strong>Команды, связанные с заказами (3 шт.):</strong></p>
+<table class="cmd-table">
+<tr><th>Индекс</th><th>Представление</th><th>Идентификатор</th><th>ИмяМетода</th><th>Служ.</th><th>Польз.</th><th>Регл.</th></tr>
+<tr class="tr-ok"><td>139</td><td>Загрузить заказы клиентов сервисов</td><td>ЗагрузитьЗаказКлиентаСервисаПоНастройке</td><td>ЗагрузитьЗаказКлиентаСервиса</td><td>Истина</td><td>Ложь</td><td>Ложь</td></tr>
+<tr class="tr-ok"><td>140</td><td>Загрузить измененные заказы клиентов сервисов</td><td>ЗагрузитьИзмененияЗаказКлиентаСервиса</td><td>ЗагрузитьЗаказКлиентаСервиса</td><td>Ложь</td><td>Истина</td><td>Ложь</td></tr>
+<tr class="tr-hl"><td><strong>141</strong></td><td><strong>Загрузить заказы клиентов сервисов</strong></td><td><strong>ЗагрузитьЗаказКлиентаСервиса</strong></td><td><strong>ЗагрузитьЗаказКлиентаСервиса</strong></td><td><strong>Ложь</strong></td><td><strong>Истина</strong></td><td><strong>Ложь</strong></td></tr>
+</table>
+
+<p><strong>Команда 141 точно соответствует поисковому запросу</strong> из <code>ВыполнитьИнтеграционнуюФункцию()</code> (строка 8585: <code>ФильтрКоманд.Вставить("Идентификатор", ИдентификаторМетода)</code>, <code>ФильтрКоманд.Вставить("Использование", "ВызовСерверногоМетода")</code>).</p>
+
+<!-- ===================== 5 ===================== -->
+<h2>5. Сравнение с другими сервисами</h2>
+
+<p>Проверено: макет WB содержит ту же структуру команд (<code>ЗагрузитьЗаказКлиентаСервисаПоНастройке</code> с <code>ИмяМетода = ЗагрузитьЗаказКлиентаСервиса</code>). Аналогичная команда с идентификатором <code>ЗагрузитьЗаказКлиентаСервиса</code> присутствует и в других сервисах (YM, Avito, VK, MM и др.).</p>
+
+<p>Архитектура УОТКОРП для загрузки заказов <strong>унифицирована</strong> для всех маркетплейсов:</p>
+<table>
+<tr><th>Сервис</th><th>Коннектор (DataProcessor)</th><th>Команда "ЗагрузитьЗаказКлиентаСервиса"</th></tr>
+<tr><td>Ozon</td><td><code>CG_Online_Ozon_ИнтеграцияСОзон</code></td><td><span class="badg-green">✅ Индекс 141</span></td></tr>
+<tr><td>Wildberries</td><td><code>CG_Online_WB_ИнтеграцияСВайлдберриз</code></td><td><span class="badg-green">✅ Есть</span></td></tr>
+<tr><td>Яндекс.Маркет</td><td><code>CG_Online_YM_ИнтеграцияСЯндексМаркет</code></td><td><span class="badg-green">✅ Есть</span></td></tr>
+<tr><td>VK</td><td><code>CG_Online_VK_ИнтеграцияСВКонтакте</code></td><td><span class="badg-green">✅ Есть</span></td></tr>
+<tr><td>МегаМаркет</td><td><code>CG_Online_MM_ИнтеграцияСМегаМаркет</code></td><td><span class="badg-green">✅ Есть</span></td></tr>
+</table>
+
+<!-- ===================== 6 ===================== -->
+<h2>6. Точки для проверки работоспособности</h2>
+
+<p>Метаданные и макет — в порядке. Реальная работоспособность зависит от 3 факторов, которые проверяются в рантайме (в 1С):</p>
+
+<table>
+<tr><th>#</th><th>Фактор</th><th>Где проверяется</th><th>Риск</th></tr>
+<tr class="tr-hl"><td><strong>1</strong></td><td><strong>Какой коннектор возвращает <code>КоннекторНастройкиАвторизации()</code> для Ozon?</strong><br>ОбщийМодуль (CG_Online_Ozon_ИнтеграцияСОзон) или СправочникСсылка (внешняя обработка).<br>От этого зависит, из какого макета читается КомандыСервиса.</td><td><code>ИнтеграцииССервисамиСервер</code> стр. 65</td><td><span class="badg-yellow">⚠️</span></td></tr>
+<tr class="tr-hl"><td><strong>2</strong></td><td><strong>Какой формат данных возвращает <code>ЗагрузитьЗаказКлиентаСервиса()</code> Ozon?</strong><br>Ожидает ли <code>ОбработатьСинхронизируемыеДанные()</code> таблицы с теми же колонками?</td><td><code>ОбработатьСинхронизируемыеДанные</code> (стр. 706)<br><code>ЗагрузитьЗаказКлиентаСервиса</code> Ozon (CM стр. 1332, OM стр. 1454)</td><td><span class="badg-yellow">⚠️</span></td></tr>
+<tr class="tr-hl"><td><strong>3</strong></td><td><strong>Создана ли НастройкаАвторизации для Ozon в базе?</strong><br>Без неё цикл по настройкам не выполнится.</td><td><code>ЗаказКлиентаСервиса.ЗагрузитьВсеОбъекты()</code></td><td><span class="badg-yellow">⚠️</span></td></tr>
+</table>
+
+<p><strong>Что можно проверить без рантайма:</strong></p>
+
+<table>
+<tr><th>#</th><th>Проверка</th><th>Файл</th></tr>
+<tr><td>1</td><td>Сравнить сигнатуру <code>ЗагрузитьЗаказКлиентаСервиса()</code> в CommonModule vs ObjectModule Ozon: какие параметры, что возвращает</td><td><code>CM: Module.bsl стр. 1332</code><br><code>OM: ObjectModule.bsl стр. 1454</code></td></tr>
+<tr><td>2</td><td>Проверить, какие таблицы читает <code>ОбработатьСинхронизируемыеДанные()</code> из <code>ЗаказКлиентаСервиса</code></td><td><code>ЗаказКлиентаСервиса/Ext/Module.bsl</code></td></tr>
+<tr><td>3</td><td>Сравнить с WB: какие таблицы возвращает WB vs Ozon</td><td><code>WB ObjectModule.bsl</code></td></tr>
+</table>
+
+<!-- ===================== 7 ===================== -->
+<h2>7. Сравнение тестовых расширений</h2>
+
+<table>
+<tr><th>Параметр</th><th>76тест</th><th>КОРПтест</th></tr>
+<tr><td>Хранение макетов Ozon</td><td><strong>CommonTemplates</strong> — отдельные файлы (498 шт.)</td><td><strong>Внутри DataProcessor</strong> — 218 макетов</td></tr>
+<tr><td>Модули тестов Ozon</td><td>Нет Ozon-специфичных CommonModules</td><td>DataProcessor <code>CG_Online_UT_Ozon_ИнтеграцияСОзон</code></td></tr>
+<tr><td>Покрытие заказов</td><td>Есть макеты: ЗагрузитьЗаказыСоСкладаСервиса, ЗагрузитьЗаказыССобственногоСклада, ЗагрузитьЗаказыСОтменой*</td><td>Есть макеты: ЗагрузитьЗаказыСоСкладаСервиса, ЗагрузитьЗаказыССобственногоСклада</td></tr>
+<tr><td>Мокито-подсистема</td><td><code>МокитоПерехват, МокитоПроверки, МокитоОбучение, МокитоСлужебный</code></td><td><code>CG_Online_UT_Мокито</code> (включает Ozon DP)</td></tr>
+<tr><td>Статус</td><td>Историческая архитектура</td><td><span class="badg-blue">Актуальная архитектура КОРП</span></td></tr>
+</table>
+
+<!-- ===================== 8 ===================== -->
+<h2>8. Резюме</h2>
+
+<table>
+<tr><th>Компонент</th><th>Статус</th><th>Действие</th></tr>
+<tr><td>Метаданные заказов</td><td><span class="badg-green">✅</span></td><td>—</td></tr>
+<tr><td>CommonModule Ozon</td><td><span class="badg-green">✅</span></td><td>688 КБ, реализация есть</td></tr>
+<tr><td>ObjectModule Ozon</td><td><span class="badg-green">✅</span></td><td>578 КБ, реализация есть</td></tr>
+<tr><td>Макет КомандыСервиса (команда загрузки заказов)</td><td><span class="badg-green">✅</span></td><td>Индекс 141, Идентификатор и ИмяМетода совпадают</td></tr>
+<tr><td>Регламентное задание</td><td><span class="badg-green">✅</span></td><td>Каждый час, цепочка выстроена</td></tr>
+<tr><td>API-эндпоинты заказов</td><td><span class="badg-green">✅</span></td><td>FBS: v3/posting/fbs/list, FBO: v2/posting/fbo/list</td></tr>
+<tr><td>Коннектор Ozon (что возвращается)</td><td><span class="badg-yellow">⚠️</span></td><td>Проверить в рантайме</td></tr>
+<tr><td>Формат возврата данных</td><td><span class="badg-yellow">⚠️</span></td><td>Сравнить таблицы Ozon vs ожидания постобработки</td></tr>
+<tr><td>Настройка авторизации Ozon</td><td><span class="badg-yellow">⚠️</span></td><td>Должна быть создана в базе</td></tr>
+</table>
+
+<!-- ===================== 9 ===================== -->
+<h2>9. План дальнейших действий</h2>
+
+<div class="step-card">
+<h4><span class="step-num step-1">1</span>Проверить коннектор Ozon</h4>
+<p><strong>Файл:</strong> <code>ИнтеграцииССервисамиСервер.КоннекторНастройкиАвторизации()</code> (стр. 65)</p>
+<p>Определить: какой объект возвращается для Ozon — <code>ОбщийМодуль.CG_Online_Ozon_ИнтеграцияСОзон</code> или <code>СправочникСсылка.ДополнительныеОтчетыИОбработки</code>. От этого зависит, из какого макета читаются команды.</p>
+</div>
+
+<div class="step-card">
+<h4><span class="step-num step-2">2</span>Проверить формат возврата данных</h4>
+<p><strong>Файлы:</strong> CM Ozon (стр. 1332), OM Ozon (стр. 1454), <code>ЗаказКлиентаСервиса.ОбработатьСинхронизируемыеДанные()</code> (стр. 706)</p>
+<p>Сравнить: какие таблицы и с какими колонками возвращает Ozon-модуль, и какие ожидает постобработка. При необходимости — адаптировать.</p>
+</div>
+
+<div class="step-card">
+<h4><span class="step-num step-3">3</span>Запустить тест через YU-тесты (Мокито)</h4>
+<p><strong>Тестовые данные:</strong> КОРПтест — DataProcessor <code>CG_Online_UT_Ozon_ИнтеграцияСОзон</code> (218 макетов)</p>
+<p>Запустить тест загрузки заказов с перехватом HTTP (Мокито). Проверить: доходит ли вызов до Ozon-модуля, возвращаются ли данные, записываются ли регистры.</p>
+</div>
+
+<div class="step-card">
+<h4><span class="step-num step-4">4</span>При необходимости — донастроить макет</h4>
+<p>Если коннектор — ОбщийМодуль, то макет читается из <code>CG_Online_КомандыСервиса</code> (общий макет, 53 колонки). Нужно убедиться, что команда <code>ЗагрузитьЗаказКлиентаСервиса</code> есть и там.</p>
+</div>
+
+<div class="step-card">
+<h4><span class="step-num step-5">5</span>Синхронизировать тестовые макеты</h4>
+<p>При необходимости — перенести недостающие макеты Ozon из 76тест (498 шт.) в КОРПтест (сейчас 218 шт.) в архитектуре КОРПтест (внутри DataProcessor).</p>
+</div>
+
+<!-- ===================== Файлы ===================== -->
+<h2>Приложение: ключевые файлы проекта</h2>
+
+<table>
+<tr><th>#</th><th>Файл</th><th>Описание</th></tr>
+<tr><td>1</td><td><code>УОТКОРП\0\ScheduledJobs\CG_Online_ЗагрузитьЗаказКлиентаСервиса.xml</code></td><td>Регламентное задание загрузки заказов</td></tr>
+<tr><td>2</td><td><code>УОТКОРП\0\ScheduledJobs\CG_Online_ЗагрузитьИзмененияЗаказКлиентаСервиса.xml</code></td><td>Регламентное задание загрузки изменений</td></tr>
+<tr><td>3</td><td><code>УОТКОРП\0\CommonModules\CG_Online_РегламентныеЗаданияИСТП\Ext\Module.bsl</code></td><td>Обработчик регламентных заданий (→ ЗаказКлиентаСервиса)</td></tr>
+<tr><td>4</td><td><code>УОТКОРП\0\CommonModules\CG_Online_ЗаказКлиентаСервиса\Ext\Module.bsl</code></td><td>Ядро: ЗагрузитьВсеОбъекты, ЗагрузитьОбъекты, ОбработатьСинхронизируемыеДанные</td></tr>
+<tr><td>5</td><td><code>УОТКОРП\0\CommonModules\CG_Online_ИнтеграцииССервисамиСервер\Ext\Module.bsl</code></td><td>Диспетчер: ВыполнитьИнтеграционнуюФункцию, КоннекторНастройкиАвторизации</td></tr>
+<tr><td>6</td><td><code>УОТКОРП\0\CommonModules\CG_Online_Ozon_ИнтеграцияСОзон\Ext\Module.bsl</code></td><td>Ozon CommonModule (688 КБ): ЗагрузитьЗаказКлиентаСервиса (стр. 1332)</td></tr>
+<tr><td>7</td><td><code>УОТКОРП\0\DataProcessors\CG_Online_Ozon_ИнтеграцияСОзон\Ext\ObjectModule.bsl</code></td><td>Ozon ObjectModule (578 КБ): ЗагрузитьЗаказКлиентаСервиса (стр. 1454)</td></tr>
+<tr><td>8</td><td><code>УОТКОРП\0\DataProcessors\CG_Online_Ozon_ИнтеграцияСОзон\Templates\КомандыСервиса\Ext\Template.xml</code></td><td>Макет команд: 14929 строк, 9 колонок, 3 команды заказов</td></tr>
+<tr><td>9</td><td><code>УОТКОРП\0\CommonModules\CG_Online_ЗаказыКлиентовВСервисах\Ext\Module.bsl</code></td><td>Постобработка: ЗаписатьДанные (стр. 136)</td></tr>
+<tr><td>10</td><td><code>УОТКОРП\0\CommonModules\CG_Online_ИнтеграцииССервисамиПереопределяемый\Ext\Module.bsl</code></td><td>Точки переопределения (Мокито, HTTP)</td></tr>
+</table>
+
+<div class="footer">
+Отчёт создан: 2026-05-29 · Проект: <a href="../../CONTEXT.md">УОТ КОРП</a> · <a href="ДорожнаяКарта.md">Дорожная карта</a><br>
+Эталон архитектуры: <strong>УОТКОРП</strong>
+</div>
+
+</div>
+</body>
+</html>

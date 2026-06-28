@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Анализ: v1/analytics/product-queries/details — Детализация запросов по товару</title>
+<style>
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; max-width: 1000px; margin: 40px auto; padding: 0 20px; color: #1a1a1a; line-height: 1.5; }
+  h1 { border-bottom: 2px solid #1565c0; padding-bottom: 10px; color: #1565c0; }
+  h2 { color: #1565c0; margin-top: 32px; }
+  .meta { background: #f5f5f5; padding: 12px 16px; border-radius: 6px; font-size: 0.9em; }
+  .code { background: #263238; color: #e2e8f0; padding: 12px 16px; border-radius: 6px; font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 0.85em; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 0.9em; }
+  th, td { border: 1px solid #bdbdbd; padding: 6px 10px; text-align: left; }
+  th { background: #1565c0; color: white; position: sticky; top: 0; }
+  tr:nth-child(even) { background: #f5f5f5; }
+  .issue { background: #ffebee; border-left: 4px solid #d32f2f; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .ok { background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .warn { background: #fff3e0; border-left: 4px solid #e65100; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .tg { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; font-weight: bold; }
+  .tg-green { background: #e8f5e9; color: #2e7d32; }
+  .tg-red { background: #ffebee; color: #c62828; }
+  .tg-amber { background: #fff3e0; color: #e65100; }
+  .tg-gray { background: #eceff1; color: #546e7a; }
+  tr.used { background: #e8f5e9; }
+  tr.unused { background: #fffde7; }
+  tr.error-row { background: #ffebee; }
+  tr.partial { background: #fff3e0; }
+  tr.premium { background: #e8eaf6; }
+</style>
+</head>
+<body>
+
+<h1>Анализ: <code>v1/analytics/product-queries/details</code></h1>
+
+<div class="meta">
+  <strong>Метод:</strong> <code>— (НЕТ в УОТ614)</code><br>
+  <strong>Модуль:</strong> <code>—</code><br>
+  <strong>Задача ДК:</strong> 4.5 — /v1/analytics/product-queries/details - Получить детализацию запросов по товару<br>
+  <strong>Проект:</strong> 1/76<br>
+  <strong>Дата:</strong> 2026-06-25
+</div>
+
+<h2>1. Описание</h2>
+<p>Метод возвращает данные по поисковым запросам на конкретный товар. Аналогичен просмотру данных по товару на вкладке «Товары в поиске → Запросы моего товара» в личном кабинете Ozon.</p>
+<p>Полная аналитика доступна с подпиской <b>Premium</b>, <b>Premium Plus</b> или <b>Premium Pro</b>. Без подписки доступна часть показателей.</p>
+<p>Данные за последний месяц доступны в любом интервале (кроме текущей даты — расчёт 1–2 дня). Аналитика за даты раньше месяца — только с Premium-подпиской и только по неделям.</p>
+
+<h2>2. Схема запроса</h2>
+
+<div class="code">
+POST /v1/analytics/product-queries/details
+</div>
+
+<h3>Параметры заголовков</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Параметр</th>
+      <th>Тип</th>
+      <th>Обязательный</th>
+      <th>Описание</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>Client-Id</code></td>
+      <td>string</td>
+      <td>✅</td>
+      <td>Идентификатор клиента</td>
+    </tr>
+    <tr>
+      <td><code>Api-Key</code></td>
+      <td>string</td>
+      <td>✅</td>
+      <td>API-ключ</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Параметры тела запроса</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Поле</th>
+      <th>Тип</th>
+      <th>Обязательный</th>
+      <th>Описание</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>date_from</code></td>
+      <td>datetime</td>
+      <td>✅</td>
+      <td>Дата начала формирования аналитики</td>
+    </tr>
+    <tr>
+      <td><code>date_to</code></td>
+      <td>datetime</td>
+      <td>❌</td>
+      <td>Дата окончания формирования аналитики</td>
+    </tr>
+    <tr>
+      <td><code>page</code></td>
+      <td>int32</td>
+      <td>❌</td>
+      <td>Номер страницы. Минимум — 0</td>
+    </tr>
+    <tr>
+      <td><code>page_size</code></td>
+      <td>int32</td>
+      <td>✅</td>
+      <td>Элементов на странице. Максимум — 1000</td>
+    </tr>
+    <tr>
+      <td><code>skus</code></td>
+      <td>array[string]</td>
+      <td>✅</td>
+      <td>Список SKU (макс. 1000)</td>
+    </tr>
+    <tr>
+      <td><code>sort_by</code></td>
+      <td>string</td>
+      <td>❌</td>
+      <td>По умолч. BY_SEARCHES. Доступны: BY_SEARCHES, BY_VIEWS, BY_POSITION, BY_CONVERSION, BY_GMV</td>
+    </tr>
+    <tr>
+      <td><code>sort_dir</code></td>
+      <td>string</td>
+      <td>❌</td>
+      <td>По умолч. DESCENDING. Направление: DESCENDING, ASCENDING</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="code">
+{
+  "date_from": "2019-08-24T14:15:22Z",
+  "date_to": "2019-08-24T14:15:22Z",
+  "page": 0,
+  "page_size": 1000,
+  "skus": ["string"],
+  "sort_by": "BY_SEARCHES",
+  "sort_dir": "DESCENDING"
+}
+</div>
+
+<h2>3. Схема ответа</h2>
+
+<div class="code">
+{
+  "result": {
+    "analytics_period": {
+      "date_from": "2019-08-24T14:15:22Z",
+      "date_to": "2019-08-24T14:15:22Z"
+    },
+    "page_count": 1,
+    "queries": [
+      {
+        "currency": "RUB",
+        "gmv": 0,
+        "order_count": 0,
+        "position": 0,
+        "query": "string",
+        "query_index": 0,
+        "sku": 0,
+        "unique_search_users": 0,
+        "unique_view_users": 0,
+        "view_conversion": 0
+      }
+    ],
+    "total": 0
+  }
+}
+</div>
+
+<h2>4. Полный маппинг полей JSON ответа</h2>
+
+<h3>Объект queries[]</h3>
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Поле JSON</th>
+      <th>Тип</th>
+      <th>Описание</th>
+      <th>Доступ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="5" style="background:#e8f5e9;font-weight:bold;">✅ Без подписки (7 полей)</td>
+    </tr>
+    <tr class="used">
+      <td>1</td>
+      <td><code>query</code></td>
+      <td>string</td>
+      <td>Текст поискового запроса</td>
+      <td>✅</td>
+    </tr>
+    <tr class="used">
+      <td>2</td>
+      <td><code>query_index</code></td>
+      <td>int64</td>
+      <td>Порядковый номер запроса</td>
+      <td>✅</td>
+    </tr>
+    <tr class="used">
+      <td>3</td>
+      <td><code>sku</code></td>
+      <td>int64</td>
+      <td>Идентификатор товара в Ozon</td>
+      <td>✅</td>
+    </tr>
+    <tr class="used">
+      <td>4</td>
+      <td><code>currency</code></td>
+      <td>string</td>
+      <td>Валюта</td>
+      <td>✅</td>
+    </tr>
+    <tr class="used">
+      <td>5</td>
+      <td><code>gmv</code></td>
+      <td>float</td>
+      <td>Сумма продаж по запросу</td>
+      <td>✅</td>
+    </tr>
+    <tr class="used">
+      <td>6</td>
+      <td><code>order_count</code></td>
+      <td>int64</td>
+      <td>Количество заказов по запросу</td>
+      <td>✅</td>
+    </tr>
+    <tr class="used">
+      <td>7</td>
+      <td><code>unique_search_users</code></td>
+      <td>int64</td>
+      <td>Количество покупателей, искавших товар</td>
+      <td>✅</td>
+    </tr>
+    <tr>
+      <td colspan="5" style="background:#e8eaf6;font-weight:bold;">👑 Только Premium (3 поля)</td>
+    </tr>
+    <tr class="premium">
+      <td>8</td>
+      <td><code>position</code></td>
+      <td>float</td>
+      <td>Средняя позиция товара в выдаче</td>
+      <td>👑</td>
+    </tr>
+    <tr class="premium">
+      <td>9</td>
+      <td><code>unique_view_users</code></td>
+      <td>int64</td>
+      <td>Уникальные покупатели, увидевшие товар</td>
+      <td>👑</td>
+    </tr>
+    <tr class="premium">
+      <td>10</td>
+      <td><code>view_conversion</code></td>
+      <td>float</td>
+      <td>Конверсия просмотров в заказ (%)</td>
+      <td>👑</td>
+    </tr>
+    <tr>
+      <td colspan="5" style="background:#e8f5e9;font-weight:bold;">✅ Верхний уровень (3 поля)</td>
+    </tr>
+    <tr class="used">
+      <td>11</td>
+      <td><code>result.analytics_period</code></td>
+      <td>object</td>
+      <td>Период аналитики (date_from, date_to)</td>
+      <td>✅</td>
+    </tr>
+    <tr class="used">
+      <td>12</td>
+      <td><code>result.page_count</code></td>
+      <td>int32</td>
+      <td>Количество страниц</td>
+      <td>✅</td>
+    </tr>
+    <tr class="used">
+      <td>13</td>
+      <td><code>result.total</code></td>
+      <td>int64</td>
+      <td>Общее количество поисковых запросов</td>
+      <td>✅</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5. Статусы и ограничения</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Условие</th>
+      <th>Описание</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Без подписки</td>
+      <td>Доступны 6 полей: query, query_index, sku, currency, gmv, order_count</td>
+    </tr>
+    <tr>
+      <td>С подпиской Premium / Premium Plus / Premium Pro</td>
+      <td>Доступны все 9 полей (position, unique_view_users, view_conversion)</td>
+    </tr>
+    <tr>
+      <td>Данные за последний месяц</td>
+      <td>Доступны в любом интервале (кроме текущей даты, расчёт 1–2 дня)</td>
+    </tr>
+    <tr>
+      <td>Данные старше месяца</td>
+      <td>Только с Premium-подпиской, только по неделям (параметр date_from)</td>
+    </tr>
+    <tr>
+      <td>Максимум SKU в запросе</td>
+      <td>1000</td>
+    </tr>
+    <tr>
+      <td>Элементов на странице</td>
+      <td>До 1000</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>6. Итоговая сводка</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Категория</th>
+      <th>Значение</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Полей в JSON ответе (queries[])</td>
+      <td><b>9</b></td>
+    </tr>
+    <tr>
+      <td>Доступны без подписки</td>
+      <td><span class="tg tg-green">7</span></td>
+    </tr>
+    <tr>
+      <td>Только Premium</td>
+      <td><span class="tg tg-amber">3</span></td>
+    </tr>
+    <tr>
+      <td>Полей верхнего уровня</td>
+      <td><b>3</b> (analytics_period, page_count, total)</td>
+    </tr>
+    <tr>
+      <td>Параметров запроса</td>
+      <td><b>7</b> (date_from, date_to, page, page_size, skus, sort_by, sort_dir)</td>
+    </tr>
+    <tr>
+      <td>Обязательных параметров</td>
+      <td><b>3</b> (date_from, page_size, skus)</td>
+    </tr>
+    <tr>
+      <td>Статус в УОТ614</td>
+      <td><span class="tg tg-red">❌ НЕ РЕАЛИЗОВАН</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+<p><em>Проект 1/76 — Дорожная карта. Отчёт привязан к задаче 4.5.</em></p>
+
+</body>
+</html>

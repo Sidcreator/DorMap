@@ -1,0 +1,558 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Логика теста: Интеграция с сервисами (Загрузка товаров)</title>
+    <style>
+        :root {
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --border: #dee2e6;
+            --text: #212529;
+            --text-muted: #6c757d;
+            --primary: #0d6efd;
+            --primary-light: #e7f1ff;
+            --danger: #dc3545;
+            --success: #198754;
+            --success-light: #e6f4ed;
+            --warning: #ffc107;
+            --warning-light: #fff9e6;
+            --info: #0dcaf0;
+            --info-light: #e6f9fc;
+            --code-bg: #f1f3f5;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container { max-width: 1100px; margin: 0 auto; }
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid var(--primary);
+        }
+        .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px; }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+        .card h2 {
+            font-size: 1.15rem;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card h3 { font-size: 1.05rem; margin: 18px 0 10px; }
+        .icon { font-size: 1.2rem; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 0.88rem;
+        }
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: var(--primary-light);
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        tr:last-child td { border-bottom: none; }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.76rem;
+            font-weight: 600;
+        }
+        .badge-green { background: var(--success-light); color: var(--success); }
+        .badge-blue { background: var(--primary-light); color: var(--primary); }
+        .badge-orange { background: var(--warning-light); color: #856404; }
+        .badge-gray { background: #e9ecef; color: var(--text-muted); }
+        .badge-red { background: #fce8ea; color: var(--danger); }
+
+        /* Architecture diagram */
+        .arch-box {
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-bottom: 4px;
+            background: var(--card-bg);
+            position: relative;
+        }
+        .arch-box.level1 { border-color: var(--primary); background: var(--primary-light); }
+        .arch-box.level2 { border-color: var(--info); background: var(--info-light); }
+        .arch-box.level3 { border-color: var(--success); background: var(--success-light); }
+        .arch-box.level4 { border-color: var(--warning); background: var(--warning-light); }
+        .arch-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+        .arch-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+        .arch-arrow {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            padding: 2px 0;
+        }
+
+        /* Code block */
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px 16px;
+            font-size: 0.82rem;
+            overflow-x: auto;
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+        code { font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace; }
+        .code-comment { color: #6a9955; }
+        .code-keyword { color: #569cd6; }
+        .code-string { color: #ce9178; }
+
+        /* Test detail card */
+        .test-detail {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 14px;
+            overflow: hidden;
+        }
+        .test-detail-header {
+            padding: 10px 16px;
+            background: var(--primary-light);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .test-detail-body {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+            background: #fafbfc;
+            font-size: 0.88rem;
+        }
+        .test-detail-body p { margin-bottom: 6px; }
+        .test-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .call-chain {
+            font-family: monospace;
+            font-size: 0.82rem;
+            background: var(--code-bg);
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin: 8px 0;
+            line-height: 1.7;
+        }
+        .call-arrow { color: var(--primary); font-weight: 700; }
+        .call-module { color: var(--success); font-weight: 600; }
+        .call-method { color: var(--danger); }
+
+        /* Service table */
+        .svc-active { background: var(--success-light); }
+        .svc-commented { background: var(--code-bg); }
+
+        .footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-top: 30px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .card { padding: 14px 16px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>📦 Логика теста: «Интеграция с сервисами (Загрузка товаров)»</h1>
+    <p class="subtitle">
+        Расширение: <code>КОРПтест</code> &nbsp;|&nbsp; Дата: 2026-05-27 &nbsp;|&nbsp;
+        Тестов в наборе: <strong>8</strong>
+    </p>
+
+    <!-- Общая информация -->
+    <div class="card">
+        <h2><span class="icon">📋</span> Общая информация</h2>
+        <table>
+            <tbody>
+                <tr><td style="width:220px;font-weight:600;">Модуль регистрации</td><td><code>CG_Online_UT_ИнтеграцииССервисами_ЮнитТестыКлиентСервер</code></td></tr>
+                <tr><td style="font-weight:600;">Модуль-прокси</td><td><code>CG_Online_UT_ИнтеграцииССервисами_ВызовСервера</code></td></tr>
+                <tr><td style="font-weight:600;">Модуль-переопределение</td><td><code>CG_Online_UT_ИнтеграцииССервисамиПереопределяемый</code></td></tr>
+                <tr><td style="font-weight:600;">Контекст выполнения</td><td><span class="badge badge-blue">Сервер</span></td></tr>
+                <tr><td style="font-weight:600;">Количество тестов</td><td><strong>8</strong></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Архитектура -->
+    <div class="card">
+        <h2><span class="icon">🏗️</span> Архитектура: 4-уровневая модель вызовов</h2>
+
+        <div class="arch-box level1">
+            <div class="arch-title">Уровень 1: Регистрация тестов</div>
+            <div class="arch-desc">CG_Online_UT_ИнтеграцииССервисами_ЮнитТестыКлиентСервер<br>
+                ИсполняемыеСценарии() → ЮТТесты.ДобавитьТестовыйНабор("Интеграция с сервисами (Загрузка товаров)")<br>
+                .ДобавитьСерверныйТест("ЗагрузитьТовары", ..., Сервер)</div>
+        </div>
+        <div class="arch-arrow">▼ вызывает</div>
+
+        <div class="arch-box level2">
+            <div class="arch-title">Уровень 2: Тестовый метод (прокси)</div>
+            <div class="arch-desc">CG_Online_UT_ИнтеграцииССервисами_ЮнитТестыКлиентСервер<br>
+                Процедура ЗагрузитьТовары() Экспорт → ВызовСервера.ЗагрузитьТовары()</div>
+        </div>
+        <div class="arch-arrow">▼ делегирует</div>
+
+        <div class="arch-box level3">
+            <div class="arch-title">Уровень 3: Серверный вызов (резолвер модулей)</div>
+            <div class="arch-desc">CG_Online_UT_ИнтеграцииССервисами_ВызовСервера<br>
+                1. ОбщийМодульМетода("CG_Online_ИнтеграцииССервисамиСервер")<br>
+                2. ПараметрыСинхронизацииДанныхПоНастройке()<br>
+                3. ЗаполнитьЗначениеПараметра("НомерСтраницы", 1)<br>
+                4. ЗаполнитьЗначениеПараметра("КоличествоЭлементов", 10)<br>
+                5. ОбщийМодульМетода("CG_Online_НоменклатураСервисов")<br>
+                6. ЗагрузитьТовары(Параметры, ТаблицыДанных)</div>
+        </div>
+        <div class="arch-arrow">▼ вызывает</div>
+
+        <div class="arch-box level4">
+            <div class="arch-title">Уровень 4: Бизнес-логика (основное расширение УОТ)</div>
+            <div class="arch-desc">CG_Online_ИнтеграцииССервисамиСервер + CG_Online_НоменклатураСервисов<br>
+                → Переопределяемый.ПередЗагрузкойТоваров()<br>
+                → Переопределяемый.ЗагрузитьТоварыИзСервисаПоНастройке()<br>
+                → [ITPartner / Wildberries / ЯндексМаркет / ...]</div>
+        </div>
+    </div>
+
+    <!-- Состав тестов -->
+    <div class="card">
+        <h2><span class="icon">🧪</span> Состав набора тестов</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Метод</th>
+                    <th>Представление</th>
+                    <th>Целевой модуль</th>
+                    <th>Тип</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td><code>ЗагрузитьСтатусыМодерацииИИдентификаторыТоваров</code></td>
+                    <td>Статусы модерации и идентификаторы</td>
+                    <td><span class="badge badge-green">НоменклатураСервисов</span></td>
+                    <td><span class="badge badge-gray">Простой</span></td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td><code>ЗагрузитьКатегорииТоваров</code></td>
+                    <td>Категории товаров</td>
+                    <td><span class="badge badge-green">НоменклатураСервисов</span></td>
+                    <td><span class="badge badge-gray">Простой</span></td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td><code>ЗагрузитьДеревоКатегорииТоваров</code></td>
+                    <td>Дерево категории товаров</td>
+                    <td><span class="badge badge-green">НоменклатураСервисов</span></td>
+                    <td><span class="badge badge-gray">Простой</span></td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td><code>ЗагрузитьСвойстваКатегорий</code></td>
+                    <td>Свойства категорий</td>
+                    <td><span class="badge badge-green">НоменклатураСервисов</span></td>
+                    <td><span class="badge badge-gray">Простой</span></td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td><code>ЗагрузитьЗначенияСвойстваКатегорий</code></td>
+                    <td>Значения свойства категорий</td>
+                    <td><span class="badge badge-green">НоменклатураСервисов</span></td>
+                    <td><span class="badge badge-gray">Простой</span></td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td><code>ЗагрузитьНесопоставленныеТовары</code></td>
+                    <td>Несопоставленные товары</td>
+                    <td><span class="badge badge-blue">ИнтеграцииССервисамиСервер</span> + <span class="badge badge-green">НоменклатураСервисов</span></td>
+                    <td><span class="badge badge-orange">С параметрами</span></td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td><code>ЗагрузитьТовары</code></td>
+                    <td>Загрузить/обновить все товары</td>
+                    <td><span class="badge badge-blue">ИнтеграцииССервисамиСервер</span> + <span class="badge badge-green">НоменклатураСервисов</span></td>
+                    <td><span class="badge badge-red">С пагинацией</span></td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td><code>ЗагрузитьШтрихкоды</code></td>
+                    <td>Штрихкоды</td>
+                    <td><span class="badge badge-green">НоменклатураСервисов</span></td>
+                    <td><span class="badge badge-gray">Простой</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Детальный разбор -->
+    <div class="card">
+        <h2><span class="icon">🔍</span> Детальный разбор тестов</h2>
+
+        <!-- Тест 1 -->
+        <div class="test-detail">
+            <div class="test-detail-header">
+                <span class="test-num">1</span>
+                ЗагрузитьСтатусыМодерацииИИдентификаторыТоваров
+            </div>
+            <div class="test-detail-body">
+                <p><strong>Назначение:</strong> Загружает статусы модерации и идентификаторы товаров из подключённых сервисов.</p>
+                <p><strong>Параметры:</strong> Без параметров — использует настройки авторизации по умолчанию.</p>
+                <div class="call-chain">
+                    <span class="call-module">ВызовСервера</span>.ЗагрузитьСтатусыМодерацииИИдентификаторыТоваров()<br>
+                    <span class="call-arrow">→</span> ОбщийМодульМетода(<span class="call-method">"CG_Online_НоменклатураСервисов"</span>)<br>
+                    <span class="call-arrow">→</span> МодульМетода.<span class="call-method">ЗагрузитьСтатусыМодерацииИИдентификаторыТоваров</span>()
+                </div>
+            </div>
+        </div>
+
+        <!-- Тесты 2-5 -->
+        <div class="test-detail">
+            <div class="test-detail-header">
+                <span class="test-num">2-5</span>
+                ЗагрузитьКатегорииТоваров / ДеревоКатегорииТоваров / СвойстваКатегорий / ЗначенияСвойстваКатегорий
+            </div>
+            <div class="test-detail-body">
+                <p><strong>Назначение:</strong> Загрузка справочной информации о категориях товаров (плоский список, дерево, свойства, значения).</p>
+                <p><strong>Паттерн:</strong> Все 4 теста следуют одинаковому шаблону:</p>
+                <div class="call-chain">
+                    <span class="call-module">ВызовСервера</span>.<span class="call-method">{ИмяМетода}</span>()<br>
+                    <span class="call-arrow">→</span> ОбщийМодульМетода(<span class="call-method">"CG_Online_НоменклатураСервисов"</span>)<br>
+                    <span class="call-arrow">→</span> МодульМетода.<span class="call-method">{ИмяМетода}</span>()
+                </div>
+            </div>
+        </div>
+
+        <!-- Тест 6 -->
+        <div class="test-detail">
+            <div class="test-detail-header">
+                <span class="test-num">6</span>
+                ЗагрузитьНесопоставленныеТовары
+                <span class="badge badge-orange" style="margin-left:auto;">С параметрами</span>
+            </div>
+            <div class="test-detail-body">
+                <p><strong>Назначение:</strong> Загружает только товары, которые ещё не сопоставлены с номенклатурой в базе.</p>
+                <p><strong>Ключевой параметр:</strong> <code>ТолькоНесопоставленные = Истина</code></p>
+                <div class="call-chain">
+                    <span class="call-module">ВызовСервера</span>.ЗагрузитьНесопоставленныеТовары()<br>
+                    <span class="call-arrow">→</span> ОбщийМодульМетода(<span class="call-method">"CG_Online_ИнтеграцииССервисамиСервер"</span>)<br>
+                    <span class="call-arrow">→</span> ПараметрыСинхронизацииДанных = <span class="call-method">ПараметрыСинхронизацииДанныхПоНастройке</span>()<br>
+                    <span class="call-arrow">→</span> ЗаполнитьЗначениеПараметра(<span class="call-method">"ТолькоНесопоставленные"</span>, Истина)<br>
+                    <span class="call-arrow">→</span> ТаблицыДанных = <span class="call-method">ТаблицыДанныхВСтруктуруПараметровСинхронизацииДанных</span>()<br>
+                    <span class="call-arrow">→</span> ОбщийМодульМетода(<span class="call-method">"CG_Online_НоменклатураСервисов"</span>)<br>
+                    <span class="call-arrow">→</span> Модуль.<span class="call-method">ЗагрузитьТовары</span>(Параметры, ТаблицыДанных)
+                </div>
+            </div>
+        </div>
+
+        <!-- Тест 7 -->
+        <div class="test-detail">
+            <div class="test-detail-header">
+                <span class="test-num">7</span>
+                ЗагрузитьТовары
+                <span class="badge badge-red" style="margin-left:auto;">С пагинацией</span>
+            </div>
+            <div class="test-detail-body">
+                <p><strong>Назначение:</strong> Основной тест загрузки товаров. Загружает страницу товаров (10 элементов) из сервисов.</p>
+                <p><strong>Ключевые параметры:</strong></p>
+                <ul style="margin-left:20px; margin-bottom:8px;">
+                    <li><code>НомерСтраницы = 1</code> — первая страница</li>
+                    <li><code>КоличествоЭлементов = 10</code> — лимит 10 товаров (для ускорения теста)</li>
+                </ul>
+                <div class="call-chain">
+                    <span class="call-module">ВызовСервера</span>.ЗагрузитьТовары()<br>
+                    <span class="call-arrow">→</span> ОбщийМодульМетода(<span class="call-method">"CG_Online_ИнтеграцииССервисамиСервер"</span>)<br>
+                    <span class="call-arrow">→</span> Параметры = <span class="call-method">ПараметрыСинхронизацииДанныхПоНастройке</span>()<br>
+                    <span class="call-arrow">→</span> ЗаполнитьЗначениеПараметра(<span class="call-method">"НомерСтраницы"</span>, 1)<br>
+                    <span class="call-arrow">→</span> ЗаполнитьЗначениеПараметра(<span class="call-method">"КоличествоЭлементов"</span>, 10)<br>
+                    <span class="call-arrow">→</span> ТаблицыДанных = <span class="call-method">ТаблицыДанныхВСтруктуруПараметровСинхронизацииДанных</span>()<br>
+                    <span class="call-arrow">→</span> ОбщийМодульМетода(<span class="call-method">"CG_Online_НоменклатураСервисов"</span>)<br>
+                    <span class="call-arrow">→</span> Модуль.<span class="call-method">ЗагрузитьТовары</span>(Параметры, ТаблицыДанных)
+                </div>
+            </div>
+        </div>
+
+        <!-- Тест 8 -->
+        <div class="test-detail">
+            <div class="test-detail-header">
+                <span class="test-num">8</span>
+                ЗагрузитьШтрихкоды
+            </div>
+            <div class="test-detail-body">
+                <p><strong>Назначение:</strong> Загружает штрихкоды товаров из сервисов.</p>
+                <div class="call-chain">
+                    <span class="call-module">ВызовСервера</span>.ЗагрузитьШтрихкоды()<br>
+                    <span class="call-arrow">→</span> ОбщийМодульМетода(<span class="call-method">"CG_Online_НоменклатураСервисов"</span>)<br>
+                    <span class="call-arrow">→</span> МодульМетода.<span class="call-method">ЗагрузитьШтрихкоды</span>()
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Механизм переопределения -->
+    <div class="card">
+        <h2><span class="icon">🔌</span> Механизм переопределения (Override)</h2>
+        <p style="margin-bottom:12px;">Модуль <code>CG_Online_UT_ИнтеграцииССервисамиПереопределяемый</code> предоставляет точки расширения для различных сервисов:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Сервис</th>
+                    <th>Модуль</th>
+                    <th>Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="svc-active">
+                    <td>ITPartner</td>
+                    <td><code>CG_Online_UT_ITP_ИнтеграцияСИТПартнер</code></td>
+                    <td><span class="badge badge-green">✅ Активен</span></td>
+                </tr>
+                <tr class="svc-commented">
+                    <td>Wildberries</td>
+                    <td><code>...WildberriesПереопределяемый</code></td>
+                    <td><span class="badge badge-gray">💬 Закомментирован</span></td>
+                </tr>
+                <tr class="svc-commented">
+                    <td>ЯндексМаркет</td>
+                    <td><code>...ЯндексМаркетПереопределяемый</code></td>
+                    <td><span class="badge badge-gray">💬 Закомментирован</span></td>
+                </tr>
+                <tr class="svc-commented">
+                    <td>СпортМастер</td>
+                    <td><code>...СпортМастерПереопределяемый</code></td>
+                    <td><span class="badge badge-gray">💬 Закомментирован</span></td>
+                </tr>
+                <tr class="svc-commented">
+                    <td>ExpressRMS</td>
+                    <td><code>...ExpressRMSПереопределяемый</code></td>
+                    <td><span class="badge badge-gray">💬 Закомментирован</span></td>
+                </tr>
+                <tr class="svc-commented">
+                    <td>БетаПро</td>
+                    <td><code>...БетаПроПереопределяемый</code></td>
+                    <td><span class="badge badge-gray">💬 Закомментирован</span></td>
+                </tr>
+                <tr class="svc-commented">
+                    <td>ВКонтакте</td>
+                    <td><code>...ВКонтактеПереопределяемый</code></td>
+                    <td><span class="badge badge-gray">💬 Закомментирован</span></td>
+                </tr>
+                <tr class="svc-commented">
+                    <td>SimaLand</td>
+                    <td><code>...SimaLandПереопределяемый</code></td>
+                    <td><span class="badge badge-gray">💬 Закомментирован</span></td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="margin-top:12px; font-size:0.85rem; color:var(--text-muted);">
+            <strong>Точки расширения:</strong><br>
+            1. <code>ПередЗагрузкойТоваровИзСервисаПоНастройке()</code> — подготовка данных перед загрузкой<br>
+            2. <code>ЗагрузитьТоварыИзСервисаПоНастройке()</code> — основная загрузка товаров
+        </p>
+    </div>
+
+    <!-- Резолвинг модулей -->
+    <div class="card">
+        <h2><span class="icon">⚙️</span> Механизм резолвинга модулей</h2>
+        <p style="margin-bottom:10px;">Все тесты используют паттерн <strong>«динамический резолвинг модулей»</strong> через <code>CG_Online_UT_ОбщегоНазначения.ОбщийМодульМетода()</code>:</p>
+<pre><code><span class="code-keyword">МодульМетода</span> = CG_Online_UT_ОбщегоНазначения.ОбщийМодульМетода(<span class="code-string">"CG_Online_НоменклатураСервисов"</span>);
+<span class="code-keyword">Если</span> МодульМетода <> Неопределено <span class="code-keyword">Тогда</span>
+    МодульМетода.ЗагрузитьТовары(...);
+<span class="code-keyword">КонецЕсли</span>;</code></pre>
+        <p style="font-size:0.88rem;">
+            <strong>Смысл:</strong> Модуль вызывается по имени. Если модуль не существует в конфигурации (например, расширение не подключено),
+            <code>ОбщийМодульМетода</code> возвращает <code>Неопределено</code>, и тест просто пропускает вызов.
+            Это обеспечивает совместимость с разными конфигурациями.
+        </p>
+    </div>
+
+    <!-- Ключевые файлы -->
+    <div class="card">
+        <h2><span class="icon">📁</span> Ключевые файлы</h2>
+        <table>
+            <thead>
+                <tr><th>Файл</th><th>Роль</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>.../CG_Online_UT_ИнтеграцииССервисами_ЮнитТестыКлиентСервер/Ext/Module.bsl</code></td>
+                    <td>Регистрация тестов + прокси-методы</td>
+                </tr>
+                <tr>
+                    <td><code>.../CG_Online_UT_ИнтеграцииССервисами_ВызовСервера/Ext/Module.bsl</code></td>
+                    <td>Серверные вызовы, резолвинг модулей</td>
+                </tr>
+                <tr>
+                    <td><code>.../CG_Online_UT_ИнтеграцииССервисамиПереопределяемый/Ext/Module.bsl</code></td>
+                    <td>Точки расширения для сервисов</td>
+                </tr>
+                <tr>
+                    <td><code>.../CG_Online_UT_ОбщегоНазначения/Ext/Module.bsl</code></td>
+                    <td>Утилита <code>ОбщийМодульМетода()</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer">
+        Отчёт сформирован автоматически &nbsp;|&nbsp; Проект УОТ КОРП &nbsp;|&nbsp; 2026-05-27
+    </div>
+
+</div>
+</body>
+</html>

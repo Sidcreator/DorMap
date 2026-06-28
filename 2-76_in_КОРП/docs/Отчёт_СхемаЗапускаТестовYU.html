@@ -1,0 +1,234 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Схема запуска тестов YU в КОРПтест</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; background: #f5f5f5; color: #333; }
+        h1 { color: #1a73e8; border-bottom: 3px solid #1a73e8; padding-bottom: 10px; }
+        h2 { color: #1a73e8; margin-top: 35px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+        h3 { color: #555; margin-top: 25px; }
+        .meta { color: #666; font-size: 14px; margin-bottom: 20px; background: #e8f0fe; padding: 10px 15px; border-radius: 6px; }
+        table { border-collapse: collapse; width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin: 15px 0; font-size: 14px; }
+        th { background: #1a73e8; color: white; padding: 10px 12px; text-align: left; }
+        td { padding: 8px 12px; border-bottom: 1px solid #e0e0e0; }
+        tr:hover { background: #f0f7ff; }
+        code { background: #f1f3f4; padding: 2px 6px; border-radius: 3px; font-family: 'Consolas', monospace; font-size: 13px; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 6px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+        pre .comment { color: #6a9955; }
+        pre .keyword { color: #569cd6; }
+        pre .string { color: #ce9178; }
+        pre .method { color: #dcdcaa; }
+        .flow { background: white; border-left: 4px solid #1a73e8; padding: 15px 20px; margin: 15px 0; border-radius: 0 6px 6px 0; font-family: 'Consolas', monospace; font-size: 13px; line-height: 2; }
+        .flow .arrow { color: #1a73e8; font-weight: bold; }
+        .flow .step { color: #333; }
+        .flow .module { color: #e65100; font-weight: bold; }
+        .flow .method { color: #2e7d32; }
+        .section-card { background: white; border-radius: 8px; padding: 20px; margin: 15px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .tag { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; margin: 2px; }
+        .tag-blue { background: #e3f2fd; color: #1565c0; }
+        .tag-green { background: #e8f5e9; color: #2e7d32; }
+        .tag-orange { background: #fff3e0; color: #e65100; }
+        .tag-red { background: #ffebee; color: #c62828; }
+        .tag-purple { background: #f3e5f5; color: #6a1b9a; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .summary-card { background: white; border-radius: 8px; padding: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); text-align: center; }
+        .summary-card .icon { font-size: 32px; margin-bottom: 5px; }
+        .summary-card .title { font-weight: bold; color: #333; }
+        .summary-card .desc { font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+
+<h1>🧪 Схема запуска тестов YU в КОРПтест</h1>
+<div class="meta">
+    <strong>Дата:</strong> 2026-05-27 | <strong>Задача:</strong> 5.8 — Схема запуска тестов YU<br>
+    <strong>Цель:</strong> Документирование архитектуры YU-тестов для формирования новых тестов и отладки существующих
+</div>
+
+<h2>1. Обзор архитектуры</h2>
+
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="icon">⚙️</div>
+        <div class="title">Тестовый движок</div>
+        <div class="desc"><code>ЮТДвижок</code> / <code>ЮТТесты</code></div>
+    </div>
+    <div class="summary-card">
+        <div class="icon">▶️</div>
+        <div class="title">Исполнитель</div>
+        <div class="desc"><code>ЮТИсполнительСлужебныйКлиент</code></div>
+    </div>
+    <div class="summary-card">
+        <div class="icon">📖</div>
+        <div class="title">Читатель</div>
+        <div class="desc"><code>ЮТЧитательСлужебный</code></div>
+    </div>
+    <div class="summary-card">
+        <div class="icon">🏷️</div>
+        <div class="title">Allure</div>
+        <div class="desc"><code>ЮТАлюр</code></div>
+    </div>
+    <div class="summary-card">
+        <div class="icon">🎭</div>
+        <div class="title">Мокито</div>
+        <div class="desc"><code>МокитоПерехват</code> / <code>МокитоПроверки</code></div>
+    </div>
+    <div class="summary-card">
+        <div class="icon">🖥️</div>
+        <div class="title">UI</div>
+        <div class="desc">Обработка <code>ЮТЮнитТесты</code></div>
+    </div>
+</div>
+
+<h2>2. Жизненный цикл тестов</h2>
+
+<h3>Фаза 1: Открытие формы → Загрузка модулей</h3>
+<div class="flow">
+    <span class="step">Пользователь открывает обработку "ЮТЮнитТесты"</span><br>
+    <span class="arrow">↓</span>
+    <span class="step">Форма.ПриСозданииНаСервере() → Загрузка списка тестовых модулей</span><br>
+    <span class="arrow">↓</span>
+    <span class="module">ЮТЧитательСлужебныйКлиент</span>.<span class="method">ИсполняемыеСценарии()</span> — перебор всех модулей<br>
+    <span class="arrow">↓</span>
+    <span class="step">Для каждого модуля: проверка наличия метода <code>ИсполняемыеСценарии()</code></span>
+</div>
+
+<h3>Фаза 2: Построение дерева тестов (Discovery)</h3>
+<div class="flow">
+    <span class="module">ЮТЧитательСлужебный</span>.<span class="method">ИсполняемыеСценарииМодуля()</span><br>
+    <span class="arrow">↓</span>
+    <span class="step">Вызов: <code>Модуль.ИсполняемыеСценарии()</code> ← точка входа</span><br>
+    <span class="arrow">↓</span>
+    <span class="step">Внутри <code>ИсполняемыеСценарии()</code>:</span><br>
+    &nbsp;&nbsp;<code>ЮТТесты.ДобавитьТестовыйНабор("Имя")</code> → создаёт suite<br>
+    &nbsp;&nbsp;<code>.ДобавитьТест("Метод", "Представление")</code> → добавляет тест<br>
+    &nbsp;&nbsp;<code>.ДобавитьКлиентскийТест(...)</code> → клиентский контекст<br>
+    &nbsp;&nbsp;<code>.ДобавитьСерверныйТест(...)</code> → серверный контекст<br>
+    &nbsp;&nbsp;<code>.Настроить(ЮТАлюр.Epic(...))</code> → теги Allure<br>
+    <span class="arrow">↓</span>
+    <span class="step">Результат: <code>ОписаниеТестовогоМодуля</code> (наборы → тесты → параметры)</span>
+</div>
+
+<h3>Фаза 3: Запуск тестов (Execution)</h3>
+<div class="flow">
+    <span class="step">Пользователь нажимает "Запустить"</span><br>
+    <span class="arrow">↓</span>
+    <span class="module">ЮТИсполнительСлужебныйКлиент</span>.<span class="method">ВыполнитьТестовыеМодули()</span><br>
+    <span class="arrow">↓</span>
+    <span class="step">Для каждого модуля → набора → теста:</span><br>
+    &nbsp;&nbsp;<span class="module">ЮТМетодыСлужебный</span>.<span class="method">ВыполнитьМетодОбъектаСПерехватомОшибки()</span><br>
+    <span class="arrow">↓</span>
+    <span class="step"><code>Выполнить("Объект.МетодТеста(Параметры)")</code> ← прямой вызов</span><br>
+    <span class="arrow">↓</span>
+    <span class="step">Запись результата → отображение в UI + Allure XML</span>
+</div>
+
+<h2>3. API регистрации тестов</h2>
+
+<div class="section-card">
+<h3>Основные методы <code>ЮТТесты</code></h3>
+<table>
+    <tr><th>Метод</th><th>Описание</th><th>Тег</th></tr>
+    <tr><td><code>ДобавитьТестовыйНабор(Имя)</code></td><td>Создаёт группу тестов (suite)</td><td><span class="tag tag-blue">Suite</span></td></tr>
+    <tr><td><code>ДобавитьТест(Метод, Представление, Контекст)</code></td><td>Добавляет тест</td><td><span class="tag tag-green">Test</span></td></tr>
+    <tr><td><code>ДобавитьКлиентскийТест(...)</code></td><td>Клиентский контекст</td><td><span class="tag tag-green">Client</span></td></tr>
+    <tr><td><code>ДобавитьСерверныйТест(...)</code></td><td>Серверный контекст</td><td><span class="tag tag-green">Server</span></td></tr>
+    <tr><td><code>Настроить(ЮТАлюр...)</code></td><td>Теги Allure</td><td><span class="tag tag-purple">Allure</span></td></tr>
+    <tr><td><code>ВТранзакции()</code></td><td>Выполнять в транзакции</td><td><span class="tag tag-orange">Config</span></td></tr>
+    <tr><td><code>УдалениеТестовыхДанных()</code></td><td>Автоочистка после теста</td><td><span class="tag tag-orange">Config</span></td></tr>
+    <tr><td><code>СПараметрами(Значение)</code></td><td>Передать параметры в тест</td><td><span class="tag tag-orange">Config</span></td></tr>
+    <tr><td><code>Перед(ИмяМетода)</code></td><td>Выполнить перед тестом</td><td><span class="tag tag-orange">Config</span></td></tr>
+    <tr><td><code>После(ИмяМетода)</code></td><td>Выполнить после теста</td><td><span class="tag tag-orange">Config</span></td></tr>
+</table>
+</div>
+
+<h2>4. Типы тестовых модулей</h2>
+
+<div class="section-card">
+<h3>4.1 Интеграционные тесты (API)</h3>
+<p><strong>Модуль:</strong> <code>CG_Online_UT_ИнтеграцииССервисами_ЮнитТестыКлиентСервер</code> (1087 строк)</p>
+<p>Тестирование API-методов Ozon/WB/Яндекс/Авито через макеты Мокито.</p>
+<pre><span class="comment">// Пример регистрации</span>
+ЮТТесты
+    .ДобавитьТестовыйНабор(<span class="string">"Интеграция (Загрузка товаров)"</span>)
+    .ДобавитьСерверныйТест(<span class="string">"ЗагрузитьКатегорииТоваров"</span>, <span class="string">"Загрузить категории"</span>, Сервер)
+    .ДобавитьСерверныйТест(<span class="string">"ЗагрузитьТовары"</span>, <span class="string">"Загрузить товары"</span>, Сервер)</pre>
+</div>
+
+<div class="section-card">
+<h3>4.2 Дымовые тесты открытия форм (ДТ)</h3>
+<p><strong>Модули:</strong> <code>ДТОткрытиеФорм</code>, <code>CG_Online_UT_ДТ_ДокументыКлиент</code>, <code>CG_Online_UT_ДТ_СправочникиКлиент</code> и др.</p>
+<p>Автоматическая генерация тестов из метаданных конфигурации. Дерево тестов строится динамически.</p>
+<pre><span class="comment">// ДТОткрытиеФорм.ИсполняемыеСценарии()</span>
+ЮТТесты.Настроить(ЮТАлюр.Epic(<span class="string">"Дымовые тесты"</span>));
+ДеревоТестов = ДТОткрытиеФормСлужебныйВызовСервера.ТипыТестов();
+<span class="comment">// → Перебор коллекций → объектов → типов тестов</span></pre>
+</div>
+
+<h2>5. Система макетов (Мокито)</h2>
+
+<table>
+    <tr><th>Модуль</th><th>Назначение</th></tr>
+    <tr><td><code>МокитоОбучение</code></td><td>Настройка ожидаемых вызовов и ответов</td></tr>
+    <tr><td><code>МокитоПерехват</code></td><td>Перехват вызовов API в runtime</td></tr>
+    <tr><td><code>МокитоПроверки</code></td><td>Проверка факта вызова и параметров</td></tr>
+    <tr><td><code>CG_Online_UT_Мокито</code></td><td>Специфичные для КОРПтест настройки</td></tr>
+</table>
+
+<h3>Паттерн использования</h3>
+<pre><span class="comment">// 1. Настроить макет</span>
+МокитоОбучение.Настроить(<span class="string">"CG_Online_Ozon_ИнтеграцияСОзон"</span>, <span class="string">"ВызватьAPI"</span>)
+    .Когда(<span class="string">"v3/product/list"</span>)
+    .Вернуть(CG_Online_UT_РаботаСТестовымиДанными.Макет(<span class="string">"CG_Online_Ozon_JSON_ДанныеОТоварах_Краткий"</span>));
+
+<span class="comment">// 2. Выполнить тестируемый код</span>
+Результат = ТестируемыйМодуль.ЗагрузитьТовары();
+
+<span class="comment">// 3. Проверить результат</span>
+ЮТест.ОжидаетЧто(Результат).Заполнено();
+МокитоПроверки.Проверить(<span class="string">"..."</span>, <span class="string">"ВызватьAPI"</span>).Вызывался(1);</pre>
+
+<h2>6. Как создать новый тест</h2>
+
+<div class="section-card">
+<h3>Шаг 1: Создать тестовый модуль</h3>
+<pre><span class="comment">// Модуль: CG_Online_UT_MyNewTests (клиентский или серверный)</span>
+#Область СлужебныйПрограммныйИнтерфейс
+
+Процедура ИсполняемыеСценарии() Экспорт
+    ЮТТесты
+        .ДобавитьТестовыйНабор(<span class="string">"Мой новый тестовый набор"</span>)
+        .ДобавитьСерверныйТест(<span class="string">"ТестМойМетод"</span>, <span class="string">"Тест моего метода"</span>, <span class="string">"Сервер"</span>)
+    ;
+КонецПроцедуры
+
+#Область Тесты
+Процедура ТестМойМетод() Экспорт
+    <span class="comment">// Настройка → Вызов → Проверка</span>
+КонецПроцедуры
+#КонецОбласти
+#КонецОбласти</pre>
+</div>
+
+<div class="section-card">
+<h3>Шаг 2: Зарегистрировать модуль</h3>
+<p>Включить модуль в подсистему <code>ЮТПодключаемыеМодули</code> или <code>ДымовыеТесты</code>.</p>
+</div>
+
+<div class="section-card">
+<h3>Шаг 3: Создать макеты</h3>
+<p>Добавить JSON-макет в <code>DataProcessors/CG_Online_UT_Ozon_ИнтеграцияСОзон/Templates/</code>.</p>
+</div>
+
+<h2>7. Типичные ошибки и решения</h2>
+<table>
+    <tr><th>Ошибка</th><th>Причина</th><th>Решение</th></tr>
+    <tr><td><span class="tag tag-red">Переменная не определена (ЮТАлюр)</span></td><td>Серверный модуль вызывается из клиентского</td><td>Установить <code>ClientManagedApplication=true</code></td></tr>
+    <tr><td><span class="tag tag-red">Преобразование к типу Дата</span></td><td>Передача Строки вместо Даты</td><td>Использовать <code>ТекущаяДата()</code> напрямую</td></tr>
+    <tr><td><span class="tag tag-orange">Тест не появляется в дереве</span></td><td>Модуль не включён в подсистему</td><td>Добавить в подсистему <code>ЮТПодключаемыеМодули</code></td></tr>
+    <tr><td><span class="tag tag-orange">Макет не найден</span></td><td>Макет отсутствует или неверное имя</td><td>Проверить имя в <code>CG_Online_UT_РаботаСТестовымиДанными.Макет()</code></td></tr>
+</table>
+
+</body>
+</html>

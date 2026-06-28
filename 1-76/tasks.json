@@ -1,0 +1,328 @@
+{
+  "project": "76",
+  "name": "1. 76",
+  "path": "D:\\1c\\EDT КОРП УОТ\\76",
+  "roadmapDir": "1-76",
+  "created": "2026-05-16",
+  "updated": "2026-06-28",
+  "tasks": [
+    {
+      "id": 1,
+      "name": "Анализ аналитик мп ВБ",
+      "priority": "P2",
+      "complexity": 2,
+      "progress": 0,
+      "section": "active",
+      "start": "2026-06-25",
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "1.1", "name": "Анализ API", "desc": "Изучить методы аналитики WB (статистика, продажи, остатки)", "status": "⬜" },
+        { "id": "1.2", "name": "Воронка продаж мп ВБ", "desc": "Изучить метрики воронки продаж WB", "status": "⬜" },
+        { "id": "1.2.1", "name": "analytics/v3/sales-funnel/products - Статистика карточек товаров за период", "desc": "HeaderApiKey. Body: selectedPeriod (start, end), pastPeriod (start, end), nmIds[0..1000], brandNames[], subjectIds[], tagIds[], skipDeletedNm, orderBy (field: openCard|addToCart|orderCount|buyoutCount|cancelCount|avgPrice|stockMpQty|stockWbQty|shareOrderPercent|addToWishlist|timeToReady и др., mode: asc|desc), limit(50, max1000), offset. Обновление 1р/час, max 365дн. Ответ: data.products[].{product(...), statistic.{selected{...}, past{...}, comparison{...dynamic}}}, currency", "status": "⬜", "report": "Отчет_1.2.1_Анализ_analytics_v3_sales_funnel_products.html" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Мокито для поставки ВБО Озон",
+      "priority": "P2",
+      "complexity": 2,
+      "progress": 0,
+      "section": "active",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "2.1", "name": "Анализ API", "desc": "Изучить API поставок ВБО Ozon, endpoint'ы: /supplies, v1/supplies/40169894, v1/supplies/40169894/goods", "status": "⬜" },
+        { "id": "2.2", "name": "Анализ тестов", "desc": "Прочитать существующие моки в 76тест/КОРПтест по Ozon поставкам", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Анализ методов аналитики мп Озон",
+      "priority": "P2",
+      "complexity": 2,
+      "progress": 71,
+      "section": "active",
+      "start": "2026-06-25",
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "3.1", "name": "/v1/analytics/stocks", "desc": "Изучить endpoint v1/analytics/stocks — запрос остатков и перемещений", "status": "🔵", "date": "2026-06-25" },
+        { "id": "3.2", "name": "/v1/report/discounted/create", "desc": "Изучить endpoint /v1/report/discounted/create — создание отчёта по уценённым товарам", "status": "🔵", "date": "2026-06-25" },
+        { "id": "3.3", "name": "/v1/analytics/turnover/stocks", "desc": "Изучить endpoint v1/analytics/turnover/stocks — анализ оборачиваемости по складам", "status": "🔵", "date": "2026-06-25" },
+        { "id": "3.4", "name": "/v2/analytics/stock_on_warehouses", "desc": "Изучить endpoint v2/analytics/stock_on_warehouses — остатки на складах Оzon", "status": "🔵" },
+        { "id": "3.5", "name": "/v1/analytics/product-queries/details", "desc": "Изучить endpoint v1/analytics/product-queries/details — детализация поисковых запросов по товару", "status": "🔵", "date": "2026-06-25" },
+        { "id": "3.6", "name": "/v1/analytics/product-queries", "desc": "Изучить endpoint v1/analytics/product-queries — информация о поисковых запросах товаров", "status": "🔵", "date": "2026-06-25" },
+        { "id": "3.7", "name": "/v1/analytics/data", "desc": "Изучить endpoint v1/analytics/data — данные аналитики", "status": "🔵", "date": "2026-06-25" },
+        { "id": "3.8", "name": "Реализация плана аналитика Озон", "desc": "Реализовать аналитические методы Озон в УОТ614 согласно плану", "status": "🔵", "date": "2026-06-25" }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Разработка Va тестов поставки для мп ВБ",
+      "priority": "P2",
+      "complexity": 2,
+      "progress": 0,
+      "section": "active",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "4.1", "name": "Анализ API", "desc": "Изучить API поставок Wildberries: endpoint'ы, форматы запросов/ответов", "status": "⬜" },
+        { "id": "4.2", "name": "Анализ моков", "desc": "Прочитать существующие моки в Тест по WB поставкам", "status": "⬜" },
+        { "id": "4.3", "name": "Реализация", "desc": "Разработать тесты поставок WB", "status": "⬜" },
+        { "id": "4.4", "name": "Верификация", "desc": "Проверить корректность тестов, синтаксис BSL", "status": "⬜" },
+        { "id": "4.5", "name": "Документирование", "desc": "Обновить дорожную карту, документацию", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Анализ аналитик мп ЯМ",
+      "priority": "P2",
+      "complexity": 2,
+      "progress": 0,
+      "section": "active",
+      "start": "2026-06-25",
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "5.1", "name": "Анализ API", "desc": "Изучить методы аналитики Яндекс.Маркет (отчёты, статистика)", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Воронка продаж мп ВБ",
+      "priority": "P2",
+      "complexity": 2,
+      "progress": 0,
+      "section": "active",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "6.1", "name": "Анализ", "desc": "Изучить метрики воронки продаж WB", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 7.1,
+      "name": "Поле выбора кода ошибки на форме «Настройки тестовой среды»",
+      "priority": "P2",
+      "complexity": 1,
+      "progress": 100,
+      "section": "completed",
+      "start": "2026-06-05",
+      "end": "2026-06-05",
+      "time_min": null,
+      "stages": [
+        { "id": "7.1.1", "name": "Анализ", "desc": "Изучить форму, enum КодыОшибок, константы", "status": "✅", "date": "2026-06-05" },
+        { "id": "7.1.2", "name": "Реализация", "desc": "Добавить InputField + Module.bsl с обработчиком", "status": "✅", "date": "2026-06-05" },
+        { "id": "7.1.3", "name": "Верификация", "desc": "Проверить XML и BSL", "status": "✅", "date": "2026-06-05" }
+      ]
+    },
+    {
+      "id": 7.2,
+      "name": "Переключатель режима отмены на форме «Настройки тестовой среды»",
+      "priority": "P2",
+      "complexity": 1,
+      "progress": 100,
+      "section": "completed",
+      "start": "2026-06-05",
+      "end": "2026-06-05",
+      "time_min": null,
+      "stages": [
+        { "id": "7.2.1", "name": "Анализ", "desc": "Изучить существующие константы, ИспользоватьРежимОтмены()", "status": "✅", "date": "2026-06-05" },
+        { "id": "7.2.2", "name": "Реализация", "desc": "Константа CG_Online_UT_ВключитьРежимОтмены добавлена", "status": "✅", "date": "2026-06-05" }
+      ]
+    },
+    {
+      "id": 7.3,
+      "name": "Добавление/отладка макета отмены в МП WB",
+      "priority": "P2",
+      "complexity": 2,
+      "progress": 100,
+      "section": "completed",
+      "start": "2026-06-25",
+      "end": "2026-06-25",
+      "time_min": null,
+      "stages": [
+        { "id": "7.3.1", "name": "Поиск текущего макета", "desc": "Найти существующие макеты/фикстуры WB по отменам заказов в Тест/ и УОТ607", "status": "✅", "date": "2026-06-25" },
+        { "id": "7.3.2", "name": "Анализ формата", "desc": "Сравнить ожидаемый формат ответа WB с обработкой отмены в УОТ607", "status": "✅", "date": "2026-06-25" },
+        { "id": "7.3.3", "name": "Добавление макета", "desc": "Добавить или скорректировать макет ответа отмены WB", "status": "✅", "date": "2026-06-25" },
+        { "id": "7.3.4", "name": "Отладка обработки", "desc": "Прогнать сценарий отмены, исправить маппинг/поля", "status": "✅", "date": "2026-06-25" },
+        { "id": "7.3.5", "name": "Верификация", "desc": "Проверить, что макет используется тестами и отмена корректно отражается в заказе", "status": "✅", "date": "2026-06-25" },
+        { "id": "7.3.6", "name": "Документирование", "desc": "Обновить дорожную карту и связанные заметки", "status": "✅", "date": "2026-06-25" }
+      ]
+    },
+    {
+      "id": 8.1,
+      "name": "Унифицированный модуль ТК",
+      "priority": "P2.7",
+      "complexity": 5,
+      "progress": 0,
+      "section": "postponed",
+      "reason": "Приоритет — сначала завершить Авито",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "8.1.1", "name": "Фаза 1: Каркас", "desc": "Создать метаданные (справочник, документ, перечисление, регистры)", "status": "⬜" },
+        { "id": "8.1.2", "name": "Фаза 2: Провайдер ДЛ", "desc": "Перенести 44 функции, 35 API-эндпоинтов из ТК ДЛ", "status": "⬜" },
+        { "id": "8.1.3", "name": "Фаза 3: Интеграция", "desc": "Подсистема, ввод на основании, регламентные задания", "status": "⬜" },
+        { "id": "8.1.4", "name": "Фаза 4: BDD-тесты", "desc": "Тестирование через Vanessa Automation", "status": "⬜" },
+        { "id": "8.1.5", "name": "Фаза 5: Расширение", "desc": "Добавить провайдеры СДЭК, ПЭК, DPD", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 8.2,
+      "name": "Макет файла автозагрузки ЛК Авито",
+      "priority": "P3",
+      "complexity": 2,
+      "progress": 0,
+      "section": "postponed",
+      "reason": "Ожидание требований по формату файла",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "8.2.1", "name": "Анализ формата", "desc": "Изучить формат файла автозагрузки ЛК Авито", "status": "⬜" },
+        { "id": "8.2.2", "name": "Создание макета", "desc": "Разработать шаблон/макет файла", "status": "⬜" },
+        { "id": "8.2.3", "name": "Тестирование", "desc": "Проверить загрузку макета в ЛК Авито", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 8.3,
+      "name": "Доработка тестирования Docker",
+      "priority": "P3",
+      "complexity": 3,
+      "progress": 0,
+      "section": "postponed",
+      "reason": "Требуется настройка инфраструктуры",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "8.3.1", "name": "Настройка окружения", "desc": "Развернуть Docker-контейнеры для тестирования", "status": "⬜" },
+        { "id": "8.3.2", "name": "Адаптация тестов", "desc": "Доработать BDD-тесты для запуска в Docker", "status": "⬜" },
+        { "id": "8.3.3", "name": "CI/CD интеграция", "desc": "Настроить автоматический запуск тестов", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 8.4,
+      "name": "BDD-тесты для Авито",
+      "priority": "P1",
+      "complexity": 3,
+      "progress": 0,
+      "section": "postponed",
+      "reason": "Сначала завершить реализацию Авито",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "8.4.1", "name": "Подготовка", "desc": "Добавить $$Avito$$ в 099999 Служебные операции Export.feature", "status": "⬜" },
+        { "id": "8.4.2", "name": "Export: ЛК МП", "desc": "Создать 05030 Export для Авито (по паттерну Ozon)", "status": "⬜" },
+        { "id": "8.4.3", "name": "Export: Загрузка заказов", "desc": "Создать 05170 Загрузка заказов Avito Export.feature", "status": "⬜" },
+        { "id": "8.4.4", "name": "Основной тест", "desc": "Создать 02010 сценарий загрузки заказов Авито FBS", "status": "⬜" },
+        { "id": "8.4.5", "name": "Запуск", "desc": "Добавить вызов в 00000 Запуск тестов.feature", "status": "⬜" },
+        { "id": "8.4.6", "name": "Верификация", "desc": "Запустить тест через MCP, проверить результат", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 8.5,
+      "name": "Модуль ТК и развитие доставки УОТ",
+      "priority": "P2.5",
+      "complexity": 4,
+      "progress": 0,
+      "section": "postponed",
+      "reason": "Сначала завершить реализацию Авито",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "8.5.1", "name": "Анализ архитектуры", "desc": "Изучить доставку в УОТ607, ТК ДЛ, Почту России", "status": "✅", "date": "2026-05-19" },
+        { "id": "8.5.2", "name": "Фаза 1: Связка УОТ-ТК ДЛ", "desc": "Создание заявки + трек-номер", "status": "⬜" },
+        { "id": "8.5.3", "name": "Фаза 2: Модуль ТК", "desc": "Провайдеры ДЛ + Почта России", "status": "⬜" },
+        { "id": "8.5.4", "name": "Фаза 3: Расширение", "desc": "СДЭК, ПЭК, дашборд, регламенты", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 8.6,
+      "name": "Отмена заказов Авито (reject)",
+      "priority": "P2",
+      "complexity": 2,
+      "progress": 0,
+      "section": "postponed",
+      "reason": "Перенесено пользователем в отложенные",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "8.6.1", "name": "Анализ API", "desc": "Изучить applyTransition(reject) в ИС_AVITO", "status": "⬜" },
+        { "id": "8.6.2", "name": "Анализ заглушки", "desc": "Прочитать ОтменитьЗаказыПоНастройке() (стр.503)", "status": "⬜" },
+        { "id": "8.6.3", "name": "Реализация", "desc": "Написать код отмены", "status": "⬜" },
+        { "id": "8.6.4", "name": "Документирование", "desc": "Обновить документацию", "status": "⬜" },
+        { "id": "8.6.5", "name": "Тестирование", "desc": "Протестировать отмену заказа через UI УОТ", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 8.7,
+      "name": "Передача трек-номеров Авито (DBS/cDBS)",
+      "priority": "P2.5",
+      "complexity": 3,
+      "progress": 0,
+      "section": "postponed",
+      "reason": "Приоритет — сначала завершить FBS",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "8.7.1", "name": "Анализ проблемы", "desc": "Изучить хардкод на стр.2197 и рабочий код ИС_AVITO", "status": "⬜" },
+        { "id": "8.7.2", "name": "Анализ заглушки", "desc": "Прочитать ДобавитьТрекНомер() (стр.1810)", "status": "⬜" },
+        { "id": "8.7.3", "name": "Реализация", "desc": "Заменить хардкод на реальные параметры", "status": "⬜" },
+        { "id": "8.7.4", "name": "Верификация", "desc": "Проверить корректность JSON-запроса", "status": "⬜" },
+        { "id": "8.7.5", "name": "Документирование", "desc": "Обновить документацию", "status": "⬜" },
+        { "id": "8.7.6", "name": "Тестирование", "desc": "Протестировать передачу трек-номера через UI УОТ", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 8.8,
+      "name": "Активация загрузки заказов Авито FBS",
+      "priority": "P1",
+      "complexity": 1,
+      "progress": 83,
+      "section": "postponed",
+      "reason": "Требует 1С клиент для ручного тестирования",
+      "start": "2026-05-16",
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "8.8.1", "name": "Анализ заглушки", "desc": "Прочитать ЗагрузитьЗаказыССобственногоСкладаПоНастройке() (стр.476)", "status": "✅", "date": "2026-05-16" },
+        { "id": "8.8.2", "name": "Анализ реализации", "desc": "Прочитать ЗагрузитьЗаказыССобственногоСклада() (стр.2305)", "status": "✅", "date": "2026-05-16" },
+        { "id": "8.8.3", "name": "Замена заглушки", "desc": "apply_diff: заглушка → вызов реализованной функции (31 строка)", "status": "✅", "date": "2026-05-16" },
+        { "id": "8.8.4", "name": "Документирование", "desc": "Обновить CONTEXT.md, АнализУОТ607.md, Журнал изменений", "status": "✅", "date": "2026-05-16" },
+        { "id": "8.8.5", "name": "Верификация кода", "desc": "Перечитать изменённый код (стр.476-506), подтвердить корректность активации", "status": "✅", "date": "2026-05-16" },
+        { "id": "8.8.6", "name": "Тестирование", "desc": "Протестировать загрузку заказов Авито FBS через интерфейс УОТ", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 8.9,
+      "name": "Подтверждение заказов Авито (confirm)",
+      "priority": "P2",
+      "complexity": 2,
+      "progress": 0,
+      "section": "postponed",
+      "reason": "Перенесено из активных в отложенные",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "8.9.1", "name": "Анализ API", "desc": "Изучить applyTransition(confirm) в ИС_AVITO и API Авито", "status": "⬜" },
+        { "id": "8.9.2", "name": "Анализ заглушки", "desc": "Прочитать ПодтвердитьЗаказыПоНастройке()", "status": "⬜" },
+        { "id": "8.9.3", "name": "Реализация", "desc": "Реализовать подтверждение по паттерну Ozon/WB + ИС_AVITO", "status": "⬜" },
+        { "id": "8.9.4", "name": "Верификация", "desc": "Проверить изменённый код и синтаксис", "status": "⬜" },
+        { "id": "8.9.5", "name": "Документирование", "desc": "Обновить документацию", "status": "⬜" },
+        { "id": "8.9.6", "name": "Тестирование", "desc": "Протестировать подтверждение через UI УОТ", "status": "⬜" }
+      ]
+    }
+  ]
+}

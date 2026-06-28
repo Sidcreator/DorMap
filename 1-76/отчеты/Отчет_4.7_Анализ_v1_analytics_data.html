@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Анализ: v1/analytics/data — Данные аналитики</title>
+<style>
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; max-width: 1000px; margin: 40px auto; padding: 0 20px; color: #1a1a1a; line-height: 1.5; }
+  h1 { border-bottom: 2px solid #1565c0; padding-bottom: 10px; color: #1565c0; }
+  h2 { color: #1565c0; margin-top: 32px; }
+  h3 { color: #37474f; margin-top: 24px; }
+  .meta { background: #f5f5f5; padding: 12px 16px; border-radius: 6px; font-size: 0.9em; }
+  .code { background: #263238; color: #e2e8f0; padding: 12px 16px; border-radius: 6px; font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 0.85em; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 0.9em; }
+  th, td { border: 1px solid #bdbdbd; padding: 6px 10px; text-align: left; }
+  th { background: #1565c0; color: white; position: sticky; top: 0; }
+  tr:nth-child(even) { background: #f5f5f5; }
+  .issue { background: #ffebee; border-left: 4px solid #d32f2f; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .ok { background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .warn { background: #fff3e0; border-left: 4px solid #e65100; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .tg { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; font-weight: bold; }
+  .tg-green { background: #e8f5e9; color: #2e7d32; }
+  .tg-red { background: #ffebee; color: #c62828; }
+  .tg-amber { background: #fff3e0; color: #e65100; }
+  .tg-gray { background: #eceff1; color: #546e7a; }
+  .tg-blue { background: #e3f2fd; color: #1565c0; }
+  .used { background: #e8f5e9; }
+  .premium { background: #e8eaf6; }
+</style>
+</head>
+<body>
+
+<h1>Анализ: <code>v1/analytics/data</code></h1>
+
+<div class="meta">
+  <strong>Метод:</strong> <code>POST /v1/analytics/data</code><br>
+  <strong>Наличие в УОТ614:</strong> <span class="tg tg-red">НЕТ</span><br>
+  <strong>Задача ДК:</strong> 4.7 — /v1/analytics/data - Данные аналитики<br>
+  <strong>Проект:</strong> 1/76<br>
+  <strong>Дата:</strong> 2026-06-25
+</div>
+
+<h2>1. Описание</h2>
+<p>Метод возвращает аналитику по товарам продавца, сгруппированную по указанному измерению (dimension). Соответствует разделу <b>Аналитика → Графики</b> в личном кабинете Ozon.</p>
+
+<div class="warn">
+  <strong>Ограничения:</strong><br>
+  • Без подписки Premium Plus — данные только за последние 3 месяца, ограниченные метрики и способы группировки<br>
+  • Rate limit: 1 запрос в минуту<br>
+  • Максимум 14 метрик в одном запросе<br>
+  • <code>limit</code>: max 1000, min 1
+</div>
+
+<h2>2. Схема запроса</h2>
+
+<div class="code">
+POST /v1/analytics/data
+</div>
+
+<h3>Headers</h3>
+<table>
+  <thead>
+    <tr><th>Параметр</th><th>Тип</th><th>Обязательный</th><th>Описание</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>Client-Id</code></td><td>string</td><td>✅</td><td>Идентификатор клиента</td></tr>
+    <tr><td><code>Api-Key</code></td><td>string</td><td>✅</td><td>API-ключ</td></tr>
+  </tbody>
+</table>
+
+<h3>Body</h3>
+<table>
+  <thead>
+    <tr><th>Поле</th><th>Тип</th><th>Обязательный</th><th>Описание</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>date_from</code></td><td>string</td><td>✅</td><td>Дата начала (без Premium — в пределах 3 месяцев)</td></tr>
+    <tr><td><code>date_to</code></td><td>string</td><td>✅</td><td>Дата окончания</td></tr>
+    <tr><td><code>dimension</code></td><td>array[string]</td><td>✅</td><td>Группировка данных (см. таблицу ниже)</td></tr>
+    <tr><td><code>filters</code></td><td>array[object]</td><td>❌</td><td>Фильтры: key, op (EQ/GT/GTE/LT/LTE), value</td></tr>
+    <tr><td><code>limit</code></td><td>int64</td><td>✅</td><td>Кол-во значений (min 1, max 1000)</td></tr>
+    <tr><td><code>metrics</code></td><td>array[string]</td><td>✅</td><td>Метрики (макс. 14, см. таблицу ниже)</td></tr>
+    <tr><td><code>offset</code></td><td>int64</td><td>❌</td><td>Смещение (по умолч. 0)</td></tr>
+    <tr><td><code>sort</code></td><td>array[object]</td><td>❌</td><td>Сортировка: key (метрика), order (ASC/DESC)</td></tr>
+  </tbody>
+</table>
+
+<h2>3. Параметры dimension (группировка)</h2>
+
+<table>
+  <thead>
+    <tr><th>Значение</th><th>Описание</th><th>Доступ</th></tr>
+  </thead>
+  <tbody>
+    <tr class="used"><td><code>unknownDimension</code></td><td>Неизвестное измерение</td><td>✅ Всем</td></tr>
+    <tr class="used"><td><code>sku</code></td><td>Идентификатор товара</td><td>✅ Всем</td></tr>
+    <tr class="used"><td><code>spu</code></td><td>Идентификатор товара (объединённая карточка)</td><td>✅ Всем</td></tr>
+    <tr class="used"><td><code>day</code></td><td>День</td><td>✅ Всем</td></tr>
+    <tr class="used"><td><code>week</code></td><td>Неделя</td><td>✅ Всем</td></tr>
+    <tr class="used"><td><code>month</code></td><td>Месяц</td><td>✅ Всем</td></tr>
+    <tr class="premium"><td><code>year</code></td><td>Год</td><td>👑 Premium Plus</td></tr>
+    <tr class="premium"><td><code>category1</code></td><td>Категория первого уровня</td><td>👑 Premium Plus</td></tr>
+    <tr class="premium"><td><code>category2</code></td><td>Категория второго уровня</td><td>👑 Premium Plus</td></tr>
+    <tr class="premium"><td><code>brand</code></td><td>Бренд</td><td>👑 Premium Plus</td></tr>
+    <tr class="premium"><td><code>modelID</code></td><td>Модель</td><td>👑 Premium Plus</td></tr>
+    <tr class="premium"><td><code>descriptionType</code></td><td>Тип товара</td><td>👑 Premium Plus</td></tr>
+  </tbody>
+</table>
+
+<h2>4. Параметры metrics</h2>
+
+<table>
+  <thead>
+    <tr><th>#</th><th>Метрика</th><th>Тип</th><th>Описание</th><th>Доступ</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="5" style="background:#e8f5e9;font-weight:bold;">✅ Без подписки (2 метрики)</td>
+    </tr>
+    <tr class="used"><td>1</td><td><code>revenue</code></td><td>float</td><td>Заказано на сумму</td><td>✅</td></tr>
+    <tr class="used"><td>2</td><td><code>ordered_units</code></td><td>int64</td><td>Заказано товаров (штук)</td><td>✅</td></tr>
+    <tr>
+      <td colspan="5" style="background:#e8eaf6;font-weight:bold;">👑 Только Premium Plus (17 метрик)</td>
+    </tr>
+    <tr class="premium"><td>3</td><td><code>unknown_metric</code></td><td>—</td><td>Неизвестная метрика</td><td>👑</td></tr>
+    <tr class="premium"><td>4</td><td><code>hits_view_search</code></td><td>int64</td><td>Показы в поиске и в категории</td><td>👑</td></tr>
+    <tr class="premium"><td>5</td><td><code>hits_view_pdp</code></td><td>int64</td><td>Показы на карточке товара</td><td>👑</td></tr>
+    <tr class="premium"><td>6</td><td><code>hits_view</code></td><td>int64</td><td>Всего показов</td><td>👑</td></tr>
+    <tr class="premium"><td>7</td><td><code>hits_tocart_search</code></td><td>int64</td><td>В корзину из поиска или категории</td><td>👑</td></tr>
+    <tr class="premium"><td>8</td><td><code>hits_tocart_pdp</code></td><td>int64</td><td>В корзину из карточки товара</td><td>👑</td></tr>
+    <tr class="premium"><td>9</td><td><code>hits_tocart</code></td><td>int64</td><td>Всего добавлено в корзину</td><td>👑</td></tr>
+    <tr class="premium"><td>10</td><td><code>session_view_search</code></td><td>int64</td><td>Сессии с показом в поиске/каталоге (уникальные посетители)</td><td>👑</td></tr>
+    <tr class="premium"><td>11</td><td><code>session_view_pdp</code></td><td>int64</td><td>Сессии с показом на карточке товара</td><td>👑</td></tr>
+    <tr class="premium"><td>12</td><td><code>session_view</code></td><td>int64</td><td>Всего сессий (уникальные посетители)</td><td>👑</td></tr>
+    <tr class="premium"><td>13</td><td><code>conv_tocart_search</code></td><td>float</td><td>Конверсия в корзину из поиска/категории</td><td>👑</td></tr>
+    <tr class="premium"><td>14</td><td><code>conv_tocart_pdp</code></td><td>float</td><td>Конверсия в корзину из карточки товара</td><td>👑</td></tr>
+    <tr class="premium"><td>15</td><td><code>conv_tocart</code></td><td>float</td><td>Общая конверсия в корзину</td><td>👑</td></tr>
+    <tr class="premium"><td>16</td><td><code>returns</code></td><td>int64</td><td>Возвращено товаров</td><td>👑</td></tr>
+    <tr class="premium"><td>17</td><td><code>cancellations</code></td><td>int64</td><td>Отменено товаров</td><td>👑</td></tr>
+    <tr class="premium"><td>18</td><td><code>delivered_units</code></td><td>int64</td><td>Доставлено товаров</td><td>👑</td></tr>
+    <tr class="premium"><td>19</td><td><code>position_category</code></td><td>float</td><td>Позиция в поиске и категории</td><td>👑</td></tr>
+  </tbody>
+</table>
+
+<h2>5. Параметры filters и sort</h2>
+
+<h3>filters[]</h3>
+<table>
+  <thead>
+    <tr><th>Поле</th><th>Тип</th><th>Описание</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>key</code></td><td>string</td><td>Любой атрибут из dimension/metric, кроме brand</td></tr>
+    <tr><td><code>op</code></td><td>string</td><td>EQ / GT / GTE / LT / LTE (по умолч. EQ)</td></tr>
+    <tr><td><code>value</code></td><td>string</td><td>Значение для сравнения</td></tr>
+  </tbody>
+</table>
+
+<h3>sort[]</h3>
+<table>
+  <thead>
+    <tr><th>Поле</th><th>Тип</th><th>Описание</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>key</code></td><td>string</td><td>Метрика для сортировки</td></tr>
+    <tr><td><code>order</code></td><td>string</td><td>ASC (возрастание) / DESC (убывание, по умолч.)</td></tr>
+  </tbody>
+</table>
+
+<h2>6. Пример запроса</h2>
+
+<div class="code">
+{
+  "date_from": "2020-09-01",
+  "date_to": "2021-10-15",
+  "metrics": [
+    "hits_view_search"
+  ],
+  "dimension": [
+    "sku",
+    "day"
+  ],
+  "filters": [],
+  "sort": [
+    {
+      "key": "hits_view_search",
+      "order": "DESC"
+    }
+  ],
+  "limit": 1000,
+  "offset": 0
+}
+</div>
+
+<h2>7. Схема ответа</h2>
+
+<div class="code">
+{
+  "result": {
+    "data": [],
+    "totals": [
+      0
+    ]
+  },
+  "timestamp": "2021-11-25 15:19:21"
+}
+</div>
+
+<table>
+  <thead>
+    <tr><th>Поле</th><th>Тип</th><th>Описание</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>result</code></td><td>object</td><td>Контейнер с данными</td></tr>
+    <tr><td><code>result.data</code></td><td>array</td><td>Массив данных (пустой в примере — структура элемента пока не определена)</td></tr>
+    <tr><td><code>result.totals</code></td><td>array[int64]</td><td>Итоговые значения по метрикам (порядок соответствует metrics[] в запросе)</td></tr>
+    <tr><td><code>timestamp</code></td><td>string</td><td>Время формирования ответа (формат: "YYYY-MM-DD HH:mm:ss")</td></tr>
+  </tbody>
+</table>
+
+<div class="issue">
+  <strong>Проблема:</strong> <code>result.data</code> в примере пустой. Требуется ответ с реальными данными для определения структуры элемента (ожидается: dimension-поля + метрики для каждой группы).
+</div>
+
+<h2>8. Заключение</h2>
+
+<table>
+  <thead>
+    <tr><th>Параметр</th><th>Значение</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Метод</td><td>POST /v1/analytics/data</td></tr>
+    <tr><td>Наличие в УОТ614</td><td><span class="tg tg-red">НЕТ</span></td></tr>
+    <tr><td>Доступ без подписки</td><td>2 метрики (revenue, ordered_units), 6 dimension, данные за 3 мес.</td></tr>
+    <tr><td>Premium метрики</td><td>17 шт., включая показы, корзину, конверсию, возвраты, позицию</td></tr>
+    <tr><td>Rate limit</td><td>1 запрос/мин</td></tr>
+    <tr><td>Макс. метрик</td><td>14</td></tr>
+    <tr><td>Макс. limit</td><td>1000</td></tr>
+    <tr><td>Пагинация</td><td>offset + limit</td></tr>
+    <tr><td>Источник</td><td>Аналитика → Графики (ЛК Ozon)</td></tr>
+  </tbody>
+</table>
+
+</body>
+</html>

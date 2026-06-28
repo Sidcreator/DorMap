@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отчёт: Анализ процесса заказов Ozon FBS</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'base', themeVariables: { background: '#ffffff' } });</script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #1a1a1a; max-width: 1100px; margin: 0 auto; padding: 20px; background: #fff; }
+        h1 { color: #1a1a1a; border-bottom: 3px solid #4CAF50; padding-bottom: 10px; }
+        h2 { color: #333; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px; margin-top: 40px; }
+        h3 { color: #444; margin-top: 30px; }
+        h4 { color: #555; }
+        table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+        th { background: #f5f5f5; font-weight: 600; }
+        tr:nth-child(even) { background: #fafafa; }
+        blockquote { border-left: 4px solid #4CAF50; margin: 16px 0; padding: 8px 16px; background: #f9f9f9; }
+        code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; }
+        .mermaid { background: #fff; padding: 20px; margin: 20px 0; text-align: center; }
+        hr { border: none; border-top: 2px solid #e0e0e0; margin: 40px 0; }
+        .status-ok { color: #4CAF50; font-weight: bold; }
+        .status-warn { color: #FF9800; font-weight: bold; }
+        .status-err { color: #F44336; font-weight: bold; }
+        .status-info { color: #2196F3; font-weight: bold; }
+        .legend { background: #f9f9f9; border: 1px solid #ddd; padding: 12px 16px; border-radius: 6px; margin: 16px 0; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<h1>Отчёт: Анализ процесса заказов Ozon FBS — УОТ609 vs УОТКОРП</h1>
+
+<blockquote>Детальный анализ процесса загрузки, обработки и отгрузки заказов Ozon FBS в двух расширениях: <code>УОТ609</code> (источник) и <code>УОТКОРП</code> (цель миграции).</blockquote>
+
+<hr>
+
+<h2>1. Структура метаданных процесса заказов FBS</h2>
+
+<h3>1.1. Документы</h3>
+
+<table>
+    <tr><th>Объект</th><th>Тип</th><th>Назначение</th><th>УОТ609</th><th>УОТКОРП</th></tr>
+    <tr><td><code>CG_Online_ЗаказКлиентаСервиса</code></td><td>Документ</td><td>Основной документ заказа из маркетплейса</td><td class="status-ok">✅</td><td class="status-ok">✅</td></tr>
+</table>
+
+<p><strong>Табличные части документа <code>CG_Online_ЗаказКлиентаСервиса</code>:</strong></p>
+
+<table>
+    <tr><th>Табличная часть</th><th>Назначение</th><th>УОТ609</th><th>УОТКОРП</th></tr>
+    <tr><td><code>Товары</code></td><td>Номенклатура, количество, цена, SKU</td><td class="status-ok">✅</td><td class="status-ok">✅</td></tr>
+    <tr><td><code>События</code></td><td>История изменений статуса заказа</td><td class="status-ok">✅</td><td class="status-ok">✅</td></tr>
+    <tr><td><code>Скидки</code></td><td>Скидки и промокоды</td><td class="status-ok">✅</td><td class="status-ok">✅</td></tr>
+    <tr><td><code>ГрузовыеМеста</code></td><td>Грузовые места для отгрузки</td><td class="status-ok">✅</td><td class="status-ok">✅</td></tr>
+    <tr><td><code>КомиссииИШтрафы</code></td><td>Комиссии маркетплейса и штрафы</td><td class="status-ok">✅</td><td class="status-ok">✅</td></tr>
+    <tr><td><code>Логистика</code></td><td>Логистические данные: доставка, адрес</td><td class="status-ok">✅</td><td class="status-ok">✅</td></tr>
+    <tr><td><code>ШтрихкодыУпаковок</code></td><td>Штрихкоды упаковок отправления</td><td class="status-ok">✅</td><td class="status-ok">✅</td></tr>
+</table>
+
+<h3>1.2. Справочники</h3>
+
+<table>
+    <tr><th>Объект</th><th>Назначение</th><th>УОТ609</th><th>УОТКОРП</th></tr>
+    <tr><td><code>CG_Online_МоделиРаботыСервисов</code></td><td>Модели работы: FBS, FBO, DBS и др.</td><td class="status-ok">✅</td><td class="status-ok">✅</td></tr>
+    <tr><td><code>CG_Online_ХозяйственныеОперации</code></td><td>Типы операций: продажа, возврат и др.</td><td class="status-ok">✅</td><td class="status-ok">✅ (расширен)</td></tr>
+    <tr><td><code>CG_Online_СтатусыДокументовСервисов</code></td><td>Статусы документов по сервисам</td><td class="status-err">❌</td><td class="status-ok">✅ (уникальный)</td></tr>
+</table>
+
+<blockquote><strong>Ключевое отличие:</strong> УОТКОРП использует справочник <code>CG_Online_СтатусыДокументовСервисов</code> вместо прямого обращения к перечислению статусов. Это обеспечивает гибкость и поддержку нескольких сервисов.</blockquote>
+
+<h3>1.3. Перечисления</h3>
+
+<table>
+    <tr><th>Объект</th><th>Значения</th><th>Назначение</th><th>УОТ609</th><th>УОТКОРП</th></tr>
+    <tr><td><code>CG_Online_Ozon_СтатусыЗаказов</code></td><td>12 значений</td><td>Статусы заказа Ozon</td><td class="status-ok">✅</td><td class="status-ok">✅</td></tr>
+    <tr><td><code>CG_Online_МоделиРаботыСервисов</code></td><td>FBS, FBM, Crossborder, DBS и др.</td><td>Модель выполнения заказа</td><td class="status-ok">✅</td><td class="status-ok">✅</td></tr>
+    <tr><td><code>CG_Online_ХозяйственныеОперации</code></td><td>Продажа, Возврат, Отмена и др.</td><td>Типы операций</td><td class="status-ok">✅</td><td class="status-ok">✅ (расширен)</td></tr>
+</table>
+
+<p><strong>Значения <code>CG_Online_Ozon_СтатусыЗаказов</code> (12):</strong></p>
+
+<table>
+    <tr><th>Значение</th><th>Описание</th></tr>
+    <tr><td><code>awaiting_packaging</code></td><td>Ожидает упаковки</td></tr>
+    <tr><td><code>awaiting_deliver</code></td><td>Ожидает передачи в службу доставки</td></tr>
+    <tr><td><code>delivered</code></td><td>Доставлен</td></tr>
+    <tr><td><code>cancelled</code></td><td>Отменён</td></tr>
+    <tr><td><code>returning</code></td><td>Возврат</td></tr>
+    <tr><td><code>returned</code></td><td>Возвращён</td></tr>
+    <tr><td><code>awaiting_registration</code></td><td>Ожидает регистрации</td></tr>
+    <tr><td><code>registration_denied</code></td><td>Регистрация отклонена</td></tr>
+    <tr><td><code>awaiting_approve</code></td><td>Ожидает подтверждения</td></tr>
+    <tr><td><code>accepted</code></td><td>Принят</td></tr>
+    <tr><td><code>processing</code></td><td>В обработке</td></tr>
+    <tr><td><code>shipped</code></td><td>Отгружен</td></tr>
+</table>
+
+<h3>1.4. Регистры сведений</h3>
+
+<table>
+    <tr><th>Объект</th><th>Назначение</th><th>УОТ609</th><th>УОТКОРП</th></tr>
+    <tr><td><code>CG_Online_ЗаказыКлиентовСервисов</code></td><td>Кэш загруженных заказов</td><td class="status-ok">✅</td><td class="status-ok">✅</td></tr>
+    <tr><td><code>CG_Online_ТоварыКОтгрузке</code></td><td>Товары, подготовленные к отгрузке</td><td class="status-ok">✅</td><td class="status-ok">✅</td></tr>
+    <tr><td><code>CG_Online_РеестрДокументовСервисов</code></td><td>Связь документов с сервисами</td><td class="status-ok">✅</td><td class="status-ok">✅</td></tr>
+</table>
+
+<hr>
+
+<h2>2. Цепочка вызовов функций загрузки заказов FBS</h2>
+
+<h3>2.1. Диаграмма процесса загрузки заказов FBS в УОТ609</h3>
+
+<div class="mermaid">
+flowchart TD
+    A[ЗагрузитьЗаказы] --> B[ЗагрузитьЗаказыССобственногоСклада]
+    A --> C[ЗагрузитьЗаказыСоСкладаСервиса]
+    
+    B --> D[API: v3/posting/fbs/list]
+    D --> E[Пагинация: step=50]
+    E --> F[Заполнить тзТовары]
+    E --> G[Заполнить тзЗаказы]
+    E --> H[Заполнить тзШтрихкода]
+    F --> I[Обработка financial_data]
+    G --> I
+    I --> J[ЭкзмеплярыТоваровПоОтправлениям]
+    J --> K[API: v6/fbs/posting/product/exemplar/create-or-get]
+    K --> L[ЗагрузитьЗаказыКлиентовСервисовПоНастройке]
+    
+    style A fill:#4CAF50,color:#fff
+    style D fill:#2196F3,color:#fff
+    style K fill:#2196F3,color:#fff
+    style L fill:#FF9800,color:#fff
+</div>
+
+<h3>2.2. Диаграмма процесса обновления статуса заказа в УОТ609</h3>
+
+<div class="mermaid">
+flowchart TD
+    A[ОбновитьСтатусЗаказа] --> B[Сбор данных заказа]
+    B --> C[Формирование packages]
+    C --> D[Формирование products]
+    D --> E[API: v4/posting/fbs/ship]
+    E --> F{Успех?}
+    F -->|Да| G[Запись нового статуса]
+    F -->|Нет| H[Регистрация ошибки]
+    
+    style A fill:#4CAF50,color:#fff
+    style E fill:#2196F3,color:#fff
+</div>
+
+<h3>2.3. Описание функций УОТ609</h3>
+
+<h4><code>ЗагрузитьЗаказы</code> — строка 5327</h4>
+<p><strong>Обёрточная функция.</strong> Вызывает два загрузчика последовательно:</p>
+<ol>
+    <li><code>ЗагрузитьЗаказыССобственногоСклада</code> — FBS-заказы</li>
+    <li><code>ЗагрузитьЗаказыСоСкладаСервиса</code> — FBO-заказы</li>
+</ol>
+
+<h4><code>ЗагрузитьЗаказыССобственногоСклада</code> — строки 4774–5108</h4>
+<p><strong>Основная функция загрузки FBS-заказов.</strong> Выполняет:</p>
+
+<table>
+    <tr><th>Шаг</th><th>Описание</th><th>API</th></tr>
+    <tr><td>1</td><td>Инициализация таблиц: <code>тзТовары</code>, <code>тзЗаказы</code>, <code>тзШтрихкода</code></td><td>—</td></tr>
+    <tr><td>2</td><td>Цикл пагинации с <code>step=50</code></td><td><code>v3/posting/fbs/list</code></td></tr>
+    <tr><td>3</td><td>Обработка каждого заказа из <code>result.postings</code></td><td>—</td></tr>
+    <tr><td>4</td><td>Заполнение <code>тзТовары</code>: SKU, количество, цена</td><td>—</td></tr>
+    <tr><td>5</td><td>Заполнение <code>тзЗаказы</code>: номер, статус, сумма, данные логистики</td><td>—</td></tr>
+    <tr><td>6</td><td>Заполнение <code>тзШтрихкода</code>: штрихкоды упаковок</td><td>—</td></tr>
+    <tr><td>7</td><td>Обработка <code>financial_data</code>: комиссии, скидки, логистика</td><td>—</td></tr>
+    <tr><td>8</td><td>Вызов <code>ЭкзмеплярыТоваровПоОтправлениям</code></td><td><code>v6/fbs/posting/product/exemplar/create-or-get</code></td></tr>
+    <tr><td>9</td><td>Вызов <code>CG_Online_ИнтеграцииССервисамиСервер.ЗагрузитьЗаказыКлиентовСервисовПоНастройке</code></td><td>—</td></tr>
+</table>
+
+<p><strong>Ключевые параметры:</strong></p>
+<ul>
+    <li>Передаёт таблицы <code>тзТовары</code>, <code>тзЗаказы</code>, <code>тзШтрихкода</code> как отдельные параметры</li>
+    <li>Использует <code>CG_Online_ИнтеграцииССервисамиСервер.СтатусЗаказаКлиентаСервисаПоИдентификатору</code> для определения статуса</li>
+</ul>
+
+<h4><code>ОбновитьСтатусЗаказа</code> — строки 5465–5526</h4>
+<p><strong>Обновление статуса заказа через API.</strong> Выполняет:</p>
+
+<table>
+    <tr><th>Шаг</th><th>Описание</th></tr>
+    <tr><td>1</td><td>Получение данных заказа</td></tr>
+    <tr><td>2</td><td>Формирование структуры <code>packages</code> с грузовыми местами</td></tr>
+    <tr><td>3</td><td>Формирование структуры <code>products</code> с товарами</td></tr>
+    <tr><td>4</td><td>Отправка <code>v4/posting/fbs/ship</code></td></tr>
+    <tr><td>5</td><td>Обработка ответа</td></tr>
+</table>
+
+<p><strong>Особенность:</strong> Простая версия без поддержки <code>exemplar_info</code>.</p>
+
+<h4><code>ЭкзмеплярыТоваровПоОтправлениям</code> — строка 6179</h4>
+<p><strong>Получение данных маркировки товаров.</strong> Использует API <code>v6/fbs/posting/product/exemplar/create-or-get</code>.</p>
+
+<h4><code>СинхронизироватьСтатусыЗаказовКлиентовСервисов</code> — строки 11031–11034</h4>
+<p><strong>Заглушка.</strong> Вызывает <code>ЭкранированиеНеРеализованногоФункционала</code> — функционал синхронизации статусов не реализован в УОТ609.</p>
+
+<hr>
+
+<h2>3. Сравнительный анализ функций УОТ609 и УОТКОРП</h2>
+
+<h3>3.1. Сводная таблица функций</h3>
+
+<table>
+    <tr><th>Функция</th><th>УОТ609</th><th>УОТКОРП CM</th><th>УОТКОРП OM</th><th>Статус</th></tr>
+    <tr><td><code>ЗагрузитьЗаказы</code></td><td class="status-ok">✅ строка 5327</td><td class="status-err">❌</td><td class="status-err">❌</td><td class="status-err">🔴 Отсутствует</td></tr>
+    <tr><td><code>ЗагрузитьЗаказыССобственногоСклада</code></td><td class="status-ok">✅ строки 4774–5108</td><td class="status-ok">✅ строки 8560–8804</td><td class="status-ok">✅ строки 6996–7240</td><td class="status-info">🔵 Реализовано иначе</td></tr>
+    <tr><td><code>ЗагрузитьЗаказыСоСкладаСервиса</code></td><td class="status-ok">✅ строка 5110</td><td class="status-ok">✅ строка 8367</td><td class="status-ok">✅ строка 6803</td><td class="status-ok">✅ Совпадает</td></tr>
+    <tr><td><code>ОбновитьСтатусЗаказа</code> / <code>ОбновитьСтатусЗаказаПоНастройке</code></td><td class="status-ok">✅ строки 5465–5526</td><td class="status-ok">✅ строки 1383–1571</td><td class="status-ok">✅ строки 1504–1693</td><td class="status-info">🔵 УОТКОРП улучшен</td></tr>
+    <tr><td><code>ЭкзмеплярыТоваровПоОтправлениям</code></td><td class="status-ok">✅ строка 6179</td><td class="status-ok">✅ строка 8992</td><td class="status-ok">✅ строка 7428</td><td class="status-ok">✅ Совпадает</td></tr>
+    <tr><td><code>СинхронизироватьСтатусыЗаказовКлиентовСервисов</code></td><td class="status-warn">⚠️ Заглушка</td><td class="status-err">❌</td><td class="status-err">❌</td><td class="status-err">🔴 Отсутствует</td></tr>
+    <tr><td><code>ЗаполнитьСтрокуЗаказаСервиса</code></td><td class="status-ok">✅ строка 5413</td><td class="status-err">❌</td><td class="status-err">❌</td><td class="status-err">🔴 Отсутствует</td></tr>
+</table>
+
+<div class="legend">
+    <strong>Легенда:</strong><br>
+    <span class="status-ok">✅ Совпадает</span> — функция присутствует с аналогичной логикой<br>
+    <span class="status-info">🔵 Реализовано иначе</span> — функция присутствует, но с архитектурными отличиями<br>
+    <span class="status-info">🔵 УОТКОРП улучшен</span> — функция присутствует в расширенном варианте<br>
+    <span class="status-err">🔴 Отсутствует</span> — функция не найдена в УОТКОРП<br>
+    <span class="status-warn">⚠️ Заглушка</span> — функция объявлена, но не реализована
+</div>
+
+<h3>3.2. Детальные отличия <code>ЗагрузитьЗаказыССобственногоСклада</code></h3>
+
+<table>
+    <tr><th>Аспект</th><th>УОТ609</th><th>УОТКОРП</th></tr>
+    <tr><td><strong>Паттерн параметров</strong></td><td>Отдельные параметры: <code>тзТовары</code>, <code>тзЗаказы</code>, <code>тзШтрихкода</code></td><td>Структуры: <code>ПараметрыСинхронизацииДанных</code>, <code>ТаблицыДанных</code></td></tr>
+    <tr><td><strong>Определение статуса</strong></td><td><code>CG_Online_ИнтеграцииССервисамиСервер.СтатусЗаказаКлиентаСервисаПоИдентификатору</code></td><td><code>CG_Online_СтатусыДокументовСервисов.СтатусДокументаСервисаПоПараметрам</code></td></tr>
+    <tr><td><strong>Вызов exemplar</strong></td><td>После цикла загрузки</td><td>Внутри цикла загрузки</td></tr>
+    <tr><td><strong>Создание документов</strong></td><td>Вызывает <code>ЗагрузитьЗаказыКлиентовСервисовПоНастройке</code> в конце</td><td><span class="status-err"><strong>НЕ вызывает</strong></span> — создание документов обрабатывается отдельно</td></tr>
+    <tr><td><strong>API-эндпоинт</strong></td><td><code>v3/posting/fbs/list</code></td><td><code>v3/posting/fbs/list</code> (совпадает)</td></tr>
+    <tr><td><strong>Пагинация</strong></td><td><code>step=50</code></td><td><code>step=50</code> (совпадает)</td></tr>
+</table>
+
+<blockquote><strong>Критическое отличие:</strong> УОТКОРП НЕ вызывает <code>ЗагрузитьЗаказыКлиентовСервисовПоНастройке</code> в конце загрузки. Это означает, что механизм создания документов <code>CG_Online_ЗаказКлиентаСервиса</code> из загруженных данных реализован иначе или отсутствует.</blockquote>
+
+<h3>3.3. Детальные отличия <code>ОбновитьСтатусЗаказаПоНастройке</code></h3>
+
+<table>
+    <tr><th>Аспект</th><th>УОТ609</th><th>УОТКОРП</th></tr>
+    <tr><td><strong>Имя функции</strong></td><td><code>ОбновитьСтатусЗаказа</code></td><td><code>ОбновитьСтатусЗаказаПоНастройке</code></td></tr>
+    <tr><td><strong>Получение товаров</strong></td><td>Через параметры</td><td>Запрос к базе данных с группировкой по <code>НомерОтправления</code></td></tr>
+    <tr><td><strong>exemplar_info</strong></td><td class="status-err">❌ Не поддерживается</td><td class="status-ok">✅ Поддерживается: <code>mandatory_mark</code>, <code>gtd</code></td></tr>
+    <tr><td><strong>Формирование packages</strong></td><td>Простая структура</td><td>Расширенная структура с <code>exemplar_info</code></td></tr>
+    <tr><td><strong>Обработка ошибок</strong></td><td>Базовая</td><td><code>РегистрацияОшибкиИнтеграционнойФункции</code></td></tr>
+    <tr><td><strong>Статус после обновления</strong></td><td>Не устанавливается</td><td>Устанавливает <code>awaiting_deliver</code></td></tr>
+    <tr><td><strong>Запись объекта</strong></td><td>Не выполняет</td><td>Вызывает <code>Записать</code> с режимом <code>РежимЗаписиДокумента.Проведение</code></td></tr>
+    <tr><td><strong>API-эндпоинт</strong></td><td><code>v4/posting/fbs/ship</code></td><td><code>v4/posting/fbs/ship</code> (совпадает)</td></tr>
+</table>
+
+<h3>3.4. Диаграмма: реализация процесса FBS в УОТКОРП</h3>
+
+<div class="mermaid">
+flowchart TD
+    subgraph УОТКОРП - Реализовано
+        A1[ЗагрузитьЗаказыССобственногоСклада<br/>CM:8560 OM:6996]
+        A2[ЭкзмеплярыТоваровПоОтправлениям<br/>CM:8992 OM:7428]
+        A3[ОбновитьСтатусЗаказаПоНастройке<br/>CM:1383 OM:1504]
+        A4[ЗагрузитьЗаказыСоСкладаСервиса<br/>CM:8367 OM:6803]
+    end
+    
+    subgraph УОТКОРП - Отсутствует
+        B1[ЗагрузитьЗаказы<br/>обёрточная функция]
+        B2[СинхронизироватьСтатусы<br/>ЗаказовКлиентовСервисов]
+        B3[ЗаполнитьСтроку<br/>ЗаказаСервиса]
+        B4[Вызов ЗагрузитьЗаказыКлиентов<br/>СервисовПоНастройке]
+    end
+    
+    A1 --> A2
+    A1 -.->|Отсутствует| B4
+    
+    style A1 fill:#4CAF50,color:#fff
+    style A2 fill:#4CAF50,color:#fff
+    style A3 fill:#4CAF50,color:#fff
+    style A4 fill:#4CAF50,color:#fff
+    style B1 fill:#F44336,color:#fff
+    style B2 fill:#F44336,color:#fff
+    style B3 fill:#F44336,color:#fff
+    style B4 fill:#F44336,color:#fff
+</div>
+
+<hr>
+
+<h2>4. План последовательной доработки УОТКОРП</h2>
+
+<h3>4.1. Карта зависимостей</h3>
+
+<div class="mermaid">
+flowchart LR
+    subgraph Этап 1.5 - Загрузка заказов
+        E5a[Создать ЗагрузитьЗаказы<br/>обёртка]
+        E5b[Адаптировать ЗагрузитьЗаказы<br/>ССобственногоСклада]
+        E5c[Добавить вызов<br/>ЗагрузитьЗаказыКлиентов<br/>СервисовПоНастройке]
+    end
+    
+    subgraph Этап 1.6 - Обработка заказов
+        E6a[Адаптировать<br/>ОбновитьСтатусЗаказаПоНастройке]
+        E6b[Создать ЗаполнитьСтроку<br/>ЗаказаСервиса]
+    end
+    
+    subgraph Этап 1.8 - Обновление статусов
+        E8a[Реализовать<br/>СинхронизироватьСтатусы<br/>ЗаказовКлиентовСервисов]
+    end
+    
+    E5a --> E5b --> E5c
+    E5c --> E6a
+    E5c --> E6b
+    E6a --> E8a
+    E6b --> E8a
+    
+    style E5a fill:#FF9800,color:#fff
+    style E5b fill:#FF9800,color:#fff
+    style E5c fill:#F44336,color:#fff
+    style E6a fill:#4CAF50,color:#fff
+    style E6b fill:#FF9800,color:#fff
+    style E8a fill:#F44336,color:#fff
+</div>
+
+<h3>4.2. Пошаговый план доработки</h3>
+
+<h4>Этап 1.5: Загрузка заказов — доработка</h4>
+
+<table>
+    <tr><th>#</th><th>Задача</th><th>Описание</th><th>Сложность</th><th>Зависимости</th></tr>
+    <tr>
+        <td>1.5.1</td><td>Создать <code>ЗагрузитьЗаказы</code></td>
+        <td>Обёрточная функция, вызывающая <code>ЗагрузитьЗаказыССобственногоСклада</code> и <code>ЗагрузитьЗаказыСоСкладаСервиса</code>. Разместить в CommonModule и ObjectModule</td>
+        <td>⭐⭐</td><td>—</td>
+    </tr>
+    <tr>
+        <td>1.5.2</td><td>Адаптировать <code>ЗагрузитьЗаказыССобственногоСклада</code></td>
+        <td>Убедиться в корректности работы с <code>ПараметрыСинхронизацииДанных</code>/<code>ТаблицыДанных</code>. Проверить заполнение всех табличных частей</td>
+        <td>⭐⭐</td><td>—</td>
+    </tr>
+    <tr>
+        <td class="status-err">1.5.3</td><td>Добавить создание документов</td>
+        <td>Реализовать вызов <code>CG_Online_ИнтеграцииССервисамиСервер.ЗагрузитьЗаказыКлиентовСервисовПоНастройке</code> или аналог после загрузки данных. <strong>Критический пробел</strong> — без этого заказы загружаются в таблицы, но документы не создаются</td>
+        <td>⭐⭐⭐⭐</td><td>1.5.2</td>
+    </tr>
+</table>
+
+<h4>Этап 1.6: Обработка заказов — доработка</h4>
+
+<table>
+    <tr><th>#</th><th>Задача</th><th>Описание</th><th>Сложность</th><th>Зависимости</th></tr>
+    <tr>
+        <td>1.6.1</td><td>Верифицировать <code>ОбновитьСтатусЗаказаПоНастройке</code></td>
+        <td>УОТКОРП-версия уже улучшена: поддерживает <code>exemplar_info</code>, запрос к БД, запись объекта. Проверить полноту</td>
+        <td>⭐</td><td>—</td>
+    </tr>
+    <tr>
+        <td>1.6.2</td><td>Создать <code>ЗаполнитьСтрокуЗаказаСервиса</code></td>
+        <td>Вспомогательная функция заполнения строки заказа. Отсутствует в УОТКОРП.</td>
+        <td>⭐⭐</td><td>1.5.3</td>
+    </tr>
+</table>
+
+<h4>Этап 1.8: Обновление статусов — реализация</h4>
+
+<table>
+    <tr><th>#</th><th>Задача</th><th>Описание</th><th>Сложность</th><th>Зависимости</th></tr>
+    <tr>
+        <td>1.8.1</td><td>Реализовать <code>СинхронизироватьСтатусыЗаказовКлиентовСервисов</code></td>
+        <td>Необходимо реализовать синхронизацию статусов через <code>CG_Online_СтатусыДокументовСервисов</code></td>
+        <td>⭐⭐⭐</td><td>1.6.1</td>
+    </tr>
+</table>
+
+<h3>4.3. Риски и рекомендации</h3>
+
+<table>
+    <tr><th>Риск</th><th>Описание</th><th>Рекомендация</th></tr>
+    <tr>
+        <td class="status-err">🔴 Создание документов</td>
+        <td>УОТКОРП не создаёт документы <code>CG_Online_ЗаказКлиентаСервиса</code> после загрузки данных. Это блокирует весь процесс</td>
+        <td>Приоритет 1: исследовать, как создаётся документ в КОРП-архитектуре. Возможно, <code>ЗагрузитьЗаказыКлиентовСервисовПоНастройке</code> вызывается из другого места</td>
+    </tr>
+    <tr>
+        <td class="status-warn">🟡 Паттерн параметров</td>
+        <td>Разные паттерны передачи данных могут затруднить отладку</td>
+        <td>Унифицировать подход: использовать <code>ПараметрыСинхронизацииДанных</code> как стандарт</td>
+    </tr>
+    <tr>
+        <td class="status-ok">🟢 Обновление статуса</td>
+        <td>УОТКОРП-версия уже улучшена</td>
+        <td>Минимальные доработки, фокус на тестирование</td>
+    </tr>
+</table>
+
+<h3>4.4. Связь с дорожной картой</h3>
+
+<table>
+    <tr><th>Этап дорожной карты</th><th>Пункты плана</th><th>Приоритет</th></tr>
+    <tr><td>1.5 Загрузка заказов</td><td>1.5.1, 1.5.2, 1.5.3</td><td>P1</td></tr>
+    <tr><td>1.6 Обработка заказов</td><td>1.6.1, 1.6.2</td><td>P1</td></tr>
+    <tr><td>1.8 Обновление статусов</td><td>1.8.1</td><td>P2</td></tr>
+</table>
+
+<hr>
+
+<h2>5. Выводы</h2>
+
+<h3>5.1. Текущий статус реализации FBS в УОТКОРП</h3>
+
+<table>
+    <tr><th>Компонент</th><th>Статус</th><th>Готовность</th></tr>
+    <tr><td>Загрузка данных FBS-заказов через API</td><td class="status-ok">✅ Реализовано</td><td>90%</td></tr>
+    <tr><td>Обработка маркировки товаров</td><td class="status-ok">✅ Реализовано</td><td>100%</td></tr>
+    <tr><td>Обновление статуса отгрузки</td><td class="status-ok">✅ Реализовано с улучшениями</td><td>100%</td></tr>
+    <tr><td>Создание документов из загруженных данных</td><td class="status-err">🔴 Критический пробел</td><td>0%</td></tr>
+    <tr><td>Обёрточная функция загрузки</td><td class="status-err">🔴 Отсутствует</td><td>0%</td></tr>
+    <tr><td>Синхронизация статусов</td><td class="status-err">🔴 Отсутствует</td><td>0%</td></tr>
+</table>
+
+<h3>5.2. Критический путь</h3>
+
+<ol>
+    <li><strong>Исследовать</strong> механизм создания документов <code>CG_Online_ЗаказКлиентаСервиса</code> в УОТКОРП — возможно, он реализован через подписки на события или другие обработчики</li>
+    <li><strong>Создать</strong> обёрточную функцию <code>ЗагрузитьЗаказы</code></li>
+    <li><strong>Реализовать</strong> создание документов после загрузки данных</li>
+    <li><strong>Реализовать</strong> синхронизацию статусов заказов</li>
+</ol>
+
+<h3>5.3. Оценка общего прогресса задачи 1</h3>
+
+<table>
+    <tr><th>Подзадача</th><th>Прогресс</th><th>Комментарий</th></tr>
+    <tr><td>1.1 Настройка коннектора</td><td>0%</td><td>ФормаНастройки отсутствует</td></tr>
+    <tr><td>1.2 Авторизация</td><td>50%</td><td>Механизм API-запросов есть, форма настроек нет</td></tr>
+    <tr><td>1.3 Загрузка товаров</td><td>0%</td><td>Не анализировалось</td></tr>
+    <tr><td>1.4 Выгрузка каталога</td><td>0%</td><td>Не анализировалось</td></tr>
+    <tr><td class="status-warn"><strong>1.5 Загрузка заказов</strong></td><td><strong>70%</strong></td><td>API загрузки есть, создание документов — нет</td></tr>
+    <tr><td class="status-ok"><strong>1.6 Обработка заказов</strong></td><td><strong>80%</strong></td><td>Обновление статуса реализовано с улучшениями</td></tr>
+    <tr><td>1.7 Отгрузка FBO</td><td>0%</td><td>Отдельная задача 3</td></tr>
+    <tr><td class="status-warn"><strong>1.8 Обновление статусов</strong></td><td><strong>30%</strong></td><td>Функция обновления есть, синхронизация — нет</td></tr>
+    <tr><td>1.9 Возвраты</td><td>0%</td><td>Не анализировалось</td></tr>
+    <tr><td>1.10 Финансы</td><td>0%</td><td>Не анализировалось</td></tr>
+</table>
+
+<hr>
+
+<blockquote>
+    <strong>Связанные документы:</strong><br>
+    · <a href="#">Дорожная карта</a> — задача 1: Внедрение процесса работы заказов Ozon<br>
+    · <a href="#">API-миграция Ozon</a> — 64 API-эндпоинта, статус переноса<br>
+    · <a href="#">Планы разработки задачи 1</a> — 10 планов процесса заказов<br>
+    · <a href="#">Обзор архитектуры</a> — общая архитектура проекта
+</blockquote>
+
+</body>
+</html>

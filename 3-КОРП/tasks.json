@@ -1,0 +1,266 @@
+{
+  "project": "КОРП",
+  "name": "3. КОРП",
+  "fullName": "DataBlade + 1С УОТ",
+  "path": "D:\\1c\\EDT КОРП УОТ\\КОРП",
+  "roadmapDir": "3-КОРП",
+  "created": "2026-05-19",
+  "updated": "2026-06-28",
+  "tasks": [
+    {
+      "id": 1,
+      "name": "Отладка блока загрузки заказов МП Озон",
+      "priority": "P1",
+      "complexity": 3,
+      "progress": 0,
+      "section": "active",
+      "start": "2026-06-03",
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "1.1", "name": "Трассировка Result[8] (ЗаказыКСозданию)", "desc": "Полный разбор запроса", "status": "🟡", "date": "2026-06-03" },
+        { "id": "1.2", "name": "Исправление АвтоматическиРазделятьЗаказНаОтправления", "desc": "array5 fix в ВызватьМетодВзаимодействияСКонфигурацией", "status": "🟢", "date": "2026-06-03" },
+        { "id": "1.3", "name": "Исправление тзЗКСШтрихкодыУпаковок", "desc": "Guard от Неопределено в ОбработатьЗаказыКлиентовСервисовПоНастройке", "status": "🟢", "date": "2026-06-03" },
+        { "id": "1.4", "name": "Проверка создания документов ЗКС", "desc": "End-to-end тест загрузки Ozon", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Добавить YU тест по кодам ошибок всех МП",
+      "priority": "P1",
+      "complexity": 2,
+      "progress": 0,
+      "section": "active",
+      "start": "2026-06-03",
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "2.1", "name": "Сбор кодов ошибок коннекторов", "desc": "Ozon, ЯМ, WB, Авито, ММ, VK, GP, LP", "status": "⬜" },
+        { "id": "2.2", "name": "Написание YU-теста", "desc": "Vanessa ADD / BDD", "status": "⬜" },
+        { "id": "2.3", "name": "Запуск и проверка", "desc": "Прогон по всем МП", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Аналитика для Озон КОРП",
+      "priority": "P2",
+      "complexity": 3,
+      "progress": 0,
+      "section": "active",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "3.1", "name": "Определение состава аналитики", "desc": "Метрики, отчёты, дашборды", "status": "⬜" },
+        { "id": "3.2", "name": "Определить способ хранения данных", "desc": "Регистры УОТ для аналитики", "status": "⬜" },
+        { "id": "3.3", "name": "Анализ методов аналитики в УОТ", "desc": "Изучить встроенные отчёты, регистры, АБС", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Мокито для поставки ВБО Озон",
+      "priority": "P2",
+      "complexity": 2,
+      "progress": 0,
+      "section": "active",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "4.1", "name": "Анализ требований", "desc": "Что такое ВБО, какие данные нужны", "status": "⬜" },
+        { "id": "4.2", "name": "Реализация мокито", "desc": "Разработка мокито-сервера", "status": "⬜" },
+        { "id": "4.3", "name": "Интеграция с УОТ", "desc": "Подключение к коннектору Ozon", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Мокито для поставки ВБО ВБ",
+      "priority": "P2",
+      "complexity": 2,
+      "progress": 0,
+      "section": "active",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "5.1", "name": "Анализ требований ВБ", "desc": "Что такое ВБО ВБ, какие данные нужны", "status": "⬜" },
+        { "id": "5.2", "name": "Реализация мокито ВБ", "desc": "Разработка мокито-сервера", "status": "⬜" },
+        { "id": "5.3", "name": "Интеграция с УОТ", "desc": "Подключение к коннектору WB", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 6.1,
+      "name": "Проектный скелет DataBlade (W1)",
+      "priority": "P1",
+      "complexity": 2,
+      "progress": 100,
+      "section": "completed",
+      "start": "2026-05-06",
+      "end": "2026-05-06",
+      "time_min": null,
+      "stages": [
+        { "id": "6.1.1", "name": "Инициализация Go backend", "desc": "Go 1.21+, структура cmd/internal, go.mod", "status": "✅", "date": "2026-05-06" },
+        { "id": "6.1.2", "name": "Инициализация React frontend", "desc": "React 18+, TypeScript, структура src/", "status": "✅", "date": "2026-05-06" },
+        { "id": "6.1.3", "name": "Инициализация AI Engine", "desc": "Python 3.11+, FastAPI, структура app/", "status": "✅", "date": "2026-05-06" },
+        { "id": "6.1.4", "name": "Docker Compose", "desc": "docker-compose.yml для 3 сервисов", "status": "✅", "date": "2026-05-06" },
+        { "id": "6.1.5", "name": "CI/CD пайплайн", "desc": "GitHub Actions", "status": "✅", "date": "2026-05-06" },
+        { "id": "6.1.6", "name": "DB Schema + миграции", "desc": "PostgreSQL, 7 таблиц", "status": "✅", "date": "2026-05-06" }
+      ]
+    },
+    {
+      "id": 6.2,
+      "name": "Анализ типовой УТ 11.5.26.106",
+      "priority": "P1",
+      "complexity": 3,
+      "progress": 100,
+      "section": "completed",
+      "start": "2026-05-06",
+      "end": "2026-05-06",
+      "time_min": null,
+      "stages": [
+        { "id": "6.2.1", "name": "Сводная таблица объектов", "desc": "38 подсистем, ~800 модулей, ~190 документов", "status": "✅", "date": "2026-05-06" },
+        { "id": "6.2.2", "name": "Ключевые справочники", "desc": "НСИ, финансы, CRM, интеграции", "status": "✅", "date": "2026-05-06" },
+        { "id": "6.2.3", "name": "Ключевые документы", "desc": "Продажи, закупки, склад, финансы, НДС", "status": "✅", "date": "2026-05-06" },
+        { "id": "6.2.4", "name": "Регистры и модули", "desc": "~100 регистров накопления, ~800 модулей", "status": "✅", "date": "2026-05-06" },
+        { "id": "6.2.5", "name": "Документирование", "desc": "Файл 01-типовая-конфигурация-ут-11.md", "status": "✅", "date": "2026-05-06" }
+      ]
+    },
+    {
+      "id": 6.3,
+      "name": "Архитектура интеграции МП (типовая)",
+      "priority": "P1",
+      "complexity": 3,
+      "progress": 100,
+      "section": "completed",
+      "start": "2026-05-06",
+      "end": "2026-05-06",
+      "time_min": null,
+      "stages": [
+        { "id": "6.3.1", "name": "Анализ фасада", "desc": "ИнтеграцияСМаркетплейсамиСервер (17 634 строки)", "status": "✅", "date": "2026-05-06" },
+        { "id": "6.3.2", "name": "Коннектор Ozon", "desc": "37 133 строк, Client-Id + Api-Key", "status": "✅", "date": "2026-05-06" },
+        { "id": "6.3.3", "name": "Коннектор Яндекс Маркет", "desc": "11 742 строки, OAuth 2.0 + REST", "status": "✅", "date": "2026-05-06" },
+        { "id": "6.3.4", "name": "Коннектор WB/Lamoda", "desc": "Через Сервис Интеграции 1С (8 369 строк)", "status": "✅", "date": "2026-05-06" },
+        { "id": "6.3.5", "name": "Статус Авито", "desc": "Полностью отсутствует в типовой", "status": "✅", "date": "2026-05-06" },
+        { "id": "6.3.6", "name": "Документирование", "desc": "Файл 03-архитектура-интеграции-маркетплейсов.md", "status": "✅", "date": "2026-05-06" }
+      ]
+    },
+    {
+      "id": 6.4,
+      "name": "Процесс заказов УОТ (CG_Online)",
+      "priority": "P1",
+      "complexity": 3,
+      "progress": 100,
+      "section": "completed",
+      "start": "2026-05-12",
+      "end": "2026-05-12",
+      "time_min": null,
+      "stages": [
+        { "id": "6.4.1", "name": "Анализ фасада CG_Online", "desc": "CG_Online_ИнтеграцииССервисамиСервер (18 814 строк)", "status": "✅", "date": "2026-05-12" },
+        { "id": "6.4.2", "name": "Коннекторы 8+ МП", "desc": "Ozon, ЯМ, WB, Авито, ММ, VK, GP, LP", "status": "✅", "date": "2026-05-12" },
+        { "id": "6.4.3", "name": "Путь загрузки заказов", "desc": "Регламент → фасад → коннектор → API → JSON → маппинг → ЗКС", "status": "✅", "date": "2026-05-12" },
+        { "id": "6.4.4", "name": "Документ ЗКС", "desc": "CG_Online_ЗаказКлиентаСервиса (собственный)", "status": "✅", "date": "2026-05-12" },
+        { "id": "6.4.5", "name": "Регистры сведений", "desc": "10+ регистров (ВСервисах + Сервисов)", "status": "✅", "date": "2026-05-12" },
+        { "id": "6.4.6", "name": "Документирование", "desc": "Файл 04-процесс-получения-заказов-УОТ.md", "status": "✅", "date": "2026-05-12" }
+      ]
+    },
+    {
+      "id": 6.5,
+      "name": "Docker + Vanessa ADD окружение",
+      "priority": "P1",
+      "complexity": 3,
+      "progress": 100,
+      "section": "completed",
+      "start": "2026-05-13",
+      "end": "2026-05-13",
+      "time_min": null,
+      "stages": [
+        { "id": "6.5.1", "name": "Dockerfile", "desc": "3-стадийная сборка (base → vanessa → test-ready)", "status": "✅", "date": "2026-05-13" },
+        { "id": "6.5.2", "name": "docker-compose.yml", "desc": "postgres + 1C + allure", "status": "✅", "date": "2026-05-13" },
+        { "id": "6.5.3", "name": "Конфигурация VA", "desc": "VAParams.docker.json, env.json", "status": "✅", "date": "2026-05-13" },
+        { "id": "6.5.4", "name": "Скрипты запуска", "desc": "setup.bat, run-my-tests.bat, entrypoint.sh", "status": "✅", "date": "2026-05-13" },
+        { "id": "6.5.5", "name": "Документирование", "desc": "Файл 05-docker-vanessa-testing.md", "status": "✅", "date": "2026-05-13" }
+      ]
+    },
+    {
+      "id": 6.6,
+      "name": "Ремонт блока загрузки статусов документов",
+      "priority": "P1",
+      "complexity": 2,
+      "progress": 100,
+      "section": "completed",
+      "start": "2026-06-03",
+      "end": "2026-06-03",
+      "time_min": null,
+      "stages": [
+        { "id": "6.6.1", "name": "Анализ причины пустого справочника", "desc": "Сравнение с СтатусыМодерацииТоваровСервисов", "status": "✅", "date": "2026-06-03" },
+        { "id": "6.6.2", "name": "Исправление WHERE стр.601 ManagerModule", "desc": "Замена СтатусыДокументовСервисов на ТаблицаСтатусы", "status": "✅", "date": "2026-06-03" },
+        { "id": "6.6.3", "name": "Заполнение справочника через кнопку", "desc": "Создать статусы — проверка работоспособности", "status": "✅", "date": "2026-06-03" }
+      ]
+    },
+    {
+      "id": 7.1,
+      "name": "Дашборд + Пользователи (W7)",
+      "priority": "P2.5",
+      "complexity": 2,
+      "progress": 0,
+      "section": "postponed",
+      "reason": "Смена приоритета на отладку загрузки Ozon",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": []
+    },
+    {
+      "id": 7.2,
+      "name": "Интеграция + Развёртывание (W8)",
+      "priority": "P2.5",
+      "complexity": 2,
+      "progress": 0,
+      "section": "postponed",
+      "reason": "Смена приоритета на отладку загрузки Ozon",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": []
+    },
+    {
+      "id": 7.3,
+      "name": "Анализ расширения Avito",
+      "priority": "P2",
+      "complexity": 2,
+      "progress": 0,
+      "section": "postponed",
+      "reason": "Смена приоритета на отладку загрузки Ozon",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": []
+    },
+    {
+      "id": 7.4,
+      "name": "Запуск BDD-тестов в Docker",
+      "priority": "P2",
+      "complexity": 2,
+      "progress": 0,
+      "section": "postponed",
+      "reason": "Смена приоритета на отладку загрузки Ozon",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": []
+    },
+    {
+      "id": 7.5,
+      "name": "DataBlade ↔ УОТ интеграция",
+      "priority": "P3",
+      "complexity": 3,
+      "progress": 0,
+      "section": "postponed",
+      "reason": "Смена приоритета на отладку загрузки Ozon",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": []
+    }
+  ]
+}

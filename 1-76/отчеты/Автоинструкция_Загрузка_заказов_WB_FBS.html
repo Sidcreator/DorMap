@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Загрузка заказов Wildberries с собственного склада (FBS)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .instruction-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px 40px;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            font-size: 28px;
+        }
+        h2 {
+            color: #2980b9;
+            border-left: 4px solid #3498db;
+            padding-left: 12px;
+            margin-top: 30px;
+            font-size: 22px;
+        }
+        p {
+            margin: 10px 0;
+            font-size: 15px;
+        }
+        b {
+            color: #2c3e50;
+        }
+        hr {
+            border: none;
+            border-top: 2px solid #ecf0f1;
+            margin: 25px 0;
+        }
+        .step-number {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            font-weight: bold;
+            margin-right: 8px;
+            font-size: 16px;
+        }
+        .note {
+            background-color: #eaf4fc;
+            border-left: 4px solid #3498db;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .warning {
+            background-color: #fef9e7;
+            border-left: 4px solid #f39c12;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .result-box {
+            background-color: #eafaf1;
+            border-left: 4px solid #27ae60;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin: 5px 0;
+        }
+        .footer {
+            text-align: center;
+            color: #95a5a6;
+            font-style: italic;
+            margin-top: 30px;
+            font-size: 13px;
+        }
+        .path {
+            background-color: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="instruction-container">
+
+        <h1>Загрузка заказов Wildberries с собственного склада (FBS)</h1>
+
+        <p>Данная инструкция описывает процесс загрузки заказов клиентов сервиса Wildberries по схеме FBS (собственный склад) через журнал «Документы сервисов и торговых площадок».</p>
+
+        <div class="note">
+            <b>Для кого:</b> Менеджер по продажам<br>
+            <b>Цель:</b> Загрузить заказы клиентов сервиса Wildberries с собственного склада, чтобы обработать их и подготовить к отгрузке
+        </div>
+
+        <hr>
+
+        <!-- Шаг 1 -->
+        <h2><span class="step-number">1</span> Открыть журнал «Документы сервисов и торговых площадок»</h2>
+
+        <p>В панели разделов выберите <b>Онлайн торговля</b>, затем в группе <b>Интеграции с сервисами</b> нажмите <b>Документы сервисов и торговых площадок</b>.</p>
+
+        <div class="note">
+            <b>Путь:</b> <span class="path">Онлайн торговля → Документы сервисов и торговых площадок</span>
+        </div>
+
+        <p>Откроется окно журнала <b>«Документы сервисов (все)»</b>.</p>
+
+        <hr>
+
+        <!-- Шаг 2 -->
+        <h2><span class="step-number">2</span> Выбрать настройку авторизации Wildberries</h2>
+
+        <p>В поле <b>Настройка авторизации</b> выберите подключение к Wildberries.</p>
+
+        <div class="note">
+            Если поле уже заполнено — перейдите к следующему шагу.
+        </div>
+
+        <p><b>Порядок действий:</b></p>
+        <ul>
+            <li>Нажмите кнопку выбора у поля <b>«Настройка авторизации»</b></li>
+            <li>В открывшемся окне «Настройки авторизации в сервисах» найдите строку <b>«Wildberries 1 Рабочий»</b></li>
+            <li>Выделите её и нажмите кнопку <b>«Выбрать»</b></li>
+        </ul>
+
+        <hr>
+
+        <!-- Шаг 3 -->
+        <h2><span class="step-number">3</span> Установить период загрузки документов</h2>
+
+        <p>Нажмите на поле <b>«Период загрузки документов»</b> и выберите нужный период.</p>
+
+        <div class="warning">
+            <b>Рекомендация:</b> Устанавливайте период не более 30 дней для оптимальной производительности.
+        </div>
+
+        <p><b>Порядок действий:</b></p>
+        <ul>
+            <li>Нажмите кнопку выбора у поля <b>«Период загрузки документов»</b></li>
+            <li>В открывшемся окне «Выберите период» нажмите на гиперссылку для переключения режима</li>
+            <li>Выберите нужный вариант периода и подтвердите выбор</li>
+        </ul>
+
+        <hr>
+
+        <!-- Шаг 4 -->
+        <h2><span class="step-number">4</span> Нажать кнопку «Загрузить заказы с собственного склада»</h2>
+
+        <p>В командной панели таблицы документов нажмите:</p>
+
+        <div class="note">
+            <b>Путь кнопки:</b> <span class="path">Загрузить документы из сервиса → Загрузить заказы клиентов сервисов → Заказы клиентов сервисов раздельно → Загрузить заказы с собственного склада</span>
+        </div>
+
+        <p>Начнётся процесс загрузки заказов. Дождитесь завершения операции.</p>
+
+        <hr>
+
+        <!-- Шаг 5 -->
+        <h2><span class="step-number">5</span> Проверить результат загрузки</h2>
+
+        <p>После завершения загрузки проверьте:</p>
+
+        <div class="result-box">
+            <ul>
+                <li>В журнале появились новые документы <b>«Заказ клиента (сервиса)»</b></li>
+                <li>Статус загруженных заказов — <b>«К выполнению»</b> или аналогичный</li>
+                <li>В поле <b>«Партнер»</b> указано <b>«Партнер Валдбериз ООО 1»</b></li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            Если в окне сообщений появились ошибки — обратитесь к администратору или проверьте настройки авторизации.
+        </div>
+
+        <hr>
+
+        <p class="footer"><i>Инструкция автоматически сгенерирована на основе Vanessa Automation .feature файла.<br>
+        Дата генерации: 13.05.2026<br>
+        Feature файл: 07000 Автоинструкция Загрузка заказов WB FBS.feature</i></p>
+
+    </div>
+</body>
+</html>

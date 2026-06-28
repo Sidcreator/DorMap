@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>План реализации: Методы аналитики Ozon в УОТ614</title>
+<style>
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; max-width: 1000px; margin: 40px auto; padding: 0 20px; color: #1a1a1a; line-height: 1.5; }
+  h1 { border-bottom: 2px solid #1565c0; padding-bottom: 10px; color: #1565c0; }
+  h2 { color: #1565c0; margin-top: 32px; }
+  h3 { color: #37474f; margin-top: 24px; }
+  .meta { background: #f5f5f5; padding: 12px 16px; border-radius: 6px; font-size: 0.9em; }
+  .code { background: #263238; color: #e2e8f0; padding: 12px 16px; border-radius: 6px; font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 0.85em; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 0.9em; }
+  th, td { border: 1px solid #bdbdbd; padding: 6px 10px; text-align: left; }
+  th { background: #1565c0; color: white; position: sticky; top: 0; }
+  tr:nth-child(even) { background: #f5f5f5; }
+  .issue { background: #ffebee; border-left: 4px solid #d32f2f; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .ok { background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .warn { background: #fff3e0; border-left: 4px solid #e65100; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .info { background: #e3f2fd; border-left: 4px solid #1565c0; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .tg { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; font-weight: bold; }
+  .tg-green { background: #e8f5e9; color: #2e7d32; }
+  .tg-red { background: #ffebee; color: #c62828; }
+  .tg-amber { background: #fff3e0; color: #e65100; }
+  .tg-gray { background: #eceff1; color: #546e7a; }
+  .tg-blue { background: #e3f2fd; color: #1565c0; }
+  .done { background: #e8f5e9; }
+  .todo { background: #fff3e0; }
+  .na { background: #f5f5f5; color: #9e9e9e; }
+</style>
+</head>
+<body>
+
+<h1>План реализации: Методы аналитики Ozon в УОТ614</h1>
+
+<div class="meta">
+  <strong>Проект:</strong> 1/76 — УОТ614 (CG:Управление онлайн торговлей v1.7.6.611)<br>
+  <strong>Задача ДК:</strong> 4.8 — Реализация плана аналитика Ozon<br>
+  <strong>Модуль:</strong> <code>УОТ614/DataProcessors/CG_Online_Ozon_ИнтеграцияСОзон/Ext/ObjectModule.bsl</code><br>
+  <strong>Дата:</strong> 2026-06-25
+</div>
+
+<h2>1. Сводка: статус методов аналитики в УОТ614</h2>
+
+<table>
+  <thead>
+    <tr><th>#</th><th>Метод API</th><th>Статус в УОТ614</th><th>Тип</th><th>Приоритет</th></tr>
+  </thead>
+  <tbody>
+    <tr class="done">
+      <td>4.1</td>
+      <td><code>v1/analytics/stocks</code></td>
+      <td><span class="tg tg-green">РЕАЛИЗОВАН</span></td>
+      <td>Sync GET</td>
+      <td>—</td>
+    </tr>
+    <tr class="done">
+      <td>4.3</td>
+      <td><code>v1/analytics/turnover/stocks</code></td>
+      <td><span class="tg tg-green">РЕАЛИЗОВАН</span></td>
+      <td>Sync GET (paginated)</td>
+      <td>—</td>
+    </tr>
+    <tr class="todo">
+      <td>4.2</td>
+      <td><code>v1/report/discounted/create</code></td>
+      <td><span class="tg tg-red">НЕТ</span></td>
+      <td>Async (create → poll → download)</td>
+      <td>P1</td>
+    </tr>
+    <tr class="todo">
+      <td>4.4</td>
+      <td><code>v2/analytics/stock_on_warehouses</code></td>
+      <td><span class="tg tg-red">НЕТ</span> (deprecated)</td>
+      <td>Sync → <code>/v1/analytics/stocks</code></td>
+      <td>P3</td>
+    </tr>
+    <tr class="todo">
+      <td>4.5</td>
+      <td><code>v1/analytics/product-queries/details</code></td>
+      <td><span class="tg tg-red">НЕТ</span></td>
+      <td>Sync POST</td>
+      <td>P1</td>
+    </tr>
+    <tr class="todo">
+      <td>4.6</td>
+      <td><code>v1/analytics/product-queries</code></td>
+      <td><span class="tg tg-red">НЕТ</span></td>
+      <td>Sync POST</td>
+      <td>P1</td>
+    </tr>
+    <tr class="todo">
+      <td>4.7</td>
+      <td><code>v1/analytics/data</code></td>
+      <td><span class="tg tg-red">НЕТ</span></td>
+      <td>Sync POST (paginated)</td>
+      <td>P2</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>2. Архитектура УОТ614: ключевые паттерны</h2>
+
+<div class="info">
+  <strong>Файл:</strong> <code>УОТ614/DataProcessors/CG_Online_Ozon_ИнтеграцияСОзон/Ext/ObjectModule.bsl</code> (14 317 строк)<br>
+  <strong>Общий модуль инфраструктуры:</strong> <code>CG_Online_ИнтеграцииССервисамиСервер</code>
+</div>
+
+<h3>2.1 HTTP-запрос (стандартный паттерн)</h3>
+<div class="code">
+Коннектор = CG_Online_ИнтеграцииССервисамиСервер.НастройкиПодключенияAPI(
+    НастройкаАвторизации, "v1/analytics/stocks",
+    "Ozon_" + НастройкаАвторизации + "_Остатки и перемещения");
+ОсновныеЗаголовкиКоннектора(НастройкаАвторизации, Коннектор);
+
+Данные = Новый Структура;
+Данные.Вставить("skus", МассивSkus);
+Коннектор.Вставить("Данные", Данные);
+
+Ответ = CG_Online_ИнтеграцииССервисамиСервер.HTTPЗапрос(Коннектор);
+</div>
+
+<h3>2.2 Разбор ответа (стандартный паттерн)</h3>
+<div class="code">
+// Извлечение массива из ответа
+Товары = Массив(Ответ, "items");
+// Или с обёрткой result
+Данные = Соответствие(Ответ, "result");
+Товары = Массив(Данные, "items");
+
+// Безопасное чтение полей
+Значение = Соответствие(СтрокаТовар, "offer_id");
+ЧисловоеЗначение = ЧислоСтр(Соответствие(СтрокаТовар, "sku"));
+</div>
+
+<h3>2.3 Пагинация (offset/limit)</h3>
+<div class="code">
+Пока Истина Цикл
+    Данные = Новый Структура("offset,limit", КоличествоЗагружено, 1000);
+    Коннектор.Вставить("Данные", Данные);
+    Ответ = CG_Online_ИнтеграцииССервисамиСервер.HTTPЗапрос(Коннектор);
+    Товары = Массив(Ответ, "items");
+    // ... обработка ...
+    КоличествоЗагружено = КоличествоЗагружено + Товары.Количество();
+    Если КоличествоЗагружено &lt; 1000 Тогда Прервать; КонецЕсли;
+    Коннектор.Данные.offset = Коннектор.Данные.offset + Товары.Количество();
+КонецЦикла;
+</div>
+
+<h3>2.4 Подготовка функциональности (для регламентных заданий)</h3>
+<div class="code">
+Результат = МодульCG_Online_ОбщегоНазначенияСервер.ПодготовкаФункциональностиПоНастройкеАвторизации(
+    НастройкаАвторизации, Результат, АдресРезультата);
+Если Результат.Статус = "Ошибка" Тогда Возврат Результат; КонецЕсли;
+</div>
+
+<h3>2.5 Асинхронный отчёт (create → poll → download)</h3>
+<div class="warn">
+  <strong>НЕТ РЕАЛИЗОВАННОГО ПРИМЕРА В УОТ614.</strong> Паттерн требуется разработать с нуля:
+  <ol>
+    <li>POST <code>/v1/report/discounted/create</code> → получаем <code>code</code> (UUID отчёта)</li>
+    <li>GET <code>/v1/report/info?code={uuid}</code> → опрашиваем статус (<code>IN_PROGRESS</code> → ждём → <code>OK</code>/<code>ERROR</code>)</li>
+    <li>GET <code>/v1/report/info/download?code={uuid}</code> → скачиваем CSV-файл</li>
+  </ol>
+</div>
+
+<h2>3. План реализации по методам</h2>
+
+<h3>3.1 <code>v1/report/discounted/create</code> — Отчёт об уценённых товарах (P1)</h3>
+
+<p><b>Описание:</b> Асинхронный отчёт. POST — создание, GET /v1/report/info — опрос статуса, скачивание CSV.</p>
+
+<table>
+  <thead>
+    <tr><th>Шаг</th><th>Действие</th><th>Описание</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td><b>Создать функцию <code>ЗагрузитьУцененныеТовары()</code></b></td><td>POST /v1/report/discounted/create. Параметры: language, skus (опц.). Возвращает code UUID.</td></tr>
+    <tr><td>2</td><td><b>Создать функцию <code>ОпроситьСтатусОтчетаУцененных()</code></b></td><td>GET /v1/report/info?code={uuid}. Цикл опроса: 5с, макс. 60 попыток. Статусы: IN_PROGRESS → OK/ERROR.</td></tr>
+    <tr><td>3</td><td><b>Создать функцию <code>ЗагрузитьУцененныеТоварыПоНастройке()</code></b></td><td>Обёртка: подготовка → create → poll → download → разбор CSV → ТЗ → persist.</td></tr>
+    <tr><td>4</td><td><b>Добавить обработку в диспетчер команд</b></td><td>Вставить кейс в основной цикл обработки ИдентификаторКоманды.</td></tr>
+    <tr><td>5</td><td><b>Добавить в ВерсииМетодовAPI</b></td><td>Зарегистрировать метод в Template.xml.</td></tr>
+  </tbody>
+</table>
+
+<div class="issue">
+  <strong>Сложность:</strong> асинхронный отчёт с опросом статуса — нет готового аналога в УОТ614. Механизм опроса реализовать через <code>CG_Online_ДлительныеОперацииПереопределяемый</code>.
+</div>
+
+<h3>3.2 <code>v1/analytics/product-queries/details</code> — Детализация запросов (P1)</h3>
+
+<p><b>Описание:</b> Синхронный POST. Возвращает поисковые запросы по SKU. 9 полей в queries[].</p>
+
+<table>
+  <thead>
+    <tr><th>Шаг</th><th>Действие</th><th>Описание</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td><b>Создать ТЗ для хранения результата</b></td><td>Колонки: SKU, поисковый запрос, показы, клики, добавления в корзину, заказы, конверсия, средняя позиция, продажи.</td></tr>
+    <tr><td>2</td><td><b>Создать функцию <code>ЗагрузитьДетализациюПоисковыхЗапросов()</code></b></td><td>POST /v1/analytics/product-queries/details. Параметры: skus[], date_from, date_to, limit, offset.</td></tr>
+    <tr><td>3</td><td><b>Разбор ответа</b></td><td>Извлечь queries[], для каждого: search_query, sku, impressions, clicks, adds_to_cart, orders, conversion, avg_position, revenue.</td></tr>
+    <tr><td>4</td><td><b>Создать функцию <code>...ПоНастройке()</code></b></td><td>Обёртка для регламентного задания.</td></tr>
+  </tbody>
+</table>
+
+<h3>3.3 <code>v1/analytics/product-queries</code> — Информация о запросах товаров (P1)</h3>
+
+<p><b>Описание:</b> Синхронный POST. Сводная аналитика по товарам. 10 полей, пагинация offset/limit.</p>
+
+<table>
+  <thead>
+    <tr><th>Шаг</th><th>Действие</th><th>Описание</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td><b>Создать ТЗ для хранения результата</b></td><td>Колонки: SKU, offer_id, name, category, currency, gmv, position, unique_search_users, unique_view_users, view_conversion.</td></tr>
+    <tr><td>2</td><td><b>Создать функцию <code>ЗагрузитьИнформациюОЗапросахТоваров()</code></b></td><td>POST /v1/analytics/product-queries. Параметры: date_from, date_to, skus[], page, page_size, sort_by, sort_dir.</td></tr>
+    <tr><td>3</td><td><b>Разбор ответа</b></td><td>top-level: analytics_period, items[], page_count, total. items: name, offer_id, sku, category, currency, gmv, position, unique_search_users, unique_view_users, view_conversion.</td></tr>
+    <tr><td>4</td><td><b>Пагинация</b></td><td>Постраничная загрузка (page + page_size).</td></tr>
+  </tbody>
+</table>
+
+<h3>3.4 <code>v1/analytics/data</code> — Данные аналитики (P2)</h3>
+
+<p><b>Описание:</b> Универсальный метод аналитики. 19 метрик, 12 dimension, фильтры, сортировка, пагинация offset/limit. Rate limit: 1 запрос/мин.</p>
+
+<table>
+  <thead>
+    <tr><th>Шаг</th><th>Действие</th><th>Описание</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td><b>Создать структуру данных запроса</b></td><td>date_from, date_to, dimension[], metrics[], filters[], sort[], limit, offset.</td></tr>
+    <tr><td>2</td><td><b>Создать функцию <code>ЗагрузитьДанныеАналитики()</code></b></td><td>POST /v1/analytics/data. Формирование тела запроса по переданным параметрам.</td></tr>
+    <tr><td>3</td><td><b>Разбор ответа</b></td><td>result.data[], result.totals[], timestamp.</td></tr>
+    <tr><td>4</td><td><b>Создать гибкий механизм маппинга</b></td><td>Т.к. состав полей в data[] зависит от dimension и metrics, использовать динамическое создание ТЗ.</td></tr>
+    <tr><td>5</td><td><b>Rate limit guard</b></td><td>Реализовать защиту от превышения 1 запрос/мин.</td></tr>
+  </tbody>
+</table>
+
+<div class="issue">
+  <strong>Сложность:</strong> Состав полей ответа зависит от запрошенных dimension/metrics — нужна динамическая таблица. Rate limit 1 запрос/мин — нужен Guard.
+</div>
+
+<h3>3.5 <code>v2/analytics/stock_on_warehouses</code> — через /v1/analytics/stocks (P3)</h3>
+
+<p><b>Описание:</b> Метод deprecated. Рекомендуется использовать <code>/v1/analytics/stocks</code> (уже реализован в УОТ614, стр. 9256).</p>
+
+<div class="ok">
+  <strong>Решение:</strong> не реализовывать отдельный метод. Использовать существующий <code>/v1/analytics/stocks</code>. Если нужны дополнительные поля, расширить существующую функцию.
+</div>
+
+<h2>4. Приоритеты и очерёдность реализации</h2>
+
+<table>
+  <thead>
+    <tr><th>Очерёдность</th><th>Метод</th><th>P</th><th>Сложность</th><th>Обоснование</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td><code>v1/report/discounted/create</code></td><td>P1</td><td>⭐⭐⭐</td><td>Асинхронный — больше всего кода. Новый паттерн (create → poll → download)</td></tr>
+    <tr><td>2</td><td><code>v1/analytics/product-queries/details</code></td><td>P1</td><td>⭐⭐</td><td>Синхронный, простой маппинг, 9 полей</td></tr>
+    <tr><td>3</td><td><code>v1/analytics/product-queries</code></td><td>P1</td><td>⭐⭐</td><td>Синхронный, пагинация offset/page, 10 полей</td></tr>
+    <tr><td>4</td><td><code>v1/analytics/data</code></td><td>P2</td><td>⭐⭐⭐</td><td>Динамический ответ, rate limit guard. Требует уточнения структуры data[]</td></tr>
+    <tr><td>5</td><td><code>v2/analytics/stock_on_warehouses</code></td><td>P3</td><td>⭐</td><td>Deprecated. Используем существующий /v1/analytics/stocks</td></tr>
+  </tbody>
+</table>
+
+<h2>5. Рекомендации по архитектуре</h2>
+
+<h3>5.1 Размещение функций</h3>
+<p>Все функции размещаются в <code>CG_Online_Ozon_ИнтеграцияСОзон\Ext\ObjectModule.bsl</code> с выделением областей:</p>
+<div class="code">
+#Область АналитикаОзон
+
+Функция ЗагрузитьУцененныеТовары() Экспорт
+    // ...
+КонецФункции
+
+Функция ЗагрузитьДетализациюПоисковыхЗапросов() Экспорт
+    // ...
+КонецФункции
+
+#КонецОбласти
+</div>
+
+<h3>5.2 Функции ПоНастройке</h3>
+<p>Для каждого метода создать функцию-обёртку, вызываемую из регламентного задания:</p>
+<div class="code">
+Функция ЗагрузитьУцененныеТоварыПоНастройке(Знач НастройкаАвторизации = Неопределено,
+    Результат = Неопределено, АдресРезультата = "") Экспорт
+
+    МодульCG_Online_ОбщегоНазначенияСервер = ПолучитьМодульРасширения(
+        "CG_Online_ОбщегоНазначенияСервер");
+    Результат = МодульCG_Online_ОбщегоНазначенияСервер.ПодготовкаФункциональностиПоНастройкеАвторизации(
+        НастройкаАвторизации, Результат, АдресРезультата);
+    Если Результат.Статус = "Ошибка" Тогда
+        Возврат Результат;
+    КонецЕсли;
+
+    // Основная логика...
+    Возврат Результат;
+КонецФункции
+</div>
+
+<h3>5.3 Регистрация в диспетчере команд</h3>
+<p>Добавить в основной цикл обработки команд (ObjectModule.bsl, ~строка 200):</p>
+<div class="code">
+ИначеЕсли ИдентификаторКоманды = "ЗагрузитьДетализациюПоисковыхЗапросов" Тогда
+    Результат = ЗагрузитьДетализациюПоисковыхЗапросов(НастройкаАвторизации, Результат);
+</div>
+
+<h3>5.4 Регистрация в ВерсииМетодовAPI</h3>
+<p>Добавить endpoint'ы в <code>Templates/ВерсииМетодовAPI/Ext/Template.xml</code> (как на стр. 2347, 2397):</p>
+<div class="code">
+&lt;v8:content&gt;v1/report/discounted/create&lt;/v8:content&gt;
+</div>
+
+<h3>5.5 Асинхронный отчёт — паттерн опроса</h3>
+<div class="code">
+// 1. Создание отчёта
+Коннектор = НастройкиПодключенияAPI(НастройкаАвторизации,
+    "v1/report/discounted/create", ...);
+Коннектор.Вставить("Данные", ДанныеЗапроса);
+Ответ = HTTPЗапрос(Коннектор);
+КодОтчета = Соответствие(Ответ, "code");
+
+// 2. Опрос статуса
+Для Индекс = 1 По 60 Цикл // макс. 60 попыток (5 мин)
+    Коннектор = НастройкиПодключенияAPI(НастройкаАвторизации,
+        "v1/report/info", ...);
+    Данные = Новый Структура("code", КодОтчета);
+    Коннектор.Вставить("Данные", Данные);
+    Ответ = HTTPЗапрос(Коннектор);
+    Статус = Соответствие(Ответ, "status");
+    Если Статус = "OK" Тогда Прервать; КонецЕсли;
+    Если Статус = "ERROR" Тогда ... КонецЕсли;
+    Пауза(5); // 5 секунд
+КонецЦикла;
+
+// 3. Скачивание
+Коннектор = НастройкиПодключенияAPI(НастройкаАвторизации,
+    "v1/report/info/download", ...);
+Данные = Новый Структура("code", КодОтчета);
+Коннектор.Вставить("Данные", Данные);
+Ответ = HTTPЗапрос(Коннектор);
+// Ответ — CSV-файл, разбор через парсинг строк
+</div>
+
+<h2>6. Оценка трудозатрат</h2>
+
+<table>
+  <thead>
+    <tr><th>Метод</th><th>Функций</th><th>Строк кода</th><th>Время (ч)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>v1/report/discounted/create</td><td>4</td><td>~250</td><td>4</td></tr>
+    <tr><td>v1/analytics/product-queries/details</td><td>2</td><td>~120</td><td>2</td></tr>
+    <tr><td>v1/analytics/product-queries</td><td>2</td><td>~150</td><td>2</td></tr>
+    <tr><td>v1/analytics/data</td><td>2</td><td>~200</td><td>3</td></tr>
+    <tr><td>v2/analytics/stock_on_warehouses</td><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td><b>Итого</b></td><td><b>10</b></td><td><b>~720</b></td><td><b>11</b></td></tr>
+  </tbody>
+</table>
+
+<h2>7. Риски</h2>
+
+<div class="issue">
+  <strong>1. Асинхронный отчёт (4.2):</strong> Паттерн create → poll → download не имеет готового аналога в УОТ614. Механизм опроса через Пауза() может блокировать длительные операции. Рекомендуется через <code>CG_Online_ДлительныеОперацииПереопределяемый</code> или внешний цикл с проверкой статуса.
+</div>
+<div class="warn">
+  <strong>2. Динамический ответ /v1/analytics/data:</strong> Состав полей меняется в зависимости от запроса. Нужна динамическая таблица значений или универсальный маппинг.
+</div>
+<div class="warn">
+  <strong>3. Rate limit 1 запрос/мин:</strong> Для /v1/analytics/data нужно хранить timestamp последнего запроса и блокировать повторные.
+</div>
+<div class="ok">
+  <strong>4. /v2/analytics/stock_on_warehouses — deprecated:</strong> Не требует реализации. Используем существующий /v1/analytics/stocks.
+</div>
+
+<h2>8. Связь с существующими объектами УОТ614</h2>
+
+<table>
+  <thead>
+    <tr><th>Объект</th><th>Назначение</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>CG_Online_ИнтеграцииССервисамиСервер.НастройкиПодключенияAPI()</code></td><td>Создание коннектора HTTP</td></tr>
+    <tr><td><code>CG_Online_ИнтеграцииССервисамиСервер.HTTPЗапрос()</code></td><td>Выполнение HTTP-запроса</td></tr>
+    <tr><td><code>CG_Online_ИнтеграцииССервисамиСервер.ЗагрузитьОборачиваемостьТовараПоНастройке()</code></td><td>Шаблон для записи данных аналитики через общий модуль</td></tr>
+    <tr><td><code>CG_Online_ОбщегоНазначенияСервер.ПодготовкаФункциональностиПоНастройкеАвторизации()</code></td><td>Шаблон подготовки функциональности</td></tr>
+    <tr><td><code>CG_Online_ДлительныеОперацииПереопределяемый</code></td><td>Для длительных операций (опрос асинхронных отчётов)</td></tr>
+    <tr><td><code>ОсновныеЗаголовкиКоннектора()</code></td><td>Установка заголовков Client-Id, Api-Key</td></tr>
+    <tr><td><code>Templates/ВерсииМетодовAPI/Ext/Template.xml</code></td><td>Регистрация версий методов API</td></tr>
+  </tbody>
+</table>
+
+</body>
+</html>

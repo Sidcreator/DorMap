@@ -1,0 +1,182 @@
+{
+  "project": "76_in_КОРП",
+  "name": "2. 76_in_КОРП",
+  "path": "D:\\1c\\EDT КОРП УОТ\\76_in_КОРП",
+  "roadmapDir": "2-76_in_КОРП",
+  "created": "2026-05-16",
+  "updated": "2026-06-28",
+  "tasks": [
+    {
+      "id": 1,
+      "name": "Внедрение процесса работы заказов Ozon в УОТКОРП",
+      "priority": "P1",
+      "complexity": 4,
+      "progress": 0,
+      "section": "active",
+      "start": "2026-05-19",
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "1.1", "name": "Настройка коннектора Ozon", "desc": "Настройка подключения к API Ozon", "status": "⬜" },
+        { "id": "1.2", "name": "Авторизация", "desc": "Авторизация", "status": "⬜" },
+        { "id": "1.3", "name": "Загрузка товаров", "desc": "Загрузка товаров", "status": "⬜" },
+        { "id": "1.4", "name": "Выгрузка каталога", "desc": "Выгрузка каталога", "status": "⬜" },
+        { "id": "1.5", "name": "Загрузка заказов", "desc": "Загрузка заказов", "status": "⬜" },
+        { "id": "1.6", "name": "Обработка заказов", "desc": "Обработка заказов", "status": "⬜" },
+        { "id": "1.7", "name": "Отгрузка FBO", "desc": "Отгрузка FBO", "status": "⬜" },
+        { "id": "1.8", "name": "Обновление статусов", "desc": "Обновление статусов", "status": "⬜" },
+        { "id": "1.9", "name": "Возвраты", "desc": "Возвраты", "status": "⬜" },
+        { "id": "1.10", "name": "Финансы", "desc": "Финансы", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Внедрение управления поставками FBO Ozon в УОТКОРП",
+      "priority": "P1",
+      "complexity": 4,
+      "progress": 0,
+      "section": "active",
+      "start": "2026-05-22",
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "2.1", "name": "Анализ кода FBO в УОТ609", "desc": "Анализ кода FBO в УОТ609", "status": "⬜" },
+        { "id": "2.2", "name": "Перенос макетов FBO", "desc": "Перенос макетов FBO", "status": "⬜" },
+        { "id": "2.3", "name": "API: Черновики поставок", "desc": "API: Черновики поставок", "status": "⬜" },
+        { "id": "2.4", "name": "API: Заявки на поставку", "desc": "API: Заявки на поставку", "status": "⬜" },
+        { "id": "2.5", "name": "API: Управление поставками", "desc": "API: Управление поставками", "status": "⬜" },
+        { "id": "2.6", "name": "API: Водители поставок", "desc": "API: Водители поставок", "status": "⬜" },
+        { "id": "2.7", "name": "Обновление макета КомандыСервиса", "desc": "Обновление макета КомандыСервиса", "status": "⬜" },
+        { "id": "2.8", "name": "Интеграционное тестирование", "desc": "Интеграционное тестирование", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Сверка API-методов Wildberries в УОТКОРП и тестах",
+      "priority": "P1",
+      "complexity": 3,
+      "progress": 0,
+      "section": "active",
+      "start": "2026-05-26",
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "3.1", "name": "Актуализация отчета по API", "desc": "Актуализация отчёта по API-методам Ozon УОТ609 vs УОТКОРП", "status": "⬜" },
+        { "id": "3.2", "name": "Сверка тестового покрытия", "desc": "Сверка тестового покрытия", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Анализ и отладка YU-тестов 76тест и КОРПтест",
+      "priority": "P1",
+      "complexity": 3,
+      "progress": 40,
+      "section": "active",
+      "start": "2026-05-26",
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "4.1", "name": "Инвентаризация модулей YU-тестов", "status": "✅" },
+        { "id": "4.2", "name": "Анализ макетов YU-тестов", "status": "✅" },
+        { "id": "4.3", "name": "Анализ констант и настроек", "status": "⬜" },
+        { "id": "4.4", "name": "Сравнение DataProcessor тестов", "status": "⬜" },
+        { "id": "4.5", "name": "Анализ переопределяемых модулей", "status": "⬜" },
+        { "id": "4.6", "name": "Отладка: запуск тестов", "status": "⬜" },
+        { "id": "4.7", "name": "Итоговый отчёт", "status": "⬜" },
+        { "id": "4.8", "name": "Схема запуска тестов YU", "status": "🔧" },
+        { "id": "4.9", "name": "Тестирование кодов ошибок от МП", "status": "⬜" },
+        { "id": "4.10", "name": "Тест на реакцию кодов ошибок в цикле", "status": "🔧" }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Аналитика КОРП (отчёты Ozon/WB)",
+      "priority": "P1",
+      "complexity": 3,
+      "progress": 0,
+      "section": "active",
+      "start": "2026-06-09",
+      "end": null,
+      "time_min": null,
+      "stages": [
+        { "id": "5.1", "name": "Анализ отчётов Ozon", "status": "⬜" },
+        { "id": "5.2", "name": "Анализ отчётов Wildberries", "status": "⬜" },
+        { "id": "5.3", "name": "Сверка API-методов финансов", "status": "⬜" },
+        { "id": "5.4", "name": "Тестовое покрытие аналитики", "status": "⬜" },
+        { "id": "5.5", "name": "Итоговый отчёт", "status": "⬜" }
+      ]
+    },
+    {
+      "id": 6.1,
+      "name": "Создание системы документации 1сexpert",
+      "section": "completed",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": []
+    },
+    {
+      "id": 6.2,
+      "name": "Развёртывание системы дорожных карт",
+      "section": "completed",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": []
+    },
+    {
+      "id": 6.3,
+      "name": "Анализ XML УТ тип 11.5.26.106",
+      "section": "completed",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": []
+    },
+    {
+      "id": 6.4,
+      "name": "Анализ XML УОТКОРП",
+      "section": "completed",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": []
+    },
+    {
+      "id": 6.5,
+      "name": "Анализ XML УОТ607",
+      "section": "completed",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": []
+    },
+    {
+      "id": 6.6,
+      "name": "Сравнение функциональности УОТКОРП и УОТ607",
+      "section": "completed",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": []
+    },
+    {
+      "id": 6.7,
+      "name": "Выявление недостающей функциональности заказов в УОТКОРП",
+      "section": "completed",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": []
+    },
+    {
+      "id": 6.8,
+      "name": "Сравнительный анализ расширений и тестов УОТ",
+      "section": "completed",
+      "start": null,
+      "end": null,
+      "time_min": null,
+      "stages": []
+    }
+  ]
+}

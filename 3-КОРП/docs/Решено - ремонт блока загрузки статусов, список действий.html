@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Решено — ремонт блока загрузки статусов, список действий</title>
+<style>
+body { font-family: 'Segoe UI', sans-serif; margin: 20px; background: #f5f5f5; }
+h1 { color: #1a1a2e; border-bottom: 3px solid #e94560; padding-bottom: 8px; }
+h2 { color: #16213e; margin-top: 28px; }
+h3 { color: #0f3460; margin-top: 20px; }
+.done { background: #e8f5e9; border-left: 5px solid #4caf50; padding: 12px 18px; margin: 16px 0; border-radius: 4px; }
+.step { background: #fff; border-radius: 6px; padding: 14px 18px; margin: 14px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.code { background: #1e1e2e; color: #cdd6f4; padding: 8px 14px; border-radius: 4px; font-family: 'Cascadia Code', monospace; font-size: 13px; white-space: pre-wrap; }
+.code-del { color: #f38ba8; }
+.code-add { color: #a6e3a1; }
+table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+th { background: #16213e; color: white; }
+tr:nth-child(even) { background: #f9f9f9; }
+.filepath { font-family: 'Cascadia Code', monospace; background: #e0e0e0; padding: 2px 6px; border-radius: 3px; font-size: 13px; }
+pre { background: #1e1e2e; color: #cdd6f4; padding: 8px 14px; border-radius: 4px; font-family: 'Cascadia Code', monospace; font-size: 13px; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+
+<h1>Решено — ремонт блока загрузки статусов документов</h1>
+
+<div class="done">
+<strong>Статус:</strong> ✅ Задача решена<br>
+<strong>Дата:</strong> 2026-06-03<br>
+<strong>Описание:</strong> Справочник <code>CG_Online_СтатусыДокументовСервисов</code> теперь заполняется при нажатии кнопки "Создать статусы". Загрузка заказов Ozon работает.
+</div>
+
+<h2>Список действий</h2>
+
+<h3>Действие 1: Анализ причины пустого справочника</h3>
+
+<div class="step">
+<p><strong>Проблема:</strong> Кнопка "Создать статусы" в справочнике <code>CG_Online_СтатусыДокументовСервисов</code> не создаёт элементы. Справочник остаётся пустым. Без элемента <code>ТипСтатуса = Ошибка</code> запрос <code>СтатусОшибка</code> в <code>ДозаполнитьЗаказыКлиентовСервисов</code> (строка 3227–3234) возвращает 0 строк → <code>Result[8] = ЗаказыКСозданию</code> пуст → заказы не загружаются.</p>
+
+<p><strong>Сравнение:</strong> Проведён анализ двух процессов — заполнения <code>СтатусыМодерацииТоваровСервисов</code> (работает) и <code>СтатусыДокументовСервисов</code> (не работает).</p>
+
+<table>
+<tr><th>Аспект</th><th>СтатусыМодерации (✅)</th><th>СтатусыДокументов (❌)</th></tr>
+<tr><td>Структура запроса</td><td>Простой LEFT JOIN</td><td>Пакет из 3 частей + ИТОГИ ПО</td></tr>
+<tr><td>LEFT JOIN условие</td><td><code>ON Идентификатор = Идентификатор</code></td><td>Перекрёстное: <code>ON input.Ид = existing.ИдСубстатуса</code></td></tr>
+<tr><td>Проверка NULL</td><td><code>ТаблицаСтатусы.Наименование</code> (входные данные)</td><td><code>СтатусыДокументовСервисов.Наименование</code> (<strong>временная таблица!</strong>)</td></tr>
+<tr><td>Поведение при пустом справочнике</td><td>Строки проходят фильтр</td><td>Все строки отсекаются</td></tr>
+</table>
+</div>
+
+<h3>Действие 2: Исправление WHERE (строка 601)</h3>
+
+<div class="step">
+<p><strong>Файл:</strong> <span class="filepath">Catalogs\CG_Online_СтатусыДокументовСервисов\Ext\ManagerModule.bsl</span></p>
+<p><strong>Метод:</strong> <code>СтатусыДокументовСервисовПоНастройке</code> (строка 502)</p>
+<p><strong>Баг:</strong> WHERE в Part 3 запроса проверял поле <strong>временной таблицы</strong>, а не входных данных.</p>
+
+<pre>
+<span class="code-del">// Было (строка 601) — проверяет существующий справочник:</span>
+И НЕ СтатусыДокументовСервисов.Наименование ЕСТЬ NULL
+
+<span class="code-add">// Стало (строка 601) — проверяет входную таблицу:</span>
+И НЕ ТаблицаСтатусы.Заголовок ЕСТЬ NULL
+</pre>
+
+<p><strong>Механизм бага:</strong></p>
+<ol>
+<li>Part 2 запроса: <code>ПОМЕСТИТЬ СтатусыДокументовСервисов</code> — читает существующие данные справочника</li>
+<li>При пустом справочнике Part 2 возвращает <strong>0 строк</strong></li>
+<li>Part 3: <code>ТаблицаСтатусы LEFT JOIN СтатусыДокументовСервисов</code> — все поля правой таблицы = NULL</li>
+<li>WHERE: <code>НЕ NULL</code> = <strong>ЛОЖЬ</strong> → все строки отфильтрованы</li>
+<li>Цикл записи не выполняется ни разу → справочник остаётся пустым</li>
+</ol>
+</div>
+
+<h3>Действие 3: Запуск заполнения</h3>
+
+<div class="step">
+<p>После исправления нажать кнопку "Создать статусы" в панели администрирования УОТ:</p>
+<ul>
+<li><strong>Путь:</strong> Администрирование → CG_Online → Панель справочников интеграции с сервисами → Статусы документов сервисов → Создать статусы</li>
+<li><strong>Результат:</strong> Справочник заполняется элементами из макетов для всех сервисов</li>
+</ul>
+</div>
+
+<h2>Схема запроса (исправленная)</h2>
+
+<pre>
+Part 1: ПОМЕСТИТЬ ТаблицаСтатусы FROM &ТаблицаСтатусы          [входные данные из макета]
+Part 2: ПОМЕСТИТЬ СтатусыДокументовСервисов FROM справочник    [существующие элементы]
+  WHERE ПометкаУдаления = ЛОЖЬ
+
+Part 3 (первый SELECT):
+  FROM ТаблицаСтатусы
+    LEFT JOIN СтатусыДокументовСервисов (cross-reference)
+    LEFT JOIN СтатусыДокументовСервисовСУчетомСервиса (по сервису)
+  WHERE
+    НЕ ТаблицаСтатусы.Сервис ЕСТЬ NULL
+    И НЕ ТаблицаСтатусы.ХозяйственнаяОперация ЕСТЬ NULL
+    И НЕ ТаблицаСтатусы.ТипСтатуса ЕСТЬ NULL
+    И НЕ ТаблицаСтатусы.Заголовок ЕСТЬ NULL        ← ИСПРАВЛЕНО
+  UNION ALL
+  SELECT FROM СтатусыДокументовСервисов              [элементы на удаление]
+    LEFT JOIN ТаблицаСтатусы
+  WHERE ТаблицаСтатусы.Идентификатор ЕСТЬ NULL
+
+ИТОГИ ПО ХозяйственнаяОперация, ТипСтатуса, Ссылка, Идентификатор, ИдентификаторСубстатуса
+
+→ 5-уровневый цикл: → СоздатьЭлемент / ПолучитьОбъект
+  → Заполнение реквизитов и табчасти ДанныеСервисов
+  → СтатусДокументаОбъект.Записать()   [строка 746]
+</pre>
+
+<h2>Созданные отчёты</h2>
+
+<table>
+<tr><th>Файл</th><th>Описание</th></tr>
+<tr><td><code>CG_Online_ВзаимодействиеСКонфигурацией array5.html</code></td><td>Баг передачи массива параметров</td></tr>
+<tr><td><code>Анализ_Результат8_Дозаполнить.html</code></td><td>Трассировка Result[8] (ЗаказыКСозданию)</td></tr>
+<tr><td><code>Отчёт_ОшибкиЗагрузкиOzon_ШтрихкодыУпаковок.html</code></td><td>Guard для тзЗКСШтрихкодыУпаковок</td></tr>
+<tr><td><code>Отчёт_ИзмененияУОТ_ЗагрузкаЗаказов.html</code></td><td>Сводка всех 3 изменений</td></tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "defaultProject": "76",
+  "projects": [
+    {
+      "id": 1,
+      "name": "76",
+      "fullName": "1. 76",
+      "path": "D:\\1c\\EDT КОРП УОТ\\76",
+      "roadmapDir": "1-76",
+      "roadmapFile": "1-76/ДорожнаяКарта.md",
+      "commands": ["проект 76", "проект 1", "пр76", "пр1"]
+    }
+  ]
+}

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Анализ: v1/analytics/turnover/stocks — ЗагрузитьОборачиваемостьТовара</title>
+<style>
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; max-width: 1000px; margin: 40px auto; padding: 0 20px; color: #1a1a1a; line-height: 1.5; }
+  h1 { border-bottom: 2px solid #1565c0; padding-bottom: 10px; color: #1565c0; }
+  h2 { color: #1565c0; margin-top: 32px; }
+  .meta { background: #f5f5f5; padding: 12px 16px; border-radius: 6px; font-size: 0.9em; }
+  .code { background: #263238; color: #e2e8f0; padding: 12px 16px; border-radius: 6px; font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 0.85em; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 0.9em; }
+  th, td { border: 1px solid #bdbdbd; padding: 6px 10px; text-align: left; }
+  th { background: #1565c0; color: white; position: sticky; top: 0; }
+  tr:nth-child(even) { background: #f5f5f5; }
+  .issue { background: #ffebee; border-left: 4px solid #d32f2f; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .ok { background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .warn { background: #fff3e0; border-left: 4px solid #e65100; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .tg { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; font-weight: bold; }
+  .tg-green { background: #e8f5e9; color: #2e7d32; }
+  .tg-red { background: #ffebee; color: #c62828; }
+  .tg-amber { background: #fff3e0; color: #e65100; }
+  tr.used { background: #e8f5e9; }
+  tr.unused { background: #fffde7; }
+  tr.error-row { background: #ffebee; }
+  tr.partial { background: #fff3e0; }
+</style>
+</head>
+<body>
+
+<h1>Анализ: <code>v1/analytics/turnover/stocks</code></h1>
+
+<div class="meta">
+  <strong>Метод:</strong> <code>ЗагрузитьОборачиваемостьТовара()</code><br>
+  <strong>Модуль:</strong> <code>УОТ614/DataProcessors/CG_Online_Ozon_ИнтеграцияСОзон/Ext/ObjectModule.bsl</code><br>
+  <strong>Строка:</strong> 13765<br>
+  <strong>Задача ДК:</strong> 4.3 — Анализ /v1/analytics/turnover/stocks<br>
+  <strong>Проект:</strong> 1/76<br>
+  <strong>Дата:</strong> 2026-06-25
+</div>
+
+<h2>1. Полный маппинг полей JSON ответа → код</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Поле JSON</th>
+      <th>Тип</th>
+      <th>Использование в коде (ObjectModule.bsl)</th>
+      <th>Статус</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="5" style="background:#e8f5e9;font-weight:bold;">✅ Используются (8 полей)</td>
+    </tr>
+    <tr class="used">
+      <td>1</td>
+      <td><code>offer_id</code></td>
+      <td>string</td>
+      <td>стр.13824 → Артикул</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr class="used">
+      <td>2</td>
+      <td><code>sku</code></td>
+      <td>number</td>
+      <td>стр.13825 → ИдентификаторНоменклатурыСервиса</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr class="used">
+      <td>3</td>
+      <td><code>ads</code></td>
+      <td>number</td>
+      <td>стр.13834 → СреднесуточнаяПродажа</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr class="used">
+      <td>4</td>
+      <td><code>idc</code></td>
+      <td>number</td>
+      <td>стр.13836 → ДнейОстаткаХватит</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr class="used">
+      <td>5</td>
+      <td><code>current_stock</code></td>
+      <td>number</td>
+      <td>стр.13838 → ОстатокТовара</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr class="used">
+      <td>6</td>
+      <td><code>idc_grade</code></td>
+      <td>string</td>
+      <td>стр.13847 → УровеньОстаткаТовара() → УровеньОстатка</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr class="used">
+      <td>7</td>
+      <td><code>turnover</code></td>
+      <td>number</td>
+      <td>стр.13849 → ОборачиваемостьВДнях</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr class="used">
+      <td>8</td>
+      <td><code>turnover_grade</code></td>
+      <td>string</td>
+      <td>стр.13858 → УровеньОборачиваемостиТовара() → УровеньОборачиваемости</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr>
+      <td colspan="5" style="background:#ffebee;font-weight:bold;">❌ Ошибки маппинга (1 поле)</td>
+    </tr>
+    <tr class="error-row">
+      <td>9</td>
+      <td><code><b>name</b></code></td>
+      <td>string</td>
+      <td>стр.13831: <code>НаименованиеТовара = Соответствие(СтрокаТовар, "name")</code><br><b>Поле прочитано, но не записано в колонку Наименование ТЗ!</b></td>
+      <td><span class="tg tg-red">❌</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>2. Выявленные проблемы</h2>
+
+<div class="issue">
+  <strong>Проблема 1: Поле name прочитано, но не записано в таблицу</strong><br>
+  Строка 13831: <code>НаименованиеТовара = Соответствие(СтрокаТовар, "name");</code><br>
+  Переменная <code>НаименованиеТовара</code> нигде далее не присваивается в колонки <code>тзОборачиваемость</code>.<br>
+  <b>Результат:</b> Наименование товара всегда пустое. Поле JSON теряется.
+</div>
+
+<h2>3. Сводная статистика</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Категория</th>
+      <th>Количество</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Всего полей в JSON ответе</td>
+      <td><b>9</b></td>
+    </tr>
+    <tr>
+      <td>Используются</td>
+      <td><span class="tg tg-green">8</span></td>
+    </tr>
+    <tr>
+      <td>Ошибки маппинга</td>
+      <td><span class="tg tg-red">1</span> (name прочитан, не записан в ТЗ)</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+<p><em>Проект 1/76 — Дорожная карта. Отчёт привязан к задаче 4.3.</em></p>
+
+</body>
+</html>

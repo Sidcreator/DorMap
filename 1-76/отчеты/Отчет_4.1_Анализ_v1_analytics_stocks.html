@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Анализ: v1/analytics/stocks — ЗагрузитьОстаткиИПеремещенияТоваровПоСкладамИзСервиса</title>
+<style>
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; max-width: 1000px; margin: 40px auto; padding: 0 20px; color: #1a1a1a; line-height: 1.5; }
+  h1 { border-bottom: 2px solid #1565c0; padding-bottom: 10px; color: #1565c0; }
+  h2 { color: #1565c0; margin-top: 32px; }
+  .meta { background: #f5f5f5; padding: 12px 16px; border-radius: 6px; font-size: 0.9em; }
+  .code { background: #263238; color: #e2e8f0; padding: 12px 16px; border-radius: 6px; font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 0.85em; overflow-x: auto; }
+  .code .hl-red { border-left: 3px solid #ef5350; padding-left: 8px; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 0.9em; }
+  th, td { border: 1px solid #bdbdbd; padding: 6px 10px; text-align: left; }
+  th { background: #1565c0; color: white; position: sticky; top: 0; }
+  tr:nth-child(even) { background: #f5f5f5; }
+  .issue { background: #ffebee; border-left: 4px solid #d32f2f; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .ok { background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .warn { background: #fff3e0; border-left: 4px solid #e65100; padding: 12px 16px; margin: 12px 0; border-radius: 4px; }
+  .tg { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; font-weight: bold; }
+  .tg-green { background: #e8f5e9; color: #2e7d32; }
+  .tg-red { background: #ffebee; color: #c62828; }
+  .tg-amber { background: #fff3e0; color: #e65100; }
+  tr.used { background: #e8f5e9; }
+  tr.unused { background: #fffde7; }
+  tr.error-row { background: #ffebee; }
+</style>
+</head>
+<body>
+
+<h1>Анализ: <code>v1/analytics/stocks</code></h1>
+
+<div class="meta">
+  <strong>Метод:</strong> <code>ЗагрузитьОстаткиИПеремещенияТоваровПоСкладамИзСервиса()</code><br>
+  <strong>Модуль:</strong> <code>УОТ614/DataProcessors/CG_Online_Ozon_ИнтеграцияСОзон/Ext/ObjectModule.bsl</code><br>
+  <strong>Строка:</strong> 9232<br>
+  <strong>Задача ДК:</strong> 4.1 — Анализ /v1/analytics/stocks<br>
+  <strong>Проект:</strong> 1/76<br>
+  <strong>Дата:</strong> 2026-06-25
+</div>
+
+<h2>1. Полный маппинг полей JSON ответа → код</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Поле JSON</th>
+      <th>Тип</th>
+      <th>Использование в коде (ObjectModule.bsl)</th>
+      <th>Статус</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="5" style="background:#e8f5e9;font-weight:bold;">✅ Используются (13 полей)</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td><code>cluster_id</code></td>
+      <td>number</td>
+      <td>стр.9278 → ИдентификаторКластера</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><code>cluster_name</code></td>
+      <td>string</td>
+      <td>стр.9279 → НаименованиеКластера</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><code>warehouse_name</code></td>
+      <td>string</td>
+      <td>стр.9280 → НаименованиеСклада</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><code>warehouse_id</code></td>
+      <td>number</td>
+      <td>стр.9281 → ИдентификаторСклада</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td><code>macrolocal_cluster_id</code></td>
+      <td>number</td>
+      <td>стр.9282 → ИдентификаторМакрокластера</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td><code>offer_id</code></td>
+      <td>string</td>
+      <td>стр.9314 → Артикул</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td><code>sku</code></td>
+      <td>number</td>
+      <td>стр.9315 → ИдентификаторНоменклатурыСервиса</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td><code>name</code></td>
+      <td>string</td>
+      <td>стр.9316 → Наименование</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td><code>available_stock_count</code></td>
+      <td>number</td>
+      <td>стр.9317 → КоличествоДоступноеДляПродажи</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td><code>return_from_customer_stock_count</code></td>
+      <td>number</td>
+      <td>стр.9318 → КоличествоВПутиККлиенту</td>
+      <td><span class="tg tg-amber">⚠️</span> наим. вводит в заблуждение</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td><code>other_stock_count</code></td>
+      <td>number</td>
+      <td>стр.9319 — в сумме с valid → КоличествоГотовимКПродаже</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td><code>valid_stock_count</code></td>
+      <td>number</td>
+      <td>стр.9319 — в сумме с other → КоличествоГотовимКПродаже</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td><code>transit_stock_count</code></td>
+      <td>number</td>
+      <td>стр.9322 → КоличествоВБудущихПоставках</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr>
+      <td colspan="5" style="background:#ffebee;font-weight:bold;">❌ Ошибки маппинга (1 поле)</td>
+    </tr>
+    <tr style="background:#ffebee;">
+      <td>14</td>
+      <td><code><b>reserved_amount</b></code></td>
+      <td>—</td>
+      <td>стр.9324: <code>СтрокаОстатка["reserved_amount"]</code> → КоличествоВРезерве<br><b>Поля reserved_amount нет в JSON ответа!</b></td>
+      <td><span class="tg tg-red">❌</span></td>
+    </tr>
+    <tr>
+      <td colspan="5" style="background:#fff3e0;font-weight:bold;">⚠️ Закомментировано (1 поле)</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td><code>requested_stock_count</code></td>
+      <td>number</td>
+      <td>стр.9321 — закомментировано. Заменено на transit_stock_count</td>
+      <td><span class="tg tg-amber">⚠️</span></td>
+    </tr>
+    <tr>
+      <td colspan="5" style="background:#fffde7;font-weight:bold;">⏭️ Не используются в коде (14 полей)</td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td><code>ads</code></td>
+      <td>number</td>
+      <td>Среднесуточные продажи</td>
+      <td><span class="tg tg-amber">—</span></td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td><code>ads_cluster</code></td>
+      <td>number</td>
+      <td>Среднесуточные продажи по кластеру</td>
+      <td><span class="tg tg-amber">—</span></td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td><code>days_without_sales</code></td>
+      <td>number</td>
+      <td>Дней без продаж</td>
+      <td><span class="tg tg-amber">—</span></td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td><code>days_without_sales_cluster</code></td>
+      <td>number</td>
+      <td>Дней без продаж по кластеру</td>
+      <td><span class="tg tg-amber">—</span></td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td><code>excess_stock_count</code></td>
+      <td>number</td>
+      <td>Избыточный остаток</td>
+      <td><span class="tg tg-amber">—</span></td>
+    </tr>
+    <tr>
+      <td>21</td>
+      <td><code>expiring_stock_count</code></td>
+      <td>number</td>
+      <td>Остаток с истекающим сроком</td>
+      <td><span class="tg tg-amber">—</span></td>
+    </tr>
+    <tr>
+      <td>22</td>
+      <td><code>idc</code></td>
+      <td>number</td>
+      <td>На сколько дней хватит остатка</td>
+      <td><span class="tg tg-amber">—</span></td>
+    </tr>
+    <tr>
+      <td>23</td>
+      <td><code>idc_cluster</code></td>
+      <td>number</td>
+      <td>На сколько дней хватит по кластеру</td>
+      <td><span class="tg tg-amber">—</span></td>
+    </tr>
+    <tr>
+      <td>24</td>
+      <td><code>item_tags</code></td>
+      <td>array</td>
+      <td>Теги товара (ITEM_ATTRIBUTE_NONE...)</td>
+      <td><span class="tg tg-amber">—</span></td>
+    </tr>
+    <tr>
+      <td>25</td>
+      <td><code>return_to_seller_stock_count</code></td>
+      <td>number</td>
+      <td>Возврат продавцу</td>
+      <td><span class="tg tg-amber">—</span></td>
+    </tr>
+    <tr>
+      <td>26</td>
+      <td><code>stock_defect_stock_count</code></td>
+      <td>number</td>
+      <td>Брак на складе</td>
+      <td><span class="tg tg-amber">—</span></td>
+    </tr>
+    <tr>
+      <td>27</td>
+      <td><code>transit_defect_stock_count</code></td>
+      <td>number</td>
+      <td>Брак в пути</td>
+      <td><span class="tg tg-amber">—</span></td>
+    </tr>
+    <tr>
+      <td>28</td>
+      <td><code>turnover_grade</code></td>
+      <td>string</td>
+      <td>Уровень оборачиваемости</td>
+      <td><span class="tg tg-amber">—</span></td>
+    </tr>
+    <tr>
+      <td>29</td>
+      <td><code>turnover_grade_cluster</code></td>
+      <td>string</td>
+      <td>Уровень оборачиваемости по кластеру</td>
+      <td><span class="tg tg-amber">—</span></td>
+    </tr>
+    <tr>
+      <td>30</td>
+      <td><code>waiting_docs_stock_count</code></td>
+      <td>number</td>
+      <td>Ожидание документов</td>
+      <td><span class="tg tg-amber">—</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>2. Выявленные проблемы</h2>
+
+<div class="issue">
+  <strong>Проблема 1: Поле reserved_amount отсутствует в JSON ответа</strong><br>
+  Строка 9324: <code>НоваяСтрока.КоличествоВРезерве = СтрокаОстатка["reserved_amount"]</code><br>
+  В ответе API нет поля <code>reserved_amount</code>. Всё, что связано с резервами: <code>stock_defect_stock_count</code> (брак), <code>excess_stock_count</code> (избыток).<br>
+  <b>Результат:</b> КоличествоВРезерве всегда Неопределено/0.
+</div>
+
+<div class="warn">
+  <strong>Проблема 2: requested_stock_count закомментирован</strong><br>
+  Строка 9321 закомментирована. Вместо него на КоличествоВБудущихПоставках маппится <code>transit_stock_count</code> (товары в пути), хотя <code>requested_stock_count</code> — заявки на поставку.
+</div>
+
+<div class="issue">
+  <strong>Проблема 3: Отсутствуют поля фильтрации в запросе</strong><br>
+  Из 6 полей запроса передаётся только <code>skus</code>. Нет пагинации (<code>limit</code>/<code>offset</code>).
+</div>
+
+<h2>3. Сводная таблица маппинга остатков</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Категория остатка</th>
+      <th>Поле JSON</th>
+      <th>Реквизит ТЧ</th>
+      <th>Статус</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Доступно для продажи</td>
+      <td><code>available_stock_count</code></td>
+      <td>КоличествоДоступноеДляПродажи</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr>
+      <td>Готовим к продаже</td>
+      <td><code>other_stock_count + valid_stock_count</code></td>
+      <td>КоличествоГотовимКПродаже</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr>
+      <td>В пути (от клиента)</td>
+      <td><code>return_from_customer_stock_count</code></td>
+      <td>КоличествоВПутиККлиенту</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr>
+      <td>В будущих поставках</td>
+      <td><code>transit_stock_count</code></td>
+      <td>КоличествоВБудущихПоставках</td>
+      <td><span class="tg tg-green">✅</span></td>
+    </tr>
+    <tr style="background:#ffebee;">
+      <td>В резерве</td>
+      <td><code>reserved_amount</code> — <b>нет в API</b></td>
+      <td>КоличествоВРезерве</td>
+      <td><span class="tg tg-red">❌</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+<p><em>Проект 1/76 — Дорожная карта. Отчёт привязан к задаче 4.1.</em></p>
+
+</body>
+</html>

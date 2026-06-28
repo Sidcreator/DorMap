@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Структура вызовов: ЗагрузитьКатегорииТоваров — КОРПтест ↔ УОТКОРП</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; background: #f5f5f5; color: #333; }
+        h1 { color: #1a73e8; border-bottom: 3px solid #1a73e8; padding-bottom: 10px; }
+        h2 { color: #1a73e8; margin-top: 35px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+        h3 { color: #555; margin-top: 25px; }
+        .meta { color: #666; font-size: 14px; margin-bottom: 20px; background: #e8f0fe; padding: 10px 15px; border-radius: 6px; }
+        table { border-collapse: collapse; width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin: 15px 0; font-size: 14px; }
+        th { background: #1a73e8; color: white; padding: 10px 12px; text-align: left; }
+        td { padding: 8px 12px; border-bottom: 1px solid #e0e0e0; }
+        tr:hover { background: #f0f7ff; }
+        code { background: #f1f3f4; padding: 2px 6px; border-radius: 3px; font-family: 'Consolas', monospace; font-size: 13px; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 6px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+        pre .comment { color: #6a9955; }
+        pre .keyword { color: #569cd6; }
+        pre .string { color: #ce9178; }
+        pre .method { color: #dcdcaa; }
+        .flow { background: white; border-left: 4px solid #1a73e8; padding: 15px 20px; margin: 15px 0; border-radius: 0 6px 6px 0; font-family: 'Consolas', monospace; font-size: 13px; line-height: 2.2; }
+        .flow .arrow { color: #1a73e8; font-weight: bold; }
+        .flow .step { color: #333; }
+        .flow .corp-test { color: #2e7d32; }
+        .flow .uotkorp { color: #e65100; }
+        .flow .mock { color: #6a1b9a; }
+        .flow .module { color: #1565c0; font-weight: bold; }
+        .flow .method { color: #c62828; }
+        .section-card { background: white; border-radius: 8px; padding: 20px; margin: 15px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .tag { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; margin: 2px; font-weight: bold; }
+        .tag-corptest { background: #e8f5e9; color: #2e7d32; }
+        .tag-uotkorp { background: #fff3e0; color: #e65100; }
+        .tag-mock { background: #f3e5f5; color: #6a1b9a; }
+        .tag-api { background: #e3f2fd; color: #1565c0; }
+        .legend { display: flex; gap: 15px; flex-wrap: wrap; margin: 15px 0; }
+        .legend-item { display: flex; align-items: center; gap: 5px; font-size: 13px; }
+        .legend-dot { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .summary-card { background: white; border-radius: 8px; padding: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); text-align: center; }
+        .summary-card .icon { font-size: 28px; margin-bottom: 5px; }
+        .summary-card .title { font-weight: bold; }
+        .summary-card .desc { font-size: 12px; color: #666; }
+        .flow-box { background: white; border-radius: 8px; padding: 20px; margin: 15px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-family: 'Consolas', monospace; font-size: 13px; line-height: 2.2; }
+        .flow-line { padding: 2px 0; }
+        .flow-indent1 { margin-left: 20px; }
+        .flow-indent2 { margin-left: 40px; }
+        .flow-indent3 { margin-left: 60px; }
+        .flow-indent4 { margin-left: 80px; }
+        .flow-indent5 { margin-left: 100px; }
+        .flow-indent6 { margin-left: 120px; }
+        .flow-indent7 { margin-left: 140px; }
+        .flow-indent8 { margin-left: 160px; }
+        .arrow-symbol { color: #1a73e8; font-weight: bold; margin: 0 5px; }
+        .file-ref { color: #1565c0; font-size: 11px; }
+        .mod-corptest { color: #2e7d32; }
+        .mod-uotkorp { color: #e65100; }
+        .mod-mock { color: #6a1b9a; }
+        .mod-api { color: #1565c0; }
+        .call { font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<h1>Структура вызовов: ЗагрузитьКатегорииТоваров</h1>
+<div class="meta">
+    <strong>Дата:</strong> 2026-06-10 | <strong>Задача:</strong> 4.10 — Тест на реакцию кодов ошибок от мп в цикле<br>
+    <strong>Трассировка:</strong> Полный путь от теста КОРПтест до макета ответа Ozon через УОТКОРП
+</div>
+
+<div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:#2e7d32"></span> КОРПтест</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#e65100"></span> УОТКОРП</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#6a1b9a"></span> Mockito (КОРПтест)</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#1565c0"></span> API / Макет</div>
+</div>
+
+<h2>1. Сводка</h2>
+
+<div class="summary-grid">
+    <div class="summary-card">
+        <div class="icon">🧪</div>
+        <div class="title">Тест</div>
+        <div class="desc"><span class="tag tag-corptest">КОРПтест</span><br>ЮнитТестыКлиентСервер<br>:383</div>
+    </div>
+    <div class="summary-card">
+        <div class="icon">🔌</div>
+        <div class="title">Диспетчер</div>
+        <div class="desc"><span class="tag tag-corptest">КОРПтест</span><br>ВызовСервера<br>:613</div>
+    </div>
+    <div class="summary-card">
+        <div class="icon">📦</div>
+        <div class="title">Бизнес-логика</div>
+        <div class="desc"><span class="tag tag-uotkorp">УОТКОРП</span><br>НоменклатураСервисов<br>:1832</div>
+    </div>
+    <div class="summary-card">
+        <div class="icon">🌐</div>
+        <div class="title">HTTP-запрос</div>
+        <div class="desc"><span class="tag tag-uotkorp">УОТКОРП</span><br>ИнтеграцииССервисамиСервер</div>
+    </div>
+    <div class="summary-card">
+        <div class="icon">🎭</div>
+        <div class="title">Mockito</div>
+        <div class="desc"><span class="tag tag-mock">Mockito</span><br>Переопределяемый<br>:130</div>
+    </div>
+    <div class="summary-card">
+        <div class="icon">📄</div>
+        <div class="title">Макет</div>
+        <div class="desc"><span class="tag tag-api">Макет</span><br>JSON категорий<br>Краткий / Полный</div>
+    </div>
+</div>
+
+<h2>2. Полная цепочка вызовов</h2>
+
+<div class="flow-box">
+
+<div class="flow-line"><span class="mod-corptest">КОРПтест</span> <span class="call">▶ 1.</span> CG_Online_UT_ИнтеграцииССервисами_ЮнитТестыКлиентСервер.ЗагрузитьКатегорииТоваров() <span class="file-ref">:383</span></div>
+<div class="flow-line flow-indent1"><span class="arrow-symbol">↓</span> Вызов серверного метода CG_Online_UT_ИнтеграцииССервисами_ВызовСервера.ЗагрузитьКатегорииТоваров()</div>
+<div class="flow-line flow-indent1"><span class="mod-corptest">КОРПтест</span> <span class="call">▶ 2.</span> CG_Online_UT_ИнтеграцииССервисами_ВызовСервера.ЗагрузитьКатегорииТоваров() <span class="file-ref">:613</span></div>
+<div class="flow-line flow-indent2"><span class="arrow-symbol">↓</span> Определение модуля УОТКОРП через CG_Online_UT_ОбщегоНазначения.ОбщийМодульМетода()</div>
+<div class="flow-line flow-indent2"><span class="call">МодульМетода =</span> CG_Online_UT_ОбщегоНазначения.ОбщийМодульМетода(<span class="string">"CG_Online_НоменклатураСервисов"</span>)</div>
+<div class="flow-line flow-indent2"><span class="arrow-symbol">↓</span> Вызов бизнес-логики УОТКОРП: CG_Online_НоменклатураСервисов.ЗагрузитьКатегорииТоваров()</div>
+<div class="flow-line flow-indent2"><span class="mod-uotkorp">УОТКОРП</span> <span class="call">▶ 3.</span> CG_Online_НоменклатураСервисов.ЗагрузитьКатегорииТоваров() <span class="file-ref">:1832</span></div>
+<div class="flow-line flow-indent3"><span class="arrow-symbol">↓</span> Цикл по всем НастройкиАвторизации сервиса Ozon</div>
+<div class="flow-line flow-indent3"><span class="mod-uotkorp">УОТКОРП</span> <span class="call">▶ 4.</span> CG_Online_НоменклатураСервисов.ЗагрузитьКатегорииТоваровПоНастройке() <span class="file-ref">:1782</span></div>
+<div class="flow-line flow-indent4"><span class="arrow-symbol">↓</span> Диспетчеризация: CG_Online_ИнтеграцииССервисамиСервер.ВыполнитьИнтеграционнуюФункцию()</div>
+<div class="flow-line flow-indent4"><span class="mod-uotkorp">УОТКОРП</span> <span class="call">▶ 5.</span> CG_Online_ИнтеграцииССервисамиСервер.ВыполнитьИнтеграционнуюФункцию(<span class="string">"ЗагрузитьКатегорииТоваров"</span>) <span class="file-ref">НоменклатураСервисов:1805</span></div>
+<div class="flow-line flow-indent5"><span class="arrow-symbol">↓</span> Определяет DataProcessor по типу сервиса (Ozon → CG_Online_Ozon_ИнтеграцияСОзон)</div>
+<div class="flow-line flow-indent5"><span class="mod-uotkorp">УОТКОРП</span> <span class="call">▶ 6.</span> CG_Online_Ozon_ИнтеграцияСОзон.ObjectModule.ЗагрузитьКатегорииТоваров() <span class="file-ref">ObjectModule:824</span></div>
+<div class="flow-line flow-indent6"><span class="arrow-symbol">↓</span> Присвоение метода API: Метод = <span class="string">"v1/description-category/tree"</span></div>
+<div class="flow-line flow-indent6"><span class="arrow-symbol">↓</span> Настройка коннектора: CG_Online_ИнтеграцииССервисамиСервер.НастройкиПодключенияAPI() → Структура Коннектор</div>
+<div class="flow-line flow-indent6"><span class="arrow-symbol">↓</span> Установка заголовков: ОсновныеЗаголовкиКоннектора(НастройкаАвторизации, Коннектор)</div>
+<div class="flow-line flow-indent6"><span class="mod-uotkorp">УОТКОРП</span> <span class="call">▶ 7.</span> CG_Online_ИнтеграцииССервисамиСервер.HTTPЗапрос(Коннектор) <span class="file-ref">ИнтеграцииССервисамиСервер</span></div>
+<div class="flow-line flow-indent7"><span class="arrow-symbol">↓</span> ➡➡➡ Перехват Mockito в КОРПтест ⬅⬅⬅</div>
+<div class="flow-line flow-indent7"><span class="mod-mock">КОРПтест</span> <span class="call">▶ 8.</span> CG_Online_UT_ИнтеграцииССервисамиПереопределяемый.HTTPЗапрос() <span class="file-ref">:130</span></div>
+<div class="flow-line flow-indent8"><span class="arrow-symbol">↓</span> Проверка сервиса: Коннектор.УчетнаяЗапись.Сервис = <span class="string">"Ozon"</span></div>
+<div class="flow-line flow-indent8"><span class="arrow-symbol">↓</span> Маршрутизация: Обработки.CG_Online_UT_Ozon_ИнтеграцияСОзон.ЭкранированиеЗапросаКСервису()</div>
+<div class="flow-line flow-indent8"><span class="mod-mock">КОРПтест</span> <span class="call">▶ 9.</span> CG_Online_UT_Ozon_ИнтеграцияСОзон.ManagerModule.ЭкранированиеЗапросаКСервису() <span class="file-ref">ManagerModule:35</span></div>
+<div class="flow-line flow-indent8"><span class="arrow-symbol">↓</span> Проверка метода: Коннектор.Метод = <span class="string">"v1/description-category/tree"</span></div>
+<div class="flow-line flow-indent8"><span class="arrow-symbol">↓</span> Вызов: CG_Online_UT_Ozon_ИнтеграцияСОзон.ManagerModule.ОтветЗагрузитьКатегорииТоваров()</div>
+<div class="flow-line flow-indent8"><span class="mod-mock">КОРПтест</span> <span class="call">▶ 10.</span> CG_Online_UT_Ozon_ИнтеграцияСОзон.ManagerModule.ОтветЗагрузитьКатегорииТоваров() <span class="file-ref">ManagerModule:344</span></div>
+<div class="flow-line flow-indent8"><span class="arrow-symbol">↓</span> Проверка режима: CG_Online_UT_ЗначениеНастроек.ПроводитьПолныеТесты()?</div>
+<div class="flow-line flow-indent8"><span class="mod-api">📄</span> Если Истина → загрузка из файла: <span class="string">"CG_Online_Ozon_JSON_ЗагрузитьКатегорииТоваров_Полный.JSON"</span> <span class="file-ref">:350</span></div>
+<div class="flow-line flow-indent8"><span class="mod-api">📄</span> Если Ложь → загрузка из макета: ПолучитьМакет(<span class="string">"CG_Online_Ozon_JSON_ЗагрузитьКатегорииТоваров_Краткий"</span>) <span class="file-ref">:356</span></div>
+<div class="flow-line flow-indent8"><span class="arrow-symbol">↓</span> Десериализация: Новый ЧтениеJSON → ЧтениеДанных.УстановитьСтроку() → ПрочитатьJSON() → Соответствие</div>
+<div class="flow-line flow-indent8"><span class="arrow-symbol">↩</span> Возврат: ДанныеЗапроса (Соответствие — результат JSON)</div>
+<div class="flow-line flow-indent7"><span class="arrow-symbol">↩</span> <span class="mod-mock">Возврат:</span> ДанныеЗапроса (Соответствие) в CG_Online_ИнтеграцииССервисамиСервер.HTTPЗапрос()</div>
+<div class="flow-line flow-indent6"><span class="arrow-symbol">↩</span> <span class="mod-uotkorp">Возврат:</span> Ответ (Соответствие) в CG_Online_Ozon_ИнтеграцияСОзон.ObjectModule.ЗагрузитьКатегорииТоваров()</div>
+<div class="flow-line flow-indent6"><span class="arrow-symbol">↓</span> Обработка ответа: Соответствие(Ответ, <span class="string">"result"</span>) → Данные (дерево категорий)</div>
+<div class="flow-line flow-indent6"><span class="arrow-symbol">↓</span> Загрузка: ЗагрузитьСтрокуДереваКатегории(НастройкаАвторизации, ТаблицыДанных.тзКатегории, Данные)</div>
+<div class="flow-line flow-indent5"><span class="arrow-symbol">↩</span> <span class="mod-uotkorp">Возврат:</span> Результат (Структура: Статус, Статусы, КраткоеПредставлениеОшибки, ...)</div>
+<div class="flow-line flow-indent4"><span class="arrow-symbol">↩</span> <span class="mod-uotkorp">Возврат:</span> Результат</div>
+<div class="flow-line flow-indent3"><span class="arrow-symbol">↩</span> <span class="mod-uotkorp">Возврат:</span> Результат</div>
+<div class="flow-line flow-indent2"><span class="arrow-symbol">↩</span> <span class="mod-corptest">Возврат:</span> Результат в CG_Online_UT_ИнтеграцииССервисами_ВызовСервера()</div>
+<div class="flow-line flow-indent1"><span class="arrow-symbol">↩</span> <span class="mod-corptest">Проверка:</span> ЮТест.ОжидаетЧто(Результат).Заполнено() — валидация структуры ответа</div>
+
+</div>
+
+<h2>3. Ключевые модули и строки</h2>
+
+<table>
+    <tr><th>#</th><th>Расширение</th><th>Модуль</th><th>Метод / Метка</th><th>Файл:Строка</th><th>Роль</th></tr>
+    <tr>
+        <td>1</td>
+        <td><span class="tag tag-corptest">КОРПтест</span></td>
+        <td><code>CG_Online_UT_ИнтеграцииССервисами_ЮнитТестыКлиентСервер</code></td>
+        <td><code>ЗагрузитьКатегорииТоваров()</code></td>
+        <td><code>Ext/Module.bsl:383</code></td>
+        <td>Регистрация и запуск теста</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td><span class="tag tag-corptest">КОРПтест</span></td>
+        <td><code>CG_Online_UT_ИнтеграцииССервисами_ВызовСервера</code></td>
+        <td><code>ЗагрузитьКатегорииТоваров()</code></td>
+        <td><code>Ext/Module.bsl:613</code></td>
+        <td>Серверная обёртка: получает модуль и вызывает</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td><span class="tag tag-uotkorp">УОТКОРП</span></td>
+        <td><code>CG_Online_НоменклатураСервисов</code></td>
+        <td><code>ЗагрузитьКатегорииТоваров()</code></td>
+        <td><code>Ext/Module.bsl:1832</code></td>
+        <td>Бизнес-логика: цикл по настройкам авторизации</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td><span class="tag tag-uotkorp">УОТКОРП</span></td>
+        <td><code>CG_Online_НоменклатураСервисов</code></td>
+        <td><code>ЗагрузитьКатегорииТоваровПоНастройке()</code></td>
+        <td><code>Ext/Module.bsl:1782</code></td>
+        <td>Подготовка параметров и вызов DP</td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td><span class="tag tag-uotkorp">УОТКОРП</span></td>
+        <td><code>CG_Online_ИнтеграцииССервисамиСервер</code></td>
+        <td><code>ВыполнитьИнтеграционнуюФункцию()</code></td>
+        <td>—</td>
+        <td>Диспетчеризация: определяет DP по сервису</td>
+    </tr>
+    <tr>
+        <td>6</td>
+        <td><span class="tag tag-uotkorp">УОТКОРП</span></td>
+        <td><code>CG_Online_Ozon_ИнтеграцияСОзон</code></td>
+        <td><code>ObjectModule.ЗагрузитьКатегорииТоваров()</code></td>
+        <td><code>Ext/ObjectModule.bsl:824</code></td>
+        <td>Реализация Ozon: метод v1/description-category/tree</td>
+    </tr>
+    <tr>
+        <td>7</td>
+        <td><span class="tag tag-uotkorp">УОТКОРП</span></td>
+        <td><code>CG_Online_ИнтеграцииССервисамиСервер</code></td>
+        <td><code>HTTPЗапрос()</code></td>
+        <td>—</td>
+        <td>HTTP-вызов (реальный → Mockito)</td>
+    </tr>
+    <tr>
+        <td>8</td>
+        <td><span class="tag tag-mock">Mockito</span></td>
+        <td><code>CG_Online_UT_ИнтеграцииССервисамиПереопределяемый</code></td>
+        <td><code>HTTPЗапрос()</code></td>
+        <td><code>Ext/Module.bsl:130</code></td>
+        <td>Маршрутизация по сервису: Ozon → DataProcessor</td>
+    </tr>
+    <tr>
+        <td>9</td>
+        <td><span class="tag tag-mock">КОРПтест</span></td>
+        <td><code>CG_Online_UT_Ozon_ИнтеграцияСОзон</code></td>
+        <td><code>ManagerModule.ЭкранированиеЗапросаКСервису()</code></td>
+        <td><code>Ext/ManagerModule.bsl:35</code></td>
+        <td>Диспетчер: v1/description-category/tree → ответ</td>
+    </tr>
+    <tr>
+        <td>10</td>
+        <td><span class="tag tag-mock">КОРПтест</span></td>
+        <td><code>CG_Online_UT_Ozon_ИнтеграцияСОзон</code></td>
+        <td><code>ManagerModule.ОтветЗагрузитьКатегорииТоваров()</code></td>
+        <td><code>Ext/ManagerModule.bsl:344</code></td>
+        <td>Чтение JSON: Полный (файл) или Краткий (макет)</td>
+    </tr>
+</table>
+
+<h2>4. Структура данных на каждом шаге</h2>
+
+<table>
+    <tr><th>Шаг</th><th>Тип данных</th><th>Содержимое</th></tr>
+    <tr>
+        <td>1-2</td>
+        <td>—</td>
+        <td>Нет параметров. Тест без данных.</td>
+    </tr>
+    <tr>
+        <td>3-4</td>
+        <td><code>Структура (ПараметрыСинхронизацииДанных)</code></td>
+        <td><code>НастройкаАвторизации, ВидНоменклатурыСервиса</code></td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td><code>Структура (ПараметрыФункции)</code></td>
+        <td><code>[ПараметрыСинхронизацииДанных, ТаблицыДанных, Результат]</code></td>
+    </tr>
+    <tr>
+        <td>6</td>
+        <td><code>Структура (Коннектор)</code></td>
+        <td><code>Метод = "v1/description-category/tree"</code>, <code>УчетнаяЗапись</code>, <code>Данные</code>, <code>Заголовки</code></td>
+    </tr>
+    <tr>
+        <td>7</td>
+        <td><code>HTTP-запрос / перехват</code></td>
+        <td>Коннектор → сериализация → передача</td>
+    </tr>
+    <tr>
+        <td>8</td>
+        <td><code>Структура (Коннектор)</code></td>
+        <td>Определение сервиса: <code>УчетнаяЗапись.Сервис = "Ozon"</code></td>
+    </tr>
+    <tr>
+        <td>9</td>
+        <td><code>Структура (Коннектор)</code></td>
+        <td>Определение метода: <code>Коннектор.Метод = "v1/description-category/tree"</code></td>
+    </tr>
+    <tr>
+        <td>10</td>
+        <td><code>Соответствие</code></td>
+        <td>JSON-ответ: <code>{"result": [...категории...]}</code></td>
+    </tr>
+</table>
+
+<h2>5. Код ключевых узлов</h2>
+
+<div class="section-card">
+<h3>Узел 1: ЮнитТестыКлиентСервер → регистрация и запуск</h3>
+<pre>
+<span class="comment">// Регистрация (ИсполняемыеСценарии, :44)</span>
+.ДобавитьСерверныйТест(<span class="string">"ЗагрузитьКатегорииТоваров"</span>, <span class="string">"Загрузить категории товаров"</span>, Сервер)
+
+<span class="comment">// Выполнение (:383)</span>
+Процедура ЗагрузитьКатегорииТоваров() Экспорт
+    CG_Online_UT_ИнтеграцииССервисами_ВызовСервера.ЗагрузитьКатегорииТоваров();
+КонецПроцедуры
+</pre>
+</div>
+
+<div class="section-card">
+<h3>Узел 2: ВызовСервера → серверная обёртка</h3>
+<pre>
+<span class="comment">// :613</span>
+Процедура ЗагрузитьКатегорииТоваров() Экспорт
+    МодульМетода = CG_Online_UT_ОбщегоНазначения.ОбщийМодульМетода(<span class="string">"CG_Online_НоменклатураСервисов"</span>);
+    Если МодульМетода &lt;&gt; Неопределено Тогда
+        МодульМетода.ЗагрузитьКатегорииТоваров();
+    КонецЕсли;
+КонецПроцедуры
+</pre>
+</div>
+
+<div class="section-card">
+<h3>Узел 6: ObjectModule Ozon → формирование запроса</h3>
+<pre>
+<span class="comment">// ObjectModule.bsl:824</span>
+Функция ЗагрузитьКатегорииТоваров(ПараметрыСинхронизацииДанных, ТаблицыДанных, Результат) Экспорт
+    Метод = <span class="string">"v1/description-category/tree"</span>;
+    Коннектор = CG_Online_ИнтеграцииССервисамиСервер.НастройкиПодключенияAPI(
+            ПараметрыСинхронизацииДанных, Метод);
+    ОсновныеЗаголовкиКоннектора(ПараметрыСинхронизацииДанных.НастройкаАвторизации, Коннектор);
+    Коннектор.Вставить(<span class="string">"Данные"</span>, Новый Структура);
+    <span class="comment">// ➡ HTTP-вызов (перехватывается Mockito)</span>
+    Ответ = CG_Online_ИнтеграцииССервисамиСервер.HTTPЗапрос(Коннектор);
+    ...
+КонецФункции
+</pre>
+</div>
+
+<div class="section-card">
+<h3>Узел 9-10: Экранирование → возврат макета</h3>
+<pre>
+<span class="comment">// ManagerModule.bsl:35 — диспетчеризация</span>
+ИначеЕсли Коннектор.Метод = <span class="string">"v1/description-category/tree"</span>
+    И Коннектор.УчетнаяЗапись.Режим &gt; 0 Тогда
+    ДанныеЗапроса = ОтветЗагрузитьКатегорииТоваров();
+
+<span class="comment">// ManagerModule.bsl:344 — чтение макета</span>
+Функция ОтветЗагрузитьКатегорииТоваров()
+    Если CG_Online_UT_ЗначениеНастроек.ПроводитьПолныеТесты() Тогда
+        <span class="comment">// Полный вариант — из файла</span>
+        ИмяФайла = <span class="string">"CG_Online_Ozon_JSON_ЗагрузитьКатегорииТоваров_Полный.JSON"</span>;
+        ДанныеФайла = CG_Online_UT_ОбщегоНазначения.ПолучитьДанныеФайла(ИмяФайла);
+    Иначе
+        <span class="comment">// Краткий вариант — из макета DataProcessor</span>
+        ДанныеФайла = ПолучитьМакет(<span class="string">"CG_Online_Ozon_JSON_ЗагрузитьКатегорииТоваров_Краткий"</span>).ПолучитьТекст();
+    КонецЕсли;
+    ЧтениеДанных = Новый ЧтениеJSON;
+    ЧтениеДанных.УстановитьСтроку(ДанныеФайла);
+    ДанныеЗапроса = ПрочитатьJSON(ЧтениеДанных, Истина);
+    ЧтениеДанных.Закрыть();
+    Возврат ДанныеЗапроса;
+КонецФункции
+</pre>
+</div>
+
+<h2>6. Макеты ответа</h2>
+
+<table>
+    <tr><th>Макет</th><th>Тип</th><th>Расположение</th><th>Условие</th></tr>
+    <tr>
+        <td><code>CG_Online_Ozon_JSON_ЗагрузитьКатегорииТоваров_Краткий</code></td>
+        <td><span class="tag tag-api">Templates DP</span></td>
+        <td><code>КОРПтест/.../Templates/</code></td>
+        <td>По умолчанию</td>
+    </tr>
+    <tr>
+        <td><code>CG_Online_Ozon_JSON_ЗагрузитьКатегорииТоваров_Полный.JSON</code></td>
+        <td><span class="tag tag-api">Файл</span></td>
+        <td>Каталог макетов (константа <code>АдресКаталогаМакетов</code>)</td>
+        <td>Если <code>ПроводитьПолныеТесты()=Истина</code></td>
+    </tr>
+</table>
+
+</body>
+</html>

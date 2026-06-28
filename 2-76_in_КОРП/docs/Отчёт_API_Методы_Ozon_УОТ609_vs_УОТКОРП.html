@@ -1,0 +1,222 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Сводная таблица API-методов Ozon: УОТ609 vs УОТ614 vs УОТКОРП</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        h1 { color: #333; border-bottom: 2px solid #4a90d9; padding-bottom: 10px; }
+        h2 { color: #4a90d9; margin-top: 30px; }
+        .meta { color: #666; font-size: 14px; margin-bottom: 20px; }
+        table { border-collapse: collapse; width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-size: 12px; }
+        th { background: #4a90d9; color: white; padding: 6px 8px; text-align: center; position: sticky; top: 0; }
+        th:first-child, td:first-child { text-align: center; width: 30px; }
+        td { padding: 5px 8px; border-bottom: 1px solid #e0e0e0; }
+        tr:hover { background: #f0f7ff; }
+        .mono { font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; }
+        .center { text-align: center; }
+        .st-match { background: #e8f5e9; }
+        .st-moved { background: #e3f2fd; }
+        .st-absent { background: #ffebee; }
+        .st-diff { background: #fff8e1; }
+        .st-inactive { background: #f5f5f5; color: #999; }
+        .st-removed { background: #fce4ec; color: #999; }
+        .mock-yes { color: #2e7d32; font-weight: bold; }
+        .mock-no { color: #c62828; font-weight: bold; }
+        .mock-partial { color: #e65100; font-weight: bold; }
+        .mock-na { color: #999; }
+        .version-note { font-size: 10px; color: #888; font-style: italic; }
+        .summary { display: flex; flex-wrap: wrap; gap: 15px; margin: 20px 0; }
+        .summary-card { background: white; border-radius: 8px; padding: 15px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); min-width: 140px; }
+        .summary-card .num { font-size: 28px; font-weight: bold; }
+        .summary-card .lbl { font-size: 13px; color: #666; }
+        .card-green .num { color: #4caf50; }
+        .card-blue .num { color: #2196f3; }
+        .card-red .num { color: #f44336; }
+        .card-yellow .num { color: #ff9800; }
+        .card-gray .num { color: #999; }
+        .card-total .num { color: #333; }
+        .legend { margin: 15px 0; font-size: 13px; color: #555; }
+        .legend span { margin-right: 20px; }
+        .filters { margin: 15px 0; display: flex; gap: 8px; flex-wrap: wrap; }
+        .filters button { padding: 6px 14px; border: 1px solid #ccc; border-radius: 4px; background: white; cursor: pointer; font-size: 13px; }
+        .filters button:hover { background: #e3f2fd; }
+        .filters button.active { background: #4a90d9; color: white; border-color: #4a90d9; }
+        .footnote { font-size: 12px; color: #888; margin-top: 20px; border-top: 1px solid #ddd; padding-top: 10px; }
+    </style>
+</head>
+<body>
+
+<h1>Сводная таблица API-методов Ozon: УОТ609 vs УОТ614 vs УОТКОРП</h1>
+<div class="meta">
+    Дата: 2026-06-18 | 59 уникальных API-эндпоинтов | 13 колонок<br>
+    Источник: Реальный код ObjectModule.bsl (УОТ614) + CommonModule.bsl / ObjectModule.bsl (УОТКОРП)<br>
+    <strong>Актуализация 2026-06-18 (анализ тестов 76тест / КОРПтест):</strong> 76тест +1 эндпоинт (v1/supply-order/details, всего 26), КОРПтест +3 эндпоинта (v1/supply-order/bundle, v1/supply-order/details, v3/supply-order/list, всего 19)
+</div>
+
+<div class="legend">
+    <span>✅ Совпадает</span>
+    <span>🔵 Перенесено</span>
+    <span>💤 Неактивен (закомментирован)</span>
+    <span>⚠️ Версии расходятся</span>
+    <span>— Перенос не требуется</span>
+</div>
+
+<div class="summary">
+    <div class="summary-card card-total"><div class="num">59</div><div class="lbl">Всего эндпоинтов</div></div>
+    <div class="summary-card card-green"><div class="num">48</div><div class="lbl">✅ Совпадает (81%)</div></div>
+    <div class="summary-card card-blue"><div class="num">5</div><div class="lbl">🔵 Перенесено (8%)</div></div>
+    <div class="summary-card card-gray"><div class="num">4</div><div class="lbl">💤 Неактивен (7%)</div></div>
+    <div class="summary-card card-yellow"><div class="num">2</div><div class="lbl">⚠️ Версии (3%)</div></div>
+</div>
+
+<div class="filters">
+    <button class="active" onclick="filterTable('all')">Все (59)</button>
+    <button onclick="filterTable('match')">✅ Совпадает (48)</button>
+    <button onclick="filterTable('moved')">🔵 Перенесено (5)</button>
+    <button onclick="filterTable('inactive')">💤 Неактивен (4)</button>
+    <button onclick="filterTable('diff')">⚠️ Версии (2)</button>
+</div>
+
+<table id="mainTable">
+<thead>
+<tr>
+    <th>#</th>
+    <th>API-эндпоинт</th>
+    <th>Направление</th>
+    <th>УОТ609</th>
+    <th>УОТ614</th>
+    <th>УОТКОРП</th>
+    <th>Статус</th>
+    <th>CM</th>
+    <th>OM</th>
+    <th>КОРПтест</th>
+    <th>76тест</th>
+    <th>Макет КОРП = 76</th>
+</tr>
+</thead>
+<tbody>
+<tr class="st-match"><td>1</td><td class="mono">v1/analytics/stocks</td><td>Аналитика</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>2</td><td class="mono">v1/analytics/turnover/stocks</td><td>Аналитика</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>3</td><td class="mono">v1/cluster/list</td><td>Кластеры</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>4</td><td class="mono">v1/description-category/attribute</td><td>Товары</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center mock-yes">✅ да</td></tr>
+<tr class="st-match"><td>5</td><td class="mono">v1/description-category/attribute/values</td><td>Товары</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center mock-yes">да</td></tr>
+<tr class="st-match"><td>6</td><td class="mono">v1/description-category/attribute/values/search</td><td>Товары</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>7</td><td class="mono">v1/description-category/tree</td><td>Товары</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center mock-partial">частично</td></tr>
+<tr class="st-diff"><td>8</td><td class="mono">v1/draft/crossdock/create</td><td>Поставки FBO</td><td class="center">✅</td><td class="center">✅</td><td class="center">⚠️ закомм.</td><td>⚠️ Версии</td><td class="center">✅(комм)</td><td class="center">❌(комм)</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-moved"><td>9</td><td class="mono">v1/draft/direct/create</td><td>Поставки FBO</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>🔵 Перенесено</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-moved"><td>10</td><td class="mono">v1/draft/supply/create</td><td>Поставки FBO</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>🔵 Перенесено</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>11</td><td class="mono">v1/draft/supply/create/status</td><td>Поставки FBO</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center">✅</td><td class="center mock-no">нет</td></tr>
+<tr class="st-match"><td>12</td><td class="mono">v1/draft/timeslot/info</td><td>Поставки FBO</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center">✅</td><td class="center mock-no">нет</td></tr>
+<tr class="st-moved"><td>13</td><td class="mono">v1/finance/products/buyout</td><td>Финансы</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>🔵 Перенесено</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>14</td><td class="mono">v1/posting/fbs/package-label/get</td><td>Заказы FBS</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>15</td><td class="mono">v1/product/import/info</td><td>Товары</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>16</td><td class="mono">v1/product/import/prices</td><td>Товары</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>17</td><td class="mono">v1/product/info/stocks-by-warehouse/fbs</td><td>Остатки</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-moved"><td>18</td><td class="mono">v1/removal/from-stock/list</td><td>Вывоз</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>🔵 Перенесено</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-inactive"><td>19</td><td class="mono">v1/removal/from-supply/list</td><td>Вывоз</td><td class="center">💤 комм.</td><td class="center">💤 комм.</td><td class="center">💤 комм.</td><td>💤 Неактивен</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-inactive"><td>20</td><td class="mono">v1/report/products/movement/create</td><td>Отчёты</td><td class="center">💤 комм.</td><td class="center">💤 комм.</td><td class="center">💤 комм.</td><td>💤 Неактивен</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>21</td><td class="mono">v1/returns/list</td><td>Возвраты</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center mock-yes">✅ да</td></tr>
+<tr class="st-match"><td>22</td><td class="mono">v1/supplier/available_warehouses</td><td>Склады</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center mock-no">нет</td></tr>
+<tr class="st-inactive"><td>23</td><td class="mono">v1/supplier/orders/</td><td>Поставки FBO</td><td class="center">💤 комм.</td><td class="center">💤 комм.</td><td class="center">💤 комм.</td><td>💤 Неактивен</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-inactive"><td>24</td><td class="mono">v1/supplier/waybill_acceptance_results/</td><td>Поставки FBO</td><td class="center">💤 комм.</td><td class="center">💤 комм.</td><td class="center">💤 комм.</td><td>💤 Неактивен</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>25</td><td class="mono">v1/supply-order/bundle</td><td>Поставки FBO</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">❌</td><td class="center">✅</td><td class="center">✅</td><td class="center mock-yes">✅ да</td></tr>
+<tr class="st-match"><td>26</td><td class="mono">v1/supply-order/details</td><td>Поставки FBO</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">❌</td><td class="center">✅</td><td class="center">✅</td><td class="center mock-yes">✅ да</td></tr>
+<tr class="st-match"><td>27</td><td class="mono">v1/supply-order/pass/create</td><td>Поставки FBO</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-moved"><td>28</td><td class="mono">v1/supply-order/status/counter</td><td>Поставки FBO</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>🔵 Перенесено</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center">✅</td><td class="center mock-no">нет</td></tr>
+<tr class="st-moved"><td>29</td><td class="mono">v1/warehouse/fbo/list</td><td>Склады FBO</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>🔵 Перенесено</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>30</td><td class="mono">v2/draft/create/info</td><td>Поставки FBO</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center">✅(v1)</td><td class="center mock-no">нет</td></tr>
+<tr class="st-match"><td>31</td><td class="mono">v2/fbs/posting/tracking-number/set</td><td>Заказы FBS</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>32</td><td class="mono">v2/finance/realization</td><td>Финансы</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center mock-no">нет</td></tr>
+<tr class="st-match"><td>33</td><td class="mono">v2/posting/fbo/list</td><td>Заказы FBO</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center mock-yes">да</td></tr>
+<tr class="st-match"><td>34</td><td class="mono">v2/posting/fbs/act/create</td><td>Заказы FBS</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>35</td><td class="mono">v2/posting/fbs/act/get-barcode</td><td>Заказы FBS</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>36</td><td class="mono">v2/posting/fbs/act/get-pdf</td><td>Заказы FBS</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>37</td><td class="mono">v2/posting/fbs/act/get-postings</td><td>Заказы FBS</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>38</td><td class="mono">v2/posting/fbs/package-label</td><td>Заказы FBS</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center mock-no">нет</td></tr>
+<tr class="st-match"><td>39</td><td class="mono">v2/posting/fbs/package-label/create</td><td>Заказы FBS</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>40</td><td class="mono">v2/products/stocks</td><td>Остатки</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">✅</td><td class="center mock-no">нет</td></tr>
+<tr class="st-match"><td>41</td><td class="mono">api/v2/stocks</td><td>Остатки</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>42</td><td class="mono">v2/supply-order/get</td><td>Поставки FBO</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-no">нет</td></tr>
+<tr class="st-match"><td>43</td><td class="mono">v2/warehouse/list</td><td>Склады</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center mock-no">нет</td></tr>
+<tr class="st-match"><td>44</td><td class="mono">v3/finance/transaction/list</td><td>Финансы</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>45</td><td class="mono">v3/posting/fbs/list</td><td>Заказы FBS</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center mock-partial">частично</td></tr>
+<tr class="st-match"><td>46</td><td class="mono">v3/posting/fbs/ship</td><td>Заказы FBS</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>47</td><td class="mono">v3/product/import</td><td>Товары</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center mock-no">нет</td></tr>
+<tr class="st-match"><td>48</td><td class="mono">v3/product/info/list</td><td>Товары</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center mock-yes">да</td></tr>
+<tr class="st-match"><td>49</td><td class="mono">v3/product/list</td><td>Товары</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center mock-yes">да</td></tr>
+<tr class="st-match"><td>50</td><td class="mono">v3/returns/company/fbo</td><td>Возвраты FBO</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>51</td><td class="mono">v3/supply-order/get</td><td>Поставки FBO</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center">✅</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>52</td><td class="mono">v3/supply-order/list</td><td>Поставки FBO</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">❌</td><td class="center">✅</td><td class="center">✅</td><td class="center mock-yes">✅ да</td></tr>
+<tr class="st-diff"><td>53</td><td class="mono">v4/posting/fbs/list</td><td>Заказы FBS</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌ (v3)</td><td>⚠️ Версии</td><td class="center">❌</td><td class="center">❌</td><td class="center">❌</td><td class="center">✅</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>54</td><td class="mono">v4/posting/fbs/ship</td><td>Заказы FBS</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>55</td><td class="mono">v4/product/info/attributes</td><td>Товары</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>56</td><td class="mono">v4/product/info/stocks</td><td>Остатки</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td class="center mock-no">нет</td></tr>
+<tr class="st-match"><td>57</td><td class="mono">v5/product/info/prices</td><td>Товары</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+<tr class="st-match"><td>58</td><td class="mono">v6/fbs/posting/product/exemplar/create-or-get</td><td>Заказы FBS</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅(v5)</td><td class="center">✅</td><td class="center mock-no">нет</td></tr>
+<tr class="st-match"><td>59</td><td class="mono">v6/fbs/posting/product/exemplar/set</td><td>Заказы FBS</td><td class="center">✅</td><td class="center">✅</td><td class="center">✅</td><td>Совпадает</td><td class="center">✅</td><td class="center">✅</td><td class="center">❌</td><td class="center">❌</td><td class="center mock-na">—</td></tr>
+</tbody>
+</table>
+
+<h2>Покрытие тестами</h2>
+<table>
+<tr><th>Расширение</th><th>Покрыто</th><th>%</th><th>Примечание</th></tr>
+<tr><td>76тест</td><td class="center">26 из 59</td><td class="center">44%</td><td>Поставки FBO (supply-order/*, draft/*), v6 exemplar, v2/products/stocks, v1/supply-order/details</td></tr>
+<tr><td>КОРПтест</td><td class="center">19 из 59</td><td class="center">32%</td><td>Добавлены v1/supply-order/bundle, v1/supply-order/details, v3/supply-order/list; по-прежнему нет поставок FBO (draft/*, warehouse/fbo); v5 exemplar</td></tr>
+</table>
+<div class="version-note">Примечание: 76тест использует v1/draft/create/info (вместо v2), КОРПтест использует v5 exemplar (вместо v6) — несоответствие версий в тестах</div>
+
+<h2>💤 4 неактивных эндпоинта (закомментированы во всех версиях)</h2>
+<table>
+<tr><th>#</th><th>API-эндпоинт</th><th>Направление</th><th>УОТ609</th><th>УОТ614</th><th>УОТКОРП</th></tr>
+<tr><td>1</td><td class="mono">v1/removal/from-supply/list</td><td>Вывоз товаров</td><td class="center">💤 комм.</td><td class="center">💤 комм.</td><td class="center">💤 комм.</td></tr>
+<tr><td>2</td><td class="mono">v1/report/products/movement/create</td><td>Отчёты</td><td class="center">💤 комм.</td><td class="center">💤 комм.</td><td class="center">💤 комм.</td></tr>
+<tr><td>3</td><td class="mono">v1/supplier/orders/</td><td>Поставки FBO</td><td class="center">💤 комм.</td><td class="center">💤 комм.</td><td class="center">💤 комм.</td></tr>
+<tr><td>4</td><td class="mono">v1/supplier/waybill_acceptance_results/</td><td>Поставки FBO</td><td class="center">💤 комм.</td><td class="center">💤 комм.</td><td class="center">💤 комм.</td></tr>
+</table>
+
+<h2>Исправления относительно отчёта от 2026-05-28</h2>
+<table>
+<tr><th>#</th><th>Эндпоинт</th><th>Было</th><th>Стало</th><th>Пояснение</th></tr>
+<tr><td>42</td><td class="mono">v2/product/import</td><td>⚠️ Разные версии</td><td>❌ Удалён</td><td>Не существует в коде ни одной версии</td></tr>
+<tr><td>43</td><td class="mono">v2/product/list</td><td>⚠️ Разные версии</td><td>❌ Удалён</td><td>Не существует в коде ни одной версии</td></tr>
+<tr><td>60</td><td class="mono">v5/fbs/posting/product/exemplar/create-or-get</td><td>⚠️ Разные версии</td><td>❌ Удалён</td><td>Используется только v6, v5 не существует в коде</td></tr>
+<tr><td>61</td><td class="mono">v5/fbs/posting/product/exemplar/set</td><td>⚠️ Разные версии</td><td>❌ Удалён</td><td>Используется только v6, v5 не существует в коде</td></tr>
+<tr><td>53</td><td class="mono">v3/product/list</td><td>⚠️ УОТКОРП: v2</td><td>✅ Совпадает (v3)</td><td>УОТКОРП CM + OM: v3, не v2</td></tr>
+<tr><td>51</td><td class="mono">v3/product/import</td><td>⚠️ УОТКОРП: v2</td><td>✅ Совпадает (v3)</td><td>УОТКОРП CM + OM: v3, не v2</td></tr>
+<tr><td>60→58</td><td class="mono">v6/fbs/posting/product/exemplar/create-or-get</td><td>⚠️ OM: v5</td><td>✅ Совпадает (v6)</td><td>УОТКОРП OM: v6, не v5</td></tr>
+<tr><td>61→59</td><td class="mono">v6/fbs/posting/product/exemplar/set</td><td>⚠️ OM: v5</td><td>✅ Совпадает (v6)</td><td>УОТКОРП OM: v6, не v5</td></tr>
+<tr><td>14</td><td class="mono">v1/finance/realization</td><td>⚠️ Разные версии</td><td>❌ Удалён</td><td>Нет в Ozon-коде, только v2/finance/realization</td></tr>
+<tr><td>34→32</td><td class="mono">v2/finance/realization</td><td>⚠️ УОТКОРП: v1</td><td>✅ Совпадает (v2)</td><td>УОТКОРП CM + OM: v2, не v1</td></tr>
+<tr><td>47→43</td><td class="mono">v2/warehouse/list</td><td>⚠️ УОТКОРП: v1</td><td>✅ Совпадает (v2)</td><td>УОТКОРП CM + OM: v2, не v1</td></tr>
+<tr><td>31</td><td class="mono">v1/warehouse/list</td><td>⚠️ Разные версии</td><td>❌ Удалён</td><td>Нет в Ozon-коде, только v2/warehouse/list</td></tr>
+</table>
+
+<script>
+function filterTable(type) {
+    var rows = document.querySelectorAll('#mainTable tbody tr');
+    var buttons = document.querySelectorAll('.filters button');
+    buttons.forEach(function(b) { b.classList.remove('active'); });
+    event.target.classList.add('active');
+    rows.forEach(function(row) {
+        if (type === 'all') { row.style.display = ''; }
+        else if (type === 'match') { row.style.display = row.classList.contains('st-match') ? '' : 'none'; }
+        else if (type === 'moved') { row.style.display = row.classList.contains('st-moved') ? '' : 'none'; }
+        else if (type === 'inactive') { row.style.display = row.classList.contains('st-inactive') ? '' : 'none'; }
+        else if (type === 'diff') { row.style.display = row.classList.contains('st-diff') ? '' : 'none'; }
+    });
+}
+</script>
+
+<div class="footnote">
+    <strong>Условные обозначения:</strong> CM — CommonModule, OM — ObjectModule.<br>
+    <strong>Методология колонки «Макет КОРП = 76»:</strong> сравнение содержимого Template.txt (fc /b) между КОРПтест и 76тест. Учитываются только макеты, существующие в обоих расширениях.<br>
+    <strong>v1/draft/crossdock/create</strong> — закомментирован в УОТКОРП (CM и OM), но активен в УОТ614.<br>
+    <strong>v4/posting/fbs/list</strong> — присутствует в УОТ614, отсутствует в УОТКОРП (использует v3).<br>
+    <strong>Примечание (актуализация 2026-06-18):</strong> 76тест +1 (v1/supply-order/details, всего 26), КОРПтест +3 (v1/supply-order/bundle, details, v3/supply-order/list, всего 19). 3 эндпоинта переквалифицированы из 🔵 Перенесено в ✅ Совпадает (v1/supply-order/bundle, details, v3/supply-order/list) — макеты появились в обоих тестовых расширениях.<br>
+    <strong>76тест</strong> мокает v1/draft/create/info (вместо v2), что не соответствует текущей версии API.<br>
+    <strong>КОРПтест</strong> мокает v5/fbs/posting/product/exemplar/create-or-get (вместо v6) — устаревшая версия.
+</div>
+
+</body>
+</html>

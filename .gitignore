@@ -1,13 +1,1 @@
-# Ignore everything except versioned plan files
-/*
-!/План_СистемаДорожныхКарт_v*.md
-!/Архив
-/Архив/*
-!/Архив/План_СистемаДорожныхКарт_v*.md
-!/0
-/0/*
-!/0/План_СистемаДорожныхКарт_v*.md
-
-# Keep .gitignore and README tracked
-!.gitignore
-!/README.md
+__pycache__/
